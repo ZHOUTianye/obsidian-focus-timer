@@ -18,7 +18,7 @@ jobs:
           zip -r "${{ github.event.repository.name }}.zip" \
             manifest.json \
             main.js \
-            style.css \
+            styles.css \
             data.json
 
       - name: Create GitHub Release
