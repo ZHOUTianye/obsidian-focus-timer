@@ -1,0 +1,30 @@
+name: Release Obsidian plugin
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create plugin zip
+        run: |
+          zip -r "${{ github.event.repository.name }}.zip" \
+            manifest.json \
+            main.js \
+            style.css \
+            data.json
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.event.repository.name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -1,0 +1,1219 @@
+/* ========= Focus Timer Plugin Styles ========= */
+
+/* 主容器 - 确保可以滚动 */
+.workspace-leaf-content[data-type="focus-timer-view"] {
+  height: 100%;
+  overflow: hidden; /* 父容器不滚动 */
+}
+
+.workspace-leaf-content[data-type="focus-timer-view"] .view-content {
+  padding: 20px;
+  background: var(--background-primary);
+  height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* 强制启用滚动：使用 !important 确保样式生效 */
+}
+
+/* 顶部计时器区域 */
+.focus-timer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+  position: relative;
+  margin-top: -10px; /* 圆环整体往上一些 */
+}
+
+
+/* 呼吸灯 */
+.focus-breathing-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  order: -1; /* 确保呼吸灯在左侧 */
+}
+
+.focus-breathing-light.focus-breathing-idle {
+  background-color: #4caf50; /* 绿色 */
+  /* 空闲时不呼吸，只显示静态颜色 */
+  opacity: 0.6;
+}
+
+.focus-breathing-light.focus-breathing-active {
+  background-color: #f44336; /* 红色 */
+  animation: breathe-red 2s ease-in-out infinite;
+}
+
+.focus-breathing-light.focus-breathing-rest {
+  background-color: #ff9800; /* 橙色 */
+  animation: breathe-orange 2s ease-in-out infinite;
+}
+
+/* 呼吸动画 - 绿色（空闲） */
+@keyframes breathe-green {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px 4px rgba(76, 175, 80, 0.6);
+  }
+}
+
+/* 呼吸动画 - 红色（专注中） */
+@keyframes breathe-red {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px 4px rgba(244, 67, 54, 0.6);
+  }
+}
+
+/* 呼吸动画 - 橙色（休息中） */
+@keyframes breathe-orange {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px 4px rgba(255, 152, 0, 0.6);
+  }
+}
+
+/* 状态文字容器 */
+.focus-status-text-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 状态文字 */
+.focus-status-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-normal);
+  white-space: nowrap;
+}
+
+/* 快捷Timer按钮 */
+.focus-quick-timer-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.focus-quick-timer-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--text-accent);
+}
+
+.focus-quick-timer-btn:active {
+  opacity: 0.7;
+}
+
+/* 圆环倒计时容器 */
+.focus-circle-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  width: 150px;
+  height: 150px;
+  max-width: 150px;
+  max-height: 150px;
+}
+
+/* 状态容器（状态文字和呼吸灯）- 位于圆环左上角 */
+.focus-status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  justify-content: flex-start; /* 靠左对齐 */
+  width: 100%;
+}
+
+.focus-circle-svg {
+  width: 150px;
+  height: 150px;
+  max-width: 150px;
+  max-height: 150px;
+  /* SVG circle默认从3点开始，通过transform rotate(-90)转到12点（上方） */
+  /* transform在SVG元素上通过属性设置，不在CSS中 */
+}
+
+.focus-progress-circle {
+  transition: stroke-dashoffset 0.3s ease;
+  stroke-dashoffset: var(--focus-circle-offset, 0);
+}
+
+/* SVG circle 元素也需要支持 CSS 变量 */
+.focus-circle-svg .focus-progress-circle {
+  stroke-dashoffset: var(--focus-circle-offset, 0);
+}
+
+.focus-time-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.focus-elapsed-time {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-normal);
+  line-height: 1.2;
+}
+
+.focus-time-wrapper {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.focus-time-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.focus-time-clickable:hover {
+  color: var(--text-accent);
+}
+
+.focus-time-editor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.focus-time-edit-boxes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px !important;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.focus-time-box {
+  display: inline-block;
+  min-width: 72px !important;
+  padding: 8px 12px !important;
+  font-size: 26px !important;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-secondary);
+  text-align: center;
+}
+
+.focus-time-box-fixed {
+  color: var(--text-muted);
+}
+
+.focus-time-box-input {
+  width: 72px !important;
+  min-width: 72px !important;
+  padding: 8px 12px !important;
+  font-size: 26px !important;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  box-sizing: border-box;
+}
+
+.focus-time-box-input:focus {
+  outline: none;
+  border-color: var(--text-accent);
+}
+
+.focus-overtime-label {
+  font-size: 13px;
+  color: var(--text-error, #f44336);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* 专注事项输入框容器 */
+.focus-note-input-container {
+  width: 100%;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.focus-note-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 16px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 400;
+  box-shadow: none;
+  transition: border-color 0.15s ease;
+}
+
+.focus-note-input:focus {
+  outline: none;
+  border-color: var(--text-accent);
+}
+
+.focus-note-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 按钮容器 */
+.focus-btn-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.focus-btn-container button {
+  padding: 10px 20px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: none;
+}
+
+.focus-btn-start {
+  flex: 1;
+  max-width: 200px;
+  background: var(--text-accent) !important;
+  color: var(--text-on-accent, #fff) !important;
+  border-color: var(--text-accent) !important;
+}
+
+.focus-btn-control {
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: none;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.focus-btn-control:hover {
+  background: var(--background-secondary-alt);
+}
+
+.focus-btn-primary {
+  flex: 1;
+  max-width: 150px;
+  background: var(--text-accent) !important;
+  color: var(--text-on-accent, #fff) !important;
+  border-color: var(--text-accent) !important;
+}
+
+.focus-btn-secondary {
+  flex: 1;
+  max-width: 150px;
+  background: var(--background-secondary) !important;
+}
+
+.focus-btn-container button:active {
+  opacity: 0.7;
+}
+
+/* 模式切换按钮（胶囊样式，放在开始按钮左侧） */
+.focus-mode-toggle-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 20px; /* 胶囊形状 */
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: none;
+  transition: all 0.15s ease;
+  margin-right: 12px; /* 与开始按钮的间距 */
+}
+
+.focus-mode-toggle-btn:hover {
+  background: var(--background-secondary-alt);
+}
+
+
+/* 视图切换容器 */
+.focus-view-toggle-container {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.focus-view-toggle-btn {
+  padding: 8px 16px !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-normal) !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: none !important;
+  margin: 0 !important;
+  outline: none !important;
+  position: relative !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  line-height: normal !important;
+  text-decoration: none !important;
+  text-align: left !important;
+  display: inline-block !important;
+  vertical-align: baseline !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+.focus-view-toggle-btn:hover {
+  background: transparent !important;
+  color: var(--text-normal) !important;
+}
+
+.focus-view-toggle-btn.focus-view-toggle-active {
+  color: var(--text-accent) !important;
+  border-bottom: 2px solid var(--text-accent) !important;
+  background: transparent !important;
+}
+
+.focus-view-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* 移除 overflow: hidden，允许内容自然流动 */
+}
+
+/* 统计卡片区域 */
+.focus-stats-section {
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+
+.focus-stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.focus-stats-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+/* 图表按钮和关闭按钮 - 使用加/减按钮的样式，使用important套用 */
+.focus-chart-btn,
+.focus-chart-close-btn {
+  min-width: 50px !important;
+  padding: 8px 16px !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-normal) !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: none !important;
+  margin-left: auto !important; /* 自动靠右 */
+}
+
+.focus-chart-btn:hover,
+.focus-chart-close-btn:hover {
+  background: transparent !important;
+  color: var(--text-normal) !important;
+}
+
+/* 图表按钮在切换容器中的样式 */
+.focus-view-toggle-container .focus-chart-btn {
+  margin-left: auto !important;
+}
+
+.focus-chart-close-btn {
+  float: right !important;
+  margin-bottom: 10px !important;
+}
+
+/* 统计卡片网格 - 2×2布局 */
+.focus-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* 统计卡片 */
+.focus-stat-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.focus-stat-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  letter-spacing: 0.2px;
+}
+
+.focus-stat-main-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 16px; /* 增加主值和比较值之间的间距 */
+}
+
+.focus-stat-main-value {
+  line-height: 1.2;
+  flex: 1;
+}
+
+.focus-stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.focus-stat-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-normal);
+}
+
+.focus-stat-comparison {
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.comparison-label {
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.comparison-positive .comparison-value {
+  color: var(--text-success, #4caf50);
+}
+
+.comparison-negative .comparison-value {
+  color: var(--text-error, #f44336);
+}
+
+.focus-stat-average {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.focus-stat-average-yearly {
+  margin-top: 12px;
+}
+
+/* 最近专注记录区域 */
+.focus-history-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.focus-history-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+  flex-shrink: 0;
+}
+
+
+/* 自动补全下拉列表 */
+.focus-autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 300px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.focus-autocomplete-item {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.focus-autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.focus-autocomplete-item:hover,
+.focus-autocomplete-item.focus-autocomplete-item-selected {
+  background: var(--background-modifier-hover);
+}
+
+.focus-history-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.focus-history-date-group {
+  margin-bottom: 16px;
+}
+
+.focus-history-date-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin-bottom: 8px;
+}
+
+.focus-history-item {
+  margin-bottom: 4px;
+  padding-left: 16px;
+}
+
+.focus-history-entry {
+  font-size: 13px;
+  color: var(--text-normal);
+  line-height: 1.6;
+}
+
+.focus-history-entry.status-completed {
+  color: var(--text-normal);
+}
+
+.focus-history-entry.status-abandoned {
+  color: var(--text-muted);
+}
+
+.focus-history-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* 图表模态框 */
+.focus-chart-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.focus-chart-content {
+  background: var(--background-primary);
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.focus-chart-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.focus-chart-section:last-child {
+  border-bottom: none;
+}
+
+.focus-chart-container {
+  position: relative;
+  margin-top: 10px;
+  /* 确保tooltip不会超出容器边界 */
+  overflow: visible;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.focus-chart-download-btn {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.focus-chart-download-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+.focus-line-chart {
+  /* 确保图表使用主题色 */
+  color: var(--text-accent) !important;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 状态栏样式 */
+.focus-timer-statusbar {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+  font-weight: 500;
+}
+
+.focus-timer-statusbar:hover {
+  background: var(--background-modifier-hover);
+}
+
+.focus-timer-statusbar.focus-timer-active {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+/* 紧凑模式：高度小于300px时隐藏统计和记录 */
+.focus-compact-mode .focus-stats-section,
+.focus-compact-mode .focus-history-section,
+.focus-compact-mode .focus-view-toggle-container {
+  display: none !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 400px) {
+  .focus-stats-grid,
+  .focus-code-stats-grid {
+    grid-template-columns: 1fr !important; /* 宽度<300px时单列布局（1×4） */
+  }
+}
+
+@media (max-width: 600px) {
+  .focus-stat-main-value {
+    font-size: 20px;
+  }
+  
+  .focus-btn-container {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .focus-btn-container button {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* 代码块渲染样式 */
+.focus-code-block {
+  padding: 20px;
+  background: var(--background-primary);
+  border-radius: 12px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.focus-code-stats-section {
+  margin-bottom: 32px;
+}
+
+.focus-code-stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.focus-code-stats-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+/* focus 代码块刷新按钮 */
+.focus-code-refresh-btn {
+  padding: 4px 8px;
+  min-width: 28px;
+  font-size: 16px;
+  line-height: 1;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.focus-code-refresh-btn:hover:not(:disabled) {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+  border-color: var(--background-modifier-border-hover);
+}
+
+.focus-code-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.focus-code-refresh-spin {
+  animation: focus-code-refresh-spin 0.6s ease-in-out;
+}
+
+@keyframes focus-code-refresh-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.focus-code-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* 确保代码块中的统计卡片样式生效 */
+.focus-code-block .focus-stat-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--background-secondary) !important;
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.focus-code-chart {
+  margin-top: 24px;
+}
+
+.focus-code-chart-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.focus-code-chart-canvas {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* 代码块中的历史记录样式 */
+.focus-code-history-section {
+  margin-top: 24px;
+}
+
+.focus-code-history-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.focus-code-history-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 当设置了高度时，history-content 可滚动 */
+.focus-code-block[style*="height"] .focus-code-history-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* 自定义滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--background-modifier-border) transparent;
+}
+
+.focus-code-block[style*="height"] .focus-code-history-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.focus-code-block[style*="height"] .focus-code-history-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.focus-code-block[style*="height"] .focus-code-history-content::-webkit-scrollbar-thumb {
+  background-color: var(--background-modifier-border);
+  border-radius: 3px;
+}
+
+.focus-code-block[style*="height"] .focus-code-history-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--background-modifier-border-hover);
+}
+
+.focus-code-history-item {
+  padding: 4px 12px;
+  /* 不带边框和背景 */
+  border: none;
+  background: transparent;
+}
+
+.focus-code-history-entry {
+  font-size: 14px;
+  color: var(--text-normal);
+}
+
+.focus-code-history-entry.status-completed {
+  color: var(--text-success, #4caf50);
+}
+
+.focus-code-history-entry.status-abandoned {
+  color: var(--text-error, #f44336);
+}
+
+.focus-code-history-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.focus-code-error {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-error, #f44336);
+  font-size: 14px;
+  font-weight: 500;
+  background: var(--background-secondary);
+  border: 1px solid var(--text-error, #f44336);
+  border-radius: 12px;
+}
+
+/* 图表悬浮提示样式 */
+.focus-chart-tooltip {
+  position: absolute;
+  background: var(--background-primary) !important;
+  border: 1px solid var(--background-modifier-border) !important;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-normal) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 1000;
+  min-width: 140px;
+  max-width: 250px;
+  word-wrap: break-word;
+  white-space: normal;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  /* 确保tooltip不会影响容器宽度 */
+  left: 0;
+  top: 0;
+  width: auto;
+}
+
+/* 最右侧5个数据点的tooltip样式 - 右对齐，避免挤压 */
+.focus-chart-tooltip-right {
+  transform: none !important;
+  /* 确保tooltip右边界不超出容器 */
+  max-width: calc(100% - 10px) !important;
+  /* 右对齐 */
+  right: auto !important;
+  left: auto !important;
+  /* 确保tooltip不会超出容器 */
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  box-sizing: border-box !important;
+}
+
+.focus-chart-tooltip div {
+  line-height: 1.5;
+  /* 防止单个div内的文本换行 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========= 新增：替换硬编码样式的 CSS 类 ========= */
+
+/* 确认对话框样式 */
+.focus-confirm-message {
+  margin-bottom: 1em;
+}
+
+.focus-confirm-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5em;
+}
+
+/* 编辑器显示/隐藏 */
+.focus-time-editor-hidden {
+  display: none;
+}
+
+.focus-time-display-hidden {
+  display: none;
+}
+
+/* 自动补全列表显示/隐藏 */
+.focus-autocomplete-list-hidden {
+  display: none;
+}
+
+/* 视图区域显示/隐藏 */
+.focus-section-hidden {
+  display: none;
+}
+
+/* 统计网格布局 */
+.focus-stats-grid-narrow {
+  grid-template-columns: 1fr;
+}
+
+/* 设置文本区域 */
+.focus-settings-textarea {
+  min-width: 300px;
+}
+
+/* 图表模态框样式 */
+.focus-chart-modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.focus-chart-modal-controls {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin: -10px 0 10px 0;
+  flex-wrap: wrap;
+}
+
+.focus-chart-modal-checkbox-label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-normal);
+  cursor: pointer;
+  user-select: none;
+}
+
+.focus-chart-section-title {
+  margin: 20px 0 10px 0;
+  font-size: 16px;
+}
+
+.focus-chart-download-btn-positioned {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  z-index: 10;
+}
+
+.focus-chart-error-message {
+  padding: 20px;
+  color: var(--text-error, #f44336);
+}
+
+.focus-chart-empty-message {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Canvas 样式 */
+.focus-line-chart-interactive {
+  cursor: pointer;
+}
+
+.focus-line-chart-static {
+  cursor: default;
+}
+
+/* Tooltip 样式 */
+.focus-chart-tooltip-hidden {
+  display: none;
+}
+
+.focus-chart-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.focus-chart-tooltip-line {
+  white-space: nowrap;
+}
+
+/* 代码块样式 */
+.focus-code-block-with-height {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.focus-code-stats-section-no-shrink {
+  flex-shrink: 0;
+}
+
+.focus-code-history-section-with-height {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.focus-code-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.focus-code-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.focus-code-history-content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ========= 动态样式：使用 CSS 变量 ========= */
+
+/* Canvas 尺寸 */
+.focus-line-chart {
+  width: var(--focus-canvas-width, 600px);
+  height: var(--focus-canvas-height, 200px);
+}
+
+/* Tooltip 位置 */
+.focus-chart-tooltip {
+  left: var(--focus-tooltip-left, 0);
+  top: var(--focus-tooltip-top, 0);
+}
+
+.focus-chart-tooltip-centered {
+  transform: translateX(-50%);
+}
+
+.focus-chart-tooltip-measuring {
+  visibility: hidden;
+  left: 0;
+  top: 0;
+  position: absolute;
+}
+
+/* 代码块高度 */
+.focus-code-block-with-height {
+  height: var(--focus-block-height);
+}
+
+/* 测试元素（用于获取计算后的颜色值） */
+.focus-test-element {
+  color: var(--text-accent);
+  position: absolute;
+  visibility: hidden;
+}

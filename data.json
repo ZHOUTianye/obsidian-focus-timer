@@ -1,0 +1,68 @@
+{
+  "state": {
+    "active": false,
+    "resting": false,
+    "start": "2026-01-29T01:23:01.155Z",
+    "end": "2026-01-29T01:48:01.155Z",
+    "plannedSec": 1500,
+    "mode": "countdown",
+    "note": ""
+  },
+  "sessions": [
+    {
+      "id": "2026-01-29T01:04:55.056Z",
+      "start": "2026-01-29T01:04:55.056Z",
+      "end": "2026-01-29T01:04:56.045Z",
+      "plannedSec": 1500,
+      "actualSec": 0,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T01:04:56.045Z"
+    },
+    {
+      "id": "2026-01-29T01:07:37.086Z",
+      "start": "2026-01-29T01:07:37.086Z",
+      "end": "2026-01-29T01:08:15.477Z",
+      "plannedSec": 1500,
+      "actualSec": 38,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T01:08:15.477Z"
+    },
+    {
+      "id": "2026-01-29T01:23:01.155Z",
+      "start": "2026-01-29T01:23:01.155Z",
+      "end": "2026-01-29T01:23:34.138Z",
+      "plannedSec": 1500,
+      "actualSec": 32,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-29T01:23:34.138Z"
+    }
+  ],
+  "settings": {
+    "autoContinue": false,
+    "defaultMode": "countdown",
+    "adjustStepMinutes": 5,
+    "defaultChartRange": "14天",
+    "defaultDurationMinutes": 25,
+    "quickTimer1": {
+      "name": "1",
+      "minutes": 25
+    },
+    "quickTimer2": {
+      "name": "",
+      "minutes": 25
+    },
+    "quickTimer3": {
+      "name": "",
+      "minutes": 25
+    },
+    "autoRest": false,
+    "defaultRestMinutes": 5,
+    "keyboardShortcuts": false,
+    "suggestTasks": [],
+    "codeBlockChartShowTime": true,
+    "codeBlockChartShowCount": true
+  }
+}
