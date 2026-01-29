@@ -10,7 +10,7 @@ function pickLang(supported, fallback = "en") {
   return hit ?? fallback;
 }
 
-const DATA_PATH = ".obsidian/plugins/obsidian-focus-timer/data.json";
+const DATA_PATH = ".obsidian/plugins/focus-timer/data.json";
 
 /**
  * 异步文件锁，保证对 data.json 的写入串行化，避免竞态条件。
@@ -3221,7 +3221,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     // 加载CSS样式文件
     try {
       // 方法1: 尝试使用vault adapter读取（适用于iCloud同步的vault）
-      const cssPath = ".obsidian/plugins/obsidian-focus-timer/style.css";
+      const cssPath = ".obsidian/plugins/focus-timer/styles.css";
       try {
         const cssContent = await this.app.vault.adapter.read(cssPath);
         const styleEl = document.createElement("style");
@@ -3234,7 +3234,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
         const path = require("path");
         // 尝试从vault根目录读取
         const vaultPath = this.app.vault.adapter.basePath;
-        const fullPath = path.join(vaultPath, ".obsidian", "plugins", "obsidian-focus-timer", "style.css");
+        const fullPath = path.join(vaultPath, ".obsidian", "plugins", "focus-timer", "styles.css");
         
         if (fs.existsSync(fullPath)) {
           const cssContent = fs.readFileSync(fullPath, "utf8");
