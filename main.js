@@ -12,48 +12,17 @@ function pickLang(supported, fallback = "en") {
 
 const DATA_PATH = ".obsidian/plugins/obsidian-focus-timer/data.json";
 
-/** 默认 data.json 模板（无 data.json 时创建，防止启动失败） */
-function getDefaultDataTemplate() {
-  return {
-    state: { active: false, resting: false },
-    sessions: [],
-    settings: {
-      autoContinue: false,
-      defaultMode: "countdown",
-      adjustStepMinutes: 5,
-      defaultChartRange: "14天",
-      defaultDurationMinutes: 25,
-      quickTimer1: { name: "", minutes: 25 },
-      quickTimer2: { name: "", minutes: 25 },
-      quickTimer3: { name: "", minutes: 25 },
-      autoRest: false,
-      defaultRestMinutes: 5,
-      keyboardShortcuts: false,
-      suggestTasks: [],
-      codeBlockChartShowTime: true,
-      codeBlockChartShowCount: true
-    }
-  };
-}
-
-async function ensureDataFileExists(app) {
-  await ensureJsonFile(app, DATA_PATH, getDefaultDataTemplate());
-}
-const VIEW_TYPE = "focus-timer-view";
-const MAX_SUGGEST_TASKS = 100;
-
-function nowISO() { return new Date().toISOString(); }
-function clamp0(n) { return Math.max(0, n); }
-
-// ========== 文件操作锁机制 ==========
-// 防止并发读写导致数据不一致
+/**
+ * 异步文件锁，保证对 data.json 的写入串行化，避免竞态条件。
+ * 使用方式：await dataFileLock.runWithLock(async () => { ... 读-改-写 ... });
+ */
 class FileLock {
   constructor() {
     this._locked = false;
     this._queue = [];
   }
 
-  async acquire() {
+  acquire() {
     return new Promise((resolve) => {
       if (!this._locked) {
         this._locked = true;
@@ -73,7 +42,7 @@ class FileLock {
     }
   }
 
-  async withLock(fn) {
+  async runWithLock(fn) {
     await this.acquire();
     try {
       return await fn();
@@ -85,91 +54,89 @@ class FileLock {
 
 const dataFileLock = new FileLock();
 
-// ========== 定时器管理器 ==========
-// 集中管理所有定时器，便于统一清理
+/**
+ * 定时器管理器：统一管理 setInterval/setTimeout，按 id 注册与清除，避免泄漏与重复。
+ * 使用方式：plugin.timerManager.setInterval(id, ms, fn) / setTimeout(id, ms, fn)；clear(id)；onunload 时 clearAll()。
+ */
 class TimerManager {
   constructor() {
-    this._timers = new Map(); // id -> { type: 'interval'|'timeout', handle }
-    this._nextId = 1;
+    this._timers = new Map(); // id -> { type: 'interval'|'timeout', handle: number }
   }
 
-  setInterval(callback, delay, name = null) {
-    const id = name || `interval_${this._nextId++}`;
-    this.clear(id); // 清除同名的旧定时器
-    const handle = setInterval(callback, delay);
-    this._timers.set(id, { type: 'interval', handle });
+  setInterval(id, ms, fn) {
+    this.clear(id);
+    const handle = setInterval(fn, ms);
+    this._timers.set(id, { type: "interval", handle });
     return id;
   }
 
-  setTimeout(callback, delay, name = null) {
-    const id = name || `timeout_${this._nextId++}`;
-    this.clear(id); // 清除同名的旧定时器
+  setTimeout(id, ms, fn) {
+    this.clear(id);
     const handle = setTimeout(() => {
       this._timers.delete(id);
-      callback();
-    }, delay);
-    this._timers.set(id, { type: 'timeout', handle });
+      fn();
+    }, ms);
+    this._timers.set(id, { type: "timeout", handle });
     return id;
   }
 
   clear(id) {
-    const timer = this._timers.get(id);
-    if (timer) {
-      if (timer.type === 'interval') {
-        clearInterval(timer.handle);
-      } else {
-        clearTimeout(timer.handle);
-      }
+    const t = this._timers.get(id);
+    if (t) {
+      if (t.type === "interval") clearInterval(t.handle);
+      else clearTimeout(t.handle);
       this._timers.delete(id);
     }
   }
 
   clearAll() {
-    for (const [id, timer] of this._timers) {
-      if (timer.type === 'interval') {
-        clearInterval(timer.handle);
-      } else {
-        clearTimeout(timer.handle);
-      }
+    for (const [, t] of this._timers) {
+      if (t.type === "interval") clearInterval(t.handle);
+      else clearTimeout(t.handle);
     }
     this._timers.clear();
   }
-
-  has(id) {
-    return this._timers.has(id);
-  }
 }
 
-// ========== 事件监听器管理器 ==========
-// 集中管理文档级事件监听器，便于统一清理
-class EventListenerManager {
-  constructor() {
-    this._listeners = new Map(); // id -> { target, event, handler, options }
-  }
-
-  add(target, event, handler, options = undefined, id = null) {
-    const listenerId = id || `listener_${Date.now()}_${Math.random()}`;
-    this.remove(listenerId); // 清除同名的旧监听器
-    target.addEventListener(event, handler, options);
-    this._listeners.set(listenerId, { target, event, handler, options });
-    return listenerId;
-  }
-
-  remove(id) {
-    const listener = this._listeners.get(id);
-    if (listener) {
-      listener.target.removeEventListener(listener.event, listener.handler, listener.options);
-      this._listeners.delete(id);
+/** 默认 data.json 模板（无 data.json 时创建，防止启动失败） */
+function getDefaultDataTemplate() {
+  return {
+    state: { active: false, resting: false },
+    sessions: [],
+    settings: {
+      autoContinue: false,
+      defaultMode: "countdown",
+      adjustStepMinutes: 5,
+      defaultChartRange: "14天",
+      defaultDurationMinutes: 25,
+      quickTimer1: { name: "", minutes: 25 },
+      quickTimer2: { name: "", minutes: 25 },
+      quickTimer3: { name: "", minutes: 25 },
+      autoRest: false,
+      defaultRestMinutes: 5,
+      keyboardShortcuts: false,
+      statusBarShowFocus: true,
+      allowCompleteCountdownEarly: false,
+      suggestTasks: [],
+      codeBlockChartShowTime: true,
+      codeBlockChartShowCount: true
     }
-  }
-
-  removeAll() {
-    for (const [id, listener] of this._listeners) {
-      listener.target.removeEventListener(listener.event, listener.handler, listener.options);
-    }
-    this._listeners.clear();
-  }
+  };
 }
+
+async function ensureDataFileExists(app) {
+  await dataFileLock.runWithLock(async () => {
+    const exists = await app.vault.adapter.exists(DATA_PATH);
+    if (!exists) {
+      await writeJson(app, DATA_PATH, getDefaultDataTemplate());
+    }
+  });
+}
+const VIEW_TYPE = "focus-timer-view";
+const MAX_SUGGEST_TASKS = 100;
+
+function nowISO() { return new Date().toISOString(); }
+function clamp0(n) { return Math.max(0, n); }
 
 // ========== 国际化支持 ==========
 // 翻译对象
@@ -223,6 +190,10 @@ const translations = {
     timerSettings: "Timer设置",
     autoContinueAfterCountdown: "倒计时结束后自动继续计时",
     autoContinueDesc: "开启：倒计时结束时转为正计时继续计时。关闭：倒计时结束时自动完成该次专注。",
+    statusBarShowFocus: "状态栏显示专注情况",
+    statusBarShowFocusDesc: "开启时，状态栏会显示当前专注/休息的计时；关闭则不显示。",
+    allowCompleteCountdownEarly: "倒计时允许提前完成",
+    allowCompleteCountdownEarlyDesc: "关闭时，倒计时进行中只显示「放弃」按钮，命令「完成」也不可提前完成。",
     keyboardShortcuts: "使用键盘按键快捷操作",
     keyboardShortcutsDesc: "开启后，当专注计时器面板处于焦点时：按 Enter 立即开始；按「上」加时间；按「下」减时间。在输入框内输入时不会触发。",
     defaultMode: "默认模式",
@@ -249,7 +220,7 @@ const translations = {
     showTaskCount: "显示任务完成数量（代码块）",
     showTaskCountDesc: "用于 focus 代码块中的折线图：是否默认显示任务数量",
     defaultChartRange: "默认图表显示范围",
-    defaultChartRangeDesc: "选择默认显示的图表时间范围",
+    defaultChartRangeDesc: "选择默认显示的图表时间范围，需要点击编辑代码块刷新。",
     days7: "7天",
     days14: "14天",
     days30: "30天",
@@ -274,6 +245,7 @@ const translations = {
     focusItem: "专注事项（可选）",
     clickToInput: "点击输入时间",
     overtime: "已超时",
+    totalFocusTime: "总时间",
     stopwatchOver10Hours: "正计时超过10小时，自动结束",
     csvHeaders: ["ID", "开始时间", "结束时间", "计划时长（秒）", "计划时长（分钟）", "实际时长（秒）", "实际时长（分钟）", "状态", "任务名称", "创建时间"],
     csvFilename: "专注记录",
@@ -292,6 +264,7 @@ const translations = {
     deleteFailed: "删除失败",
     suggestTasks: "联想任务（每行一个）",
     suggestTasksDesc: "在专注事项输入时可联想的任务列表（最多100行）。每行限制：40个英文字符或10个其他字符。超过100行则无法继续输入。",
+    suggestTasksPlaceholder: "写代码\n阅读\n运动",
     other: "其他",
     todayFocusAlt: "今天专注",
     yesterdayFocus: "昨天专注",
@@ -311,7 +284,8 @@ const translations = {
     restStarted: "休息开始：{minutes} 分钟",
     restEnded: "休息结束",
     focusStartFailed: "正在专注中，启动失败",
-    focusStopFailed: "当前未在执行任务，放弃/完成任务失败"
+    focusStopFailed: "当前未在执行任务，放弃/完成任务失败",
+    completeCountdownEarlyDisabled: "已关闭「倒计时允许提前完成」，无法提前完成"
   },
   en: {
     // Common
@@ -362,6 +336,10 @@ const translations = {
     timerSettings: "Timer Settings",
     autoContinueAfterCountdown: "Auto Continue After Countdown",
     autoContinueDesc: "On: Countdown switches to stopwatch when finished. Off: Countdown auto-completes when finished.",
+    statusBarShowFocus: "Show focus status in status bar",
+    statusBarShowFocusDesc: "When on, the status bar shows current focus/rest timer; when off, it is hidden.",
+    allowCompleteCountdownEarly: "Allow completing countdown early",
+    allowCompleteCountdownEarlyDesc: "When off, only \"Abandon\" is shown during countdown and the Complete command cannot finish early.",
     keyboardShortcuts: "Keyboard Shortcuts",
     keyboardShortcutsDesc: "When enabled, with focus timer panel focused: Press Enter to start; Press Up to add time; Press Down to subtract time. Not triggered when typing in input fields.",
     defaultMode: "Default Mode",
@@ -388,7 +366,7 @@ const translations = {
     showTaskCount: "Show Task Completion Count (Code Block)",
     showTaskCountDesc: "For line charts in focus code blocks: whether to show task count by default",
     defaultChartRange: "Default Chart Range",
-    defaultChartRangeDesc: "Select the default chart time range",
+    defaultChartRangeDesc: "Select the default chart time range, need to refresh by editing the focus code block",
     days7: "7 Days",
     days14: "14 Days",
     days30: "30 Days",
@@ -413,6 +391,7 @@ const translations = {
     focusItem: "Focus Item (optional)",
     clickToInput: "Click to input time",
     overtime: "Overtime",
+    totalFocusTime: "Total focus",
     stopwatchOver10Hours: "Stopwatch exceeded 10 hours, auto-completed",
     csvHeaders: ["ID", "Start Time", "End Time", "Planned Duration (seconds)", "Planned Duration (minutes)", "Actual Duration (seconds)", "Actual Duration (minutes)", "Status", "Task Name", "Created At"],
     csvFilename: "Focus Records",
@@ -431,6 +410,7 @@ const translations = {
     deleteFailed: "Delete failed",
     suggestTasks: "Suggested Tasks (one per line)",
     suggestTasksDesc: "Task list for autocomplete when entering focus items (max 100 lines). Each line limit: 40 ASCII characters or 10 other characters. Cannot input more than 100 lines.",
+    suggestTasksPlaceholder: "Coding\nReading\nExercise",
     other: "Other",
     todayFocusAlt: "Today's Focus",
     yesterdayFocus: "Yesterday's Focus",
@@ -450,7 +430,8 @@ const translations = {
     restStarted: "Rest started: {minutes} minutes",
     restEnded: "Rest ended",
     focusStartFailed: "You are focusing now, start failed",
-    focusStopFailed: "You are not focusing now, nothing to abandon/complete"
+    focusStopFailed: "You are not focusing now, nothing to abandon/complete",
+    completeCountdownEarlyDisabled: "Early complete is disabled; cannot complete countdown early"
   }
 };
 
@@ -586,12 +567,10 @@ function limitInputLength(text) {
 }
 
 async function ensureJsonFile(app, path, fallbackObj) {
-  return dataFileLock.withLock(async () => {
-    const exists = await app.vault.adapter.exists(path);
-    if (!exists) {
-      await app.vault.adapter.write(path, JSON.stringify(fallbackObj, null, 2));
-    }
-  });
+  const exists = await app.vault.adapter.exists(path);
+  if (!exists) {
+    await app.vault.adapter.write(path, JSON.stringify(fallbackObj, null, 2));
+  }
 }
 
 async function readJson(app, path, fallbackObj) {
@@ -608,14 +587,13 @@ async function writeJson(app, path, obj) {
 }
 
 // 读取整个 data.json 文件（文件缺失或解析失败时返回默认模板）
-// 注意：读操作不需要锁，因为我们使用写时锁定来保证一致性
 async function readDataFile(app) {
   return await readJson(app, DATA_PATH, getDefaultDataTemplate());
 }
 
-// 写入整个 data.json 文件（使用锁防止并发写入）
+// 写入整个 data.json 文件（持锁写入，保证原子性）
 async function writeDataFile(app, data) {
-  return dataFileLock.withLock(async () => {
+  await dataFileLock.runWithLock(async () => {
     await writeJson(app, DATA_PATH, data);
   });
 }
@@ -626,10 +604,10 @@ async function readState(app) {
   return data.state || { active: false, resting: false };
 }
 
-// 写入 state（合并更新，使用锁保证原子性）
+// 写入 state（合并更新，持锁读-改-写保证原子性）
 async function writeState(app, state) {
-  return dataFileLock.withLock(async () => {
-    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+  await dataFileLock.runWithLock(async () => {
+    const data = await readDataFile(app);
     data.state = { ...data.state, ...state };
     await writeJson(app, DATA_PATH, data);
   });
@@ -641,10 +619,10 @@ async function readSessions(app) {
   return Array.isArray(data.sessions) ? data.sessions : [];
 }
 
-// 写入 sessions（完全替换，使用锁保证原子性）
+// 写入 sessions（完全替换，持锁读-改-写保证原子性）
 async function writeSessions(app, sessions) {
-  return dataFileLock.withLock(async () => {
-    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+  await dataFileLock.runWithLock(async () => {
+    const data = await readDataFile(app);
     data.sessions = sessions;
     await writeJson(app, DATA_PATH, data);
   });
@@ -656,23 +634,19 @@ async function readSettings(app) {
   return data.settings || {};
 }
 
-// 写入 settings（合并更新，使用锁保证原子性）
+// 写入 settings（合并更新，持锁读-改-写保证原子性）
 async function writeSettings(app, settings) {
-  return dataFileLock.withLock(async () => {
-    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+  await dataFileLock.runWithLock(async () => {
+    const data = await readDataFile(app);
     data.settings = { ...data.settings, ...settings };
     await writeJson(app, DATA_PATH, data);
   });
 }
 
-// 追加 session（使用锁保证原子性）
 async function appendSession(app, session) {
-  return dataFileLock.withLock(async () => {
-    await ensureJsonFile(app, DATA_PATH, getDefaultDataTemplate());
-    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
-    if (!Array.isArray(data.sessions)) {
-      data.sessions = [];
-    }
+  await ensureDataFileExists(app);
+  await dataFileLock.runWithLock(async () => {
+    const data = await readDataFile(app);
     data.sessions.push(session);
     await writeJson(app, DATA_PATH, data);
   });
@@ -698,7 +672,8 @@ function formatTime(seconds) {
 
 function formatDate(isoString) {
   const date = new Date(isoString);
-  const locale = getLanguage() === 'zh' ? 'zh-CN' : 'en-US';
+  const lang = getLanguage();
+  const locale = lang === 'zh' ? 'zh-CN' : 'en-US';
   return date.toLocaleString(locale, {
     month: 'short',
     day: 'numeric',
@@ -949,6 +924,31 @@ function calculateStats(sessions, baseDate = null) {
   };
 }
 
+/** 图表范围统一配置：设置项可选值、内部短 key、计算用范围值、显示用翻译 key */
+const CHART_RANGE_CONFIG = [
+  { shortKey: "7", settingValues: ["7天", "7 Days"], labelKey: "days7", calcValue: "7天" },
+  { shortKey: "14", settingValues: ["14天", "14 Days"], labelKey: "days14", calcValue: "14天" },
+  { shortKey: "30", settingValues: ["30天", "30 Days"], labelKey: "days30", calcValue: "30天" },
+  { shortKey: "month", settingValues: ["本月", "This Month"], labelKey: "thisMonth", calcValue: "本月" },
+  { shortKey: "year", settingValues: ["今年", "This Year"], labelKey: "thisYear", calcValue: "今年" }
+];
+const DEFAULT_CHART_RANGE_SHORT = "14";
+
+/** 将设置中的 defaultChartRange（可能为中文或英文）转为内部短 key */
+function defaultChartRangeToShortKey(defaultRange) {
+  if (!defaultRange) return DEFAULT_CHART_RANGE_SHORT;
+  const found = CHART_RANGE_CONFIG.find(c => c.settingValues.includes(defaultRange));
+  return found ? found.shortKey : DEFAULT_CHART_RANGE_SHORT;
+}
+
+/** 将内部短 key 转为 { rangeLabel, rangeForCalculation }，供图表标题与 calculateChartData 使用 */
+function chartRangeToLabelAndCalculation(shortKey) {
+  const found = CHART_RANGE_CONFIG.find(c => c.shortKey === shortKey);
+  if (found) return { rangeLabel: t(found.labelKey), rangeForCalculation: found.calcValue };
+  const fallback = CHART_RANGE_CONFIG.find(c => c.shortKey === DEFAULT_CHART_RANGE_SHORT);
+  return { rangeLabel: t(fallback.labelKey), rangeForCalculation: fallback.calcValue };
+}
+
 // 计算不同时间范围的图表数据。规则：专注时长只统计 status==='completed'，放弃的不计入。
 function calculateChartData(sessions, range) {
   const now = new Date();
@@ -1065,135 +1065,108 @@ function calculateChartData(sessions, range) {
   return data;
 }
 
-// ========== 共享图表绘制函数 ==========
-// 提取为独立函数，供 FocusTimerView 和代码块处理器共用
-function createLineChart(container, data, opts = { showTime: true, showCount: true }, interactive = true) {
-  // 确保container是有效的DOM元素
-  if (!container || !(container instanceof Element || container instanceof HTMLElement)) {
-    return { drawChart: () => {}, timePoints: [], countPoints: [] };
-  }
-  
-  // 确保data是有效的数组
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    return { drawChart: () => {}, timePoints: [], countPoints: [] };
-  }
-  
-  // 如果container已经有canvas，先移除
+/**
+ * 共享折线图绘制函数：专注趋势（时长 + 任务数）。
+ * @param {HTMLElement} container - 挂载 canvas 的容器
+ * @param {Array<{date:string, value:number, completed:number}>} data - 图表数据
+ * @param {{ showTime?: boolean, showCount?: boolean, interactive?: boolean }} opts - showTime/showCount 控制显示；interactive 为 true 时显示 tooltip 并响应鼠标
+ */
+function createLineChart(container, data, opts = { showTime: true, showCount: true, interactive: true }) {
+  if (!container || !(container instanceof Element || container instanceof HTMLElement)) return;
+  if (!data || !Array.isArray(data) || data.length === 0) return;
+
   const existingCanvas = container.querySelector("canvas");
-  if (existingCanvas) {
-    existingCanvas.remove();
-  }
-  
-  // 移除现有的tooltip
+  if (existingCanvas) existingCanvas.remove();
   const existingTooltip = container.querySelector(".focus-chart-tooltip");
-  if (existingTooltip) {
-    existingTooltip.remove();
-  }
-  
+  if (existingTooltip) existingTooltip.remove();
+
+  const interactive = opts.interactive !== false;
   const canvas = document.createElement("canvas");
   canvas.className = "focus-line-chart";
-  // 使用高DPI支持
   const dpr = window.devicePixelRatio || 1;
   const width = 600;
   const height = 200;
   canvas.width = width * dpr;
   canvas.height = height * dpr;
-  canvas.style.setProperty('--focus-canvas-width', width + 'px');
-  canvas.style.setProperty('--focus-canvas-height', height + 'px');
+  canvas.style.setProperty("--focus-canvas-width", width + "px");
+  canvas.style.setProperty("--focus-canvas-height", height + "px");
   canvas.classList.add(interactive ? "focus-line-chart-interactive" : "focus-line-chart-static");
   container.appendChild(canvas);
-  
-  // 创建tooltip元素（仅在交互模式下）
+
   let tooltip = null;
   if (interactive) {
     tooltip = document.createElement("div");
     tooltip.className = "focus-chart-tooltip focus-chart-tooltip-hidden";
     container.appendChild(tooltip);
   }
-  
+
   const ctx = canvas.getContext("2d");
   ctx.scale(dpr, dpr);
-  
-  // 图表布局参数
   const leftPadding = 40;
   const rightPadding = 70;
   const bottomPadding = 50;
   const topPadding = 20;
   const chartWidth = width - leftPadding - rightPadding;
   const chartHeight = height - topPadding - bottomPadding;
-  
-  // 计算最大值
-  const maxValue = Math.max(...data.map(d => d.value || 0), 1);
-  const showTime = opts?.showTime !== false;
-  const showCount = opts?.showCount !== false;
+
+  const showTime = opts.showTime !== false;
+  const showCount = opts.showCount !== false;
+  const maxValue = Math.max(...data.map((d) => d.value || 0), 1);
   const maxHours = showTime ? (Math.ceil(maxValue / 3600) || 1) : 1;
-  const maxCompleted = showCount ? (Math.max(...data.map(d => d.completed || 0), 1)) : 1;
-  
-  // 存储数据点位置
+  const maxCompleted = showCount ? Math.max(...data.map((d) => d.completed || 0), 1) : 1;
   const timePoints = [];
   const countPoints = [];
-  
-  // 获取主题色
-  const getAccentColor = () => {
-    let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--text-accent');
+
+  function getAccentColor() {
+    let accentColor = getComputedStyle(document.documentElement).getPropertyValue("--text-accent");
     if (accentColor) accentColor = accentColor.trim();
-    if (!accentColor || accentColor === '') {
-      accentColor = getComputedStyle(document.documentElement).getPropertyValue('--interactive-accent');
+    if (!accentColor || accentColor === "") {
+      accentColor = getComputedStyle(document.documentElement).getPropertyValue("--interactive-accent");
       if (accentColor) accentColor = accentColor.trim();
     }
-    if (!accentColor || accentColor === '') {
-      accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+    if (!accentColor || accentColor === "") {
+      accentColor = getComputedStyle(document.documentElement).getPropertyValue("--accent");
       if (accentColor) accentColor = accentColor.trim();
     }
-    if (!accentColor || accentColor === '') {
+    if (!accentColor || accentColor === "") {
       try {
-        const testEl = document.createElement('div');
-        testEl.className = 'focus-test-element';
+        const testEl = document.createElement("div");
+        testEl.className = "focus-test-element";
         document.body.appendChild(testEl);
         const computedColor = getComputedStyle(testEl).color;
         document.body.removeChild(testEl);
-        if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
-          accentColor = computedColor;
-        }
-      } catch (e) {
-        // 忽略错误
-      }
+        if (computedColor && computedColor !== "rgba(0, 0, 0, 0)" && computedColor !== "transparent") accentColor = computedColor;
+      } catch (e) {}
     }
-    return accentColor || '#008f32';
-  };
-  
-  // 绘制函数
-  const drawChart = () => {
-    ctx.clearRect(0, 0, width, height);
+    if (!accentColor || accentColor === "") accentColor = "#008f32";
+    return accentColor;
+  }
+  const countColor = "#ff9800";
 
+  function drawChart() {
+    ctx.clearRect(0, 0, width, height);
     if (!showTime && !showCount) {
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--text-muted") || "#999";
       ctx.font = "14px var(--font-text)";
       ctx.textAlign = "center";
       ctx.fillText(t("noItemSelected"), width / 2, height / 2);
       ctx.textAlign = "left";
       return;
     }
-    
-    // 绘制网格和标签
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-modifier-border') || '#e0e0e0';
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--background-modifier-border") || "#e0e0e0";
     ctx.lineWidth = 1;
     ctx.font = "11px var(--font-text)";
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-    
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--text-muted") || "#999";
     for (let i = 0; i <= 5; i++) {
       const y = topPadding + (chartHeight / 5) * i;
       if (showTime) {
-        const valueH = maxHours * (1 - i / 5);
         ctx.textAlign = "left";
-        ctx.fillText(valueH.toFixed(1) + "h", 5, y + 4);
+        ctx.fillText((maxHours * (1 - i / 5)).toFixed(1) + "h", 5, y + 4);
       }
       if (showCount) {
         const valueC = Math.round(maxCompleted * (1 - i / 5));
         ctx.textAlign = "left";
-        const lang = getLanguage();
-        const countLabel = lang === 'zh' ? valueC + "个" : valueC.toString();
-        ctx.fillText(countLabel, width - rightPadding + 6, y + 4);
+        ctx.fillText((getLanguage() === "zh" ? valueC + "个" : valueC.toString()), width - rightPadding + 6, y + 4);
       }
       ctx.beginPath();
       ctx.moveTo(leftPadding, y);
@@ -1201,11 +1174,8 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
       ctx.stroke();
     }
     ctx.textAlign = "left";
-    
-    const accentColor = getAccentColor();
-    const countColor = "#ff9800";
 
-    // 折线1：专注时长（左轴）
+    const accentColor = getAccentColor();
     timePoints.length = 0;
     if (showTime) {
       ctx.strokeStyle = accentColor;
@@ -1213,7 +1183,6 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
-
       data.forEach((point, index) => {
         const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
         const y = topPadding + chartHeight - (point.value / 3600 / maxHours) * chartHeight;
@@ -1222,7 +1191,6 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         else ctx.lineTo(x, y);
       });
       ctx.stroke();
-
       ctx.fillStyle = accentColor;
       timePoints.forEach(({ x, y }) => {
         ctx.beginPath();
@@ -1235,8 +1203,6 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         ctx.fillStyle = accentColor;
       });
     }
-
-    // 折线2：任务数量（右轴）
     countPoints.length = 0;
     if (showCount) {
       ctx.strokeStyle = countColor;
@@ -1244,7 +1210,6 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
-
       data.forEach((point, index) => {
         const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
         const c = point.completed || 0;
@@ -1254,7 +1219,6 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         else ctx.lineTo(x, y);
       });
       ctx.stroke();
-
       ctx.fillStyle = countColor;
       countPoints.forEach(({ x, y }) => {
         ctx.beginPath();
@@ -1267,63 +1231,47 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         ctx.fillStyle = countColor;
       });
     }
-    
-    // X轴标签（日期）
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--text-muted") || "#999";
     ctx.font = "10px var(--font-text)";
+    const xLabelStep = interactive ? 2 : 2;
     data.forEach((point, index) => {
-      if (index % 2 === 0 || index === data.length - 1) {
+      if (index % xLabelStep === 0 || (!interactive && index === data.length - 1)) {
         const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
         const date = new Date(point.date);
-        const label = `${date.getMonth() + 1}/${date.getDate()}`;
         ctx.save();
         ctx.translate(x, height - bottomPadding + 15);
         ctx.rotate(-Math.PI / 4);
-        ctx.fillText(label, 0, 0);
+        ctx.fillText(`${date.getMonth() + 1}/${date.getDate()}`, 0, 0);
         ctx.restore();
       }
     });
-  };
-  
-  // 初始绘制
+  }
   drawChart();
-  
-  // 添加交互事件（仅在交互模式下）
+
   if (interactive && tooltip) {
     canvas.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
       let nearestPoint = null;
       let minDistance = Infinity;
-      
-      [...timePoints, ...countPoints].forEach(({ x: px, y: py, point, index }) => {
-        const distance = Math.sqrt(Math.pow(x - px, 2) + Math.pow(y - py, 2));
+      [...timePoints, ...countPoints].forEach(({ x: px, y: py, point }) => {
+        const distance = Math.sqrt((x - px) ** 2 + (y - py) ** 2);
         if (distance < 15 && distance < minDistance) {
           minDistance = distance;
           nearestPoint = { x: px, y: py, point };
         }
       });
-      
       if (nearestPoint) {
         tooltip.classList.remove("focus-chart-tooltip-right");
-        
         const date = new Date(nearestPoint.point.date);
         const lang = getLanguage();
-        const dateStr = lang === 'zh' 
-          ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
-          : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+        const dateStr = lang === "zh" ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日` : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
         const hours = Math.floor(nearestPoint.point.value / 3600);
         const minutes = Math.floor((nearestPoint.point.value % 3600) / 60);
-        const timeStr = lang === 'zh' 
-          ? (hours > 0 ? `${hours}时${minutes}分` : `${minutes}分`)
-          : (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`);
+        const timeStr = lang === "zh" ? (hours > 0 ? `${hours}时${minutes}分` : `${minutes}分`) : (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`);
         const completedCount = nearestPoint.point.completed || 0;
-        
-        while (tooltip.firstChild) {
-          tooltip.removeChild(tooltip.firstChild);
-        }
+        while (tooltip.firstChild) tooltip.removeChild(tooltip.firstChild);
         const titleDiv = document.createElement("div");
         titleDiv.className = "focus-chart-tooltip-title";
         titleDiv.textContent = dateStr;
@@ -1337,41 +1285,33 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         if (showCount) {
           const countDiv = document.createElement("div");
           countDiv.className = "focus-chart-tooltip-line";
-          countDiv.textContent = `${t("completedTasks")}: ${completedCount}${lang === 'zh' ? '个' : ''}`;
+          countDiv.textContent = `${t("completedTasks")}: ${completedCount}${lang === "zh" ? "个" : ""}`;
           tooltip.appendChild(countDiv);
         }
-        
         tooltip.classList.remove("focus-chart-tooltip-hidden");
         tooltip.classList.add("focus-chart-tooltip-measuring");
         const tooltipRect = tooltip.getBoundingClientRect();
         tooltip.classList.remove("focus-chart-tooltip-measuring");
-        
         let tooltipX = nearestPoint.x;
         let tooltipY = nearestPoint.y - tooltipRect.height - 15;
-        
-        if (tooltipY < 0) {
-          tooltipY = nearestPoint.y + 20;
-        }
-        
+        if (tooltipY < 0) tooltipY = nearestPoint.y + 20;
         const tooltipHalfWidth = tooltipRect.width / 2;
         tooltipX = Math.max(tooltipHalfWidth, Math.min(width - tooltipHalfWidth, tooltipX));
-        
-        tooltip.style.setProperty('--focus-tooltip-left', tooltipX + 'px');
-        tooltip.style.setProperty('--focus-tooltip-top', tooltipY + 'px');
-        tooltip.classList.add('focus-chart-tooltip-centered');
+        if (tooltipX + tooltipHalfWidth > width - 5) tooltipX = Math.max(tooltipHalfWidth, width - tooltipHalfWidth - 5);
+        if (tooltipX - tooltipHalfWidth < 5) tooltipX = Math.min(width - tooltipHalfWidth, tooltipHalfWidth + 5);
+        tooltip.style.setProperty("--focus-tooltip-left", tooltipX + "px");
+        tooltip.style.setProperty("--focus-tooltip-top", tooltipY + "px");
+        tooltip.classList.add("focus-chart-tooltip-centered");
       } else {
         tooltip.classList.add("focus-chart-tooltip-hidden");
         tooltip.classList.remove("focus-chart-tooltip-right", "focus-chart-tooltip-centered");
       }
     });
-    
     canvas.addEventListener("mouseleave", () => {
       tooltip.classList.add("focus-chart-tooltip-hidden");
       tooltip.classList.remove("focus-chart-tooltip-centered");
     });
   }
-  
-  return { drawChart, timePoints, countPoints };
 }
 
 // 侧边栏视图
@@ -1380,7 +1320,8 @@ class FocusTimerView extends ItemView {
     super(leaf);
     this.plugin = plugin;
     this.timerElements = null; // 保存计时器相关DOM元素的引用
-    this.timerInterval = null;
+    this._viewTimerId = "view-display-" + (leaf.id ?? "view-" + Date.now());
+    this._resizeTimerId = "view-resize-" + (leaf.id ?? "view-" + Date.now());
     this.startTime = null; // 本地记录的开始时间
     this.plannedSec = null; // 计划时长
     this.timerMode = "countdown"; // 计时模式：countdown 或 stopwatch
@@ -1388,7 +1329,6 @@ class FocusTimerView extends ItemView {
     this.currentView = "stats"; // 当前视图："stats" 或 "history"
     this.restStartTime = null; // 休息开始时间
     this.restSec = null; // 休息时长（秒）
-    this.eventManager = new EventListenerManager(); // 管理视图级别的事件监听器
   }
 
   getViewType() {
@@ -1414,9 +1354,10 @@ class FocusTimerView extends ItemView {
     
     if (container && window.ResizeObserver) {
       this.resizeObserver = new ResizeObserver(() => {
-        // 防抖处理
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = setTimeout(() => {
+        // 防抖处理（使用统一定时器管理器）
+        const mgr = this.plugin.timerManager;
+        mgr.clear(this._resizeTimerId);
+        mgr.setTimeout(this._resizeTimerId, 100, () => {
           const currentHeight = container.clientHeight || this.containerEl.clientHeight;
           const currentWidth = container.clientWidth || container.offsetWidth || this.containerEl.clientWidth;
           // 当高度跨越400px阈值或宽度跨越400px阈值时重新渲染
@@ -1430,7 +1371,7 @@ class FocusTimerView extends ItemView {
             lastHeight = currentHeight;
             lastWidth = currentWidth;
           }
-        }, 100);
+        });
       });
       this.resizeObserver.observe(container);
       // 也观察父容器
@@ -1441,24 +1382,15 @@ class FocusTimerView extends ItemView {
   }
 
   startTimer() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-    }
-    
-    // 每秒更新一次计时器显示（只更新文本，不重新渲染）
-    this.timerInterval = setInterval(() => {
-      this.updateTimerDisplay();
-    }, 1000);
-    
-    // 立即更新一次
+    this._wasOvertime = false; // 用于进入超时状态时只刷新一次面板
+    const mgr = this.plugin.timerManager;
+    mgr.clear(this._viewTimerId);
+    mgr.setInterval(this._viewTimerId, 1000, () => this.updateTimerDisplay());
     this.updateTimerDisplay();
   }
 
   stopTimer() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
-    }
+    this.plugin.timerManager.clear(this._viewTimerId);
   }
 
   updateTimerDisplay() {
@@ -1515,11 +1447,17 @@ class FocusTimerView extends ItemView {
         const isOvertime = remaining === 0 && this.plannedSec > 0;
         
         if (isOvertime && this.plugin.settings.autoContinue) {
-          // 超时后自动继续计时
+          // 进入超时状态时刷新面板一次，以便「完成」按钮显示出来
+          if (!this._wasOvertime) {
+            this._wasOvertime = true;
+            this.render();
+            return;
+          }
+          // 超时后自动继续计时，主数字上写清楚「超时」/「Overtime」；底部红字为总时间
           const overtimeSec = elapsed - this.plannedSec;
-          timeEl.textContent = formatTime(overtimeSec);
+          timeEl.textContent = t("overtime") + " " + formatTime(overtimeSec);
           if (overtimeLabel) {
-            overtimeLabel.textContent = `${t("overtime")} ${formatTime(overtimeSec)}`;
+            overtimeLabel.textContent = t("totalFocusTime") + " " + formatTime(elapsed);
           }
         } else if (isOvertime) {
           // 开关关闭时：倒计时结束时自动完成
@@ -1545,17 +1483,14 @@ class FocusTimerView extends ItemView {
 
   async onClose() {
     this.stopTimer();
-    // 使用事件管理器清理所有注册的监听器
-    this.eventManager.removeAll();
-    this._autocompleteClickOutside = null;
-    this._timeEditorClickOutside = null;
+    this.plugin.timerManager.clear(this._resizeTimerId);
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
     }
-    if (this.resizeTimeout) {
-      clearTimeout(this.resizeTimeout);
-      this.resizeTimeout = null;
+    if (this._autocompleteClickOutsideHandler) {
+      document.removeEventListener("click", this._autocompleteClickOutsideHandler);
+      this._autocompleteClickOutsideHandler = null;
     }
   }
 
@@ -1826,9 +1761,9 @@ class FocusTimerView extends ItemView {
       if (isStopwatch) {
         timeText = formatTime(elapsed);
       } else if (isOvertime) {
-        // 超时时：如果自动继续，显示超时时间；否则显示00:00
+        // 超时时：主数字上写清楚「超时」/「Overtime」；若未开自动继续则显示00:00
         if (this.plugin.settings.autoContinue) {
-          timeText = formatTime(overtimeSec);
+          timeText = t("overtime") + " " + formatTime(overtimeSec);
         } else {
           timeText = "00:00";
         }
@@ -1841,10 +1776,10 @@ class FocusTimerView extends ItemView {
         cls: "focus-elapsed-time"
       });
       
-      // 超时提示（仅在超时时显示）
+      // 超时时底部红字：总时间（倒计时 + 超时）
       if (isOvertime) {
         const overtimeLabel = timeDisplay.createEl("div", {
-          text: `${t("overtime")} ${formatTime(overtimeSec)}`,
+          text: `${t("totalFocusTime")} ${formatTime(elapsed)}`,
           cls: "focus-overtime-label"
         });
         this.timerElements.overtimeLabel = overtimeLabel;
@@ -1852,10 +1787,15 @@ class FocusTimerView extends ItemView {
       
       this.timerElements.timeEl = timeEl;
       
-      // 按钮：完成、放弃
+      // 按钮：完成、放弃（关闭「倒计时允许提前完成」时倒计时只显示放弃；超时后一律显示完成）
       const btnContainer = timerSection.createDiv("focus-btn-container");
-      const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-btn-primary" });
-      completeBtn.onclick = () => this.plugin.stopFocus("completed");
+      const allowEarly = this.plugin.settings.allowCompleteCountdownEarly !== false;
+      const isCountdown = this.timerMode === "countdown";
+      const showComplete = allowEarly || !isCountdown || isOvertime;
+      if (showComplete) {
+        const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-btn-primary" });
+        completeBtn.onclick = () => this.plugin.stopFocus("completed");
+      }
       const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-btn-secondary" });
       abandonBtn.onclick = () => this.plugin.stopFocus("abandoned");
     } else {
@@ -1943,9 +1883,10 @@ class FocusTimerView extends ItemView {
             editorContainer.classList.add("focus-time-editor-hidden");
             defaultTimeEl.classList.remove("focus-time-display-hidden");
             this.timeEditorOpen = false;
-            // 使用事件管理器移除监听器
-            this.eventManager.remove("time_editor_click_outside");
-            this._timeEditorClickOutside = null;
+            if (this._timeEditorClickOutside) {
+              document.removeEventListener("click", this._timeEditorClickOutside);
+              this._timeEditorClickOutside = null;
+            }
           };
           const closeEditor = this._timeEditorClose;
           this._timeEditorClickOutside = (e) => {
@@ -1953,8 +1894,7 @@ class FocusTimerView extends ItemView {
               closeEditor(true);
             }
           };
-          // 使用事件管理器注册监听器
-          this.eventManager.add(document, "click", this._timeEditorClickOutside, undefined, "time_editor_click_outside");
+          document.addEventListener("click", this._timeEditorClickOutside);
           minutesInput.focus();
         };
 
@@ -2114,15 +2054,19 @@ class FocusTimerView extends ItemView {
         }
       });
       
-      // 点击外部关闭下拉列表（使用事件管理器避免泄漏）
-      this._autocompleteClickOutside = (e) => {
+      // 点击外部关闭下拉列表（先移除旧监听器，避免重复添加导致泄漏）
+      if (this._autocompleteClickOutsideHandler) {
+        document.removeEventListener("click", this._autocompleteClickOutsideHandler);
+        this._autocompleteClickOutsideHandler = null;
+      }
+      this._autocompleteClickOutsideHandler = (e) => {
         if (!noteInputContainer.contains(e.target)) {
           autocompleteList.classList.add("focus-autocomplete-list-hidden");
           selectedIndex = -1;
         }
       };
-      this.eventManager.add(document, "click", this._autocompleteClickOutside, undefined, "autocomplete_click_outside");
-
+      document.addEventListener("click", this._autocompleteClickOutsideHandler);
+      
       // 按钮容器：模式切换按钮（在开始按钮左侧）+ 开始、加、减
       const btnContainer = timerSection.createDiv("focus-btn-container");
       
@@ -2486,7 +2430,7 @@ class FocusTimerView extends ItemView {
       const redrawAll = () => {
         const opts = { showTime: showTimeCb.checked, showCount: showCountCb.checked };
         charts.forEach(({ container, data }) => {
-          createLineChart(container, data, opts, true);
+          this.createLineChart(container, data, opts);
         });
       };
       showTimeCb.addEventListener("change", redrawAll);
@@ -2539,7 +2483,7 @@ class FocusTimerView extends ItemView {
           if (chartData && Array.isArray(chartData) && chartData.length > 0) {
             try {
               charts.push({ container: chartContainer, data: chartData });
-              createLineChart(chartContainer, chartData, { showTime: showTimeCb.checked, showCount: showCountCb.checked }, true);
+              this.createLineChart(chartContainer, chartData, { showTime: showTimeCb.checked, showCount: showCountCb.checked });
             } catch (drawError) {
               const errorMsg = document.createElement("div");
               errorMsg.textContent = `${t("chartError")}: ${drawError.message}`;
@@ -2576,352 +2520,12 @@ class FocusTimerView extends ItemView {
   }
 
   createLineChart(container, data, opts = { showTime: true, showCount: true }) {
-    // 确保container是有效的DOM元素
-    if (!container || !(container instanceof Element || container instanceof HTMLElement)) {
-      return;
-    }
-    
-    // 如果container已经有canvas，先移除
-    const existingCanvas = container.querySelector("canvas");
-    if (existingCanvas) {
-      existingCanvas.remove();
-    }
-    
-    // 移除现有的tooltip
-    const existingTooltip = container.querySelector(".focus-chart-tooltip");
-    if (existingTooltip) {
-      existingTooltip.remove();
-    }
-    
-    const canvas = document.createElement("canvas");
-    canvas.className = "focus-line-chart";
-    // 使用高DPI支持
-    const dpr = window.devicePixelRatio || 1;
-    const width = 600;
-    const height = 200;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.setProperty('--focus-canvas-width', width + 'px');
-    canvas.style.setProperty('--focus-canvas-height', height + 'px');
-    canvas.classList.add("focus-line-chart-interactive");
-    container.appendChild(canvas);
-    
-    // 创建tooltip元素
-    const tooltip = document.createElement("div");
-    tooltip.className = "focus-chart-tooltip focus-chart-tooltip-hidden";
-    container.appendChild(tooltip);
-    
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
-    
-    // 增加右侧padding，避免右侧数据点/右轴标签被挤压
-    const leftPadding = 40;
-    const rightPadding = 70; // 右侧增加：用于“任务数量”第二纵轴
-    const bottomPadding = 50; // 增加底部padding以容纳旋转的标签
-    const topPadding = 20;
-    const chartWidth = width - leftPadding - rightPadding;
-    const chartHeight = height - topPadding - bottomPadding;
-    
-    // 确保data是有效的数组
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      return;
-    }
-    
-    // 计算最大值（左轴：时长h；右轴：任务数量）
-    const maxValue = Math.max(...data.map(d => d.value || 0), 1);
-    const showTime = opts?.showTime !== false;
-    const showCount = opts?.showCount !== false;
-    const maxHours = showTime ? (Math.ceil(maxValue / 3600) || 1) : 1;
-    const maxCompleted = showCount ? (Math.max(...data.map(d => d.completed || 0), 1)) : 1;
-    
-    // 存储数据点位置（两条线）
-    const timePoints = [];
-    const countPoints = [];
-    
-    // 绘制函数
-    const drawChart = () => {
-      // 清除画布
-      ctx.clearRect(0, 0, width, height);
-
-      if (!showTime && !showCount) {
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-        ctx.font = "14px var(--font-text)";
-        ctx.textAlign = "center";
-        ctx.fillText(t("noItemSelected"), width / 2, height / 2);
-        ctx.textAlign = "left";
-        return;
-      }
-      
-      // 绘制网格和标签
-      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-modifier-border') || '#e0e0e0';
-      ctx.lineWidth = 1;
-      ctx.font = "11px var(--font-text)";
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-      
-      // Y轴标签和网格线（左：时长h；右：任务数量）
-      for (let i = 0; i <= 5; i++) {
-        const y = topPadding + (chartHeight / 5) * i;
-        if (showTime) {
-          const valueH = maxHours * (1 - i / 5);
-          ctx.textAlign = "left";
-          ctx.fillText(valueH.toFixed(1) + "h", 5, y + 4);
-        }
-
-        if (showCount) {
-          const valueC = Math.round(maxCompleted * (1 - i / 5));
-          ctx.textAlign = "left";
-          const lang = getLanguage();
-          const countLabel = lang === 'zh' ? valueC + "个" : valueC.toString();
-          ctx.fillText(countLabel, width - rightPadding + 6, y + 4);
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(leftPadding, y);
-        ctx.lineTo(width - rightPadding, y);
-        ctx.stroke();
-      }
-      ctx.textAlign = "left";
-      
-      // 绘制折线（使用主题色）
-      // 尝试多种方式获取主题色
-      let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--text-accent');
-      if (accentColor) accentColor = accentColor.trim();
-      if (!accentColor || accentColor === '') {
-        accentColor = getComputedStyle(document.documentElement).getPropertyValue('--interactive-accent');
-        if (accentColor) accentColor = accentColor.trim();
-      }
-      if (!accentColor || accentColor === '') {
-        accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
-        if (accentColor) accentColor = accentColor.trim();
-      }
-      // 如果还是获取不到，尝试从Obsidian的appearance配置读取
-      if (!accentColor || accentColor === '') {
-        try {
-          // 尝试读取appearance.json中的accentColor
-          const appearancePath = '.obsidian/appearance.json';
-          // 注意：这里不能直接读取文件，需要通过app.vault，但这里没有app实例
-          // 所以使用一个更可靠的方法：检查实际渲染的颜色
-          const testEl = document.createElement('div');
-          testEl.className = 'focus-test-element';
-          document.body.appendChild(testEl);
-          const computedColor = getComputedStyle(testEl).color;
-          document.body.removeChild(testEl);
-          if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
-            accentColor = computedColor;
-          }
-        } catch (e) {
-          // 忽略获取主题色的错误
-        }
-      }
-      // 最后的fallback
-      if (!accentColor || accentColor === '') {
-        accentColor = '#008f32'; // 默认绿色（从appearance.json看到的）
-      }
-      const countColor = "#ff9800";
-
-      // ===== 折线1：专注时长（左轴）=====
-      timePoints.length = 0;
-      if (showTime) {
-        ctx.strokeStyle = accentColor;
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.beginPath();
-
-        data.forEach((point, index) => {
-          const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
-          const y = topPadding + chartHeight - (point.value / 3600 / maxHours) * chartHeight;
-          timePoints.push({ x, y, point, index });
-          if (index === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-
-        // 数据点（时长）
-        ctx.fillStyle = accentColor;
-        timePoints.forEach(({ x, y }) => {
-          ctx.beginPath();
-          ctx.arc(x, y, 5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#fff";
-          ctx.beginPath();
-          ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = accentColor;
-        });
-      }
-
-      // ===== 折线2：任务数量（右轴）=====
-      countPoints.length = 0;
-      if (showCount) {
-        ctx.strokeStyle = countColor;
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.beginPath();
-
-        data.forEach((point, index) => {
-          const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
-          const c = point.completed || 0;
-          const y = topPadding + chartHeight - (c / maxCompleted) * chartHeight;
-          countPoints.push({ x, y, point, index });
-          if (index === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-
-        // 数据点（任务数）
-        ctx.fillStyle = countColor;
-        countPoints.forEach(({ x, y }) => {
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#fff";
-          ctx.beginPath();
-          ctx.arc(x, y, 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = countColor;
-        });
-      }
-      
-      // X轴标签（日期）
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-      ctx.font = "10px var(--font-text)";
-      data.forEach((point, index) => {
-        if (index % 2 === 0) { // 只显示部分日期，避免拥挤
-          const x = leftPadding + (chartWidth / (data.length - 1)) * index;
-          const date = new Date(point.date);
-          const label = `${date.getMonth() + 1}/${date.getDate()}`;
-          ctx.save();
-          ctx.translate(x, height - bottomPadding + 15);
-          ctx.rotate(-Math.PI / 4);
-          ctx.fillText(label, 0, 0);
-          ctx.restore();
-        }
-      });
-    };
-    
-    // 初始绘制
-    drawChart();
-    
-    // 鼠标移动事件处理
-    canvas.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      // 查找最近的数据点（两条线任一条靠近都算）
-      let nearestPoint = null;
-      let minDistance = Infinity;
-      
-      let nearestPointIndex = -1;
-      [...timePoints, ...countPoints].forEach(({ x: px, y: py, point, index }) => {
-        const distance = Math.sqrt(Math.pow(x - px, 2) + Math.pow(y - py, 2));
-        if (distance < 15 && distance < minDistance) {
-          minDistance = distance;
-          nearestPoint = { x: px, y: py, point };
-          nearestPointIndex = index;
-        }
-      });
-      
-      if (nearestPoint) {
-        // 移除之前的特殊类
-        tooltip.classList.remove("focus-chart-tooltip-right");
-        
-        // 显示tooltip
-        const date = new Date(nearestPoint.point.date);
-        const lang = getLanguage();
-        const dateStr = lang === 'zh' 
-          ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
-          : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-        const hours = Math.floor(nearestPoint.point.value / 3600);
-        const minutes = Math.floor((nearestPoint.point.value % 3600) / 60);
-        const timeStr = lang === 'zh' 
-          ? (hours > 0 ? `${hours}时${minutes}分` : `${minutes}分`)
-          : (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`);
-        const completedCount = nearestPoint.point.completed || 0;
-        
-        // 使用安全的 DOM API 构建 tooltip 内容，避免直接使用 innerHTML
-        while (tooltip.firstChild) {
-          tooltip.removeChild(tooltip.firstChild);
-        }
-        const titleDiv = document.createElement("div");
-        titleDiv.className = "focus-chart-tooltip-title";
-        titleDiv.textContent = dateStr;
-        tooltip.appendChild(titleDiv);
-        if (showTime) {
-          const timeDiv = document.createElement("div");
-          timeDiv.className = "focus-chart-tooltip-line";
-          timeDiv.textContent = `${t("focusTime")}: ${timeStr}`;
-          tooltip.appendChild(timeDiv);
-        }
-        if (showCount) {
-          const countDiv = document.createElement("div");
-          countDiv.className = "focus-chart-tooltip-line";
-          countDiv.textContent = `${t("completedTasks")}: ${completedCount}${lang === 'zh' ? '个' : ''}`;
-          tooltip.appendChild(countDiv);
-        }
-        
-        // 计算tooltip位置（相对于canvas容器）
-        // 先显示tooltip以获取其实际尺寸，但不影响布局
-        tooltip.classList.remove("focus-chart-tooltip-hidden");
-        tooltip.classList.add("focus-chart-tooltip-measuring");
-        const tooltipRect = tooltip.getBoundingClientRect();
-        tooltip.classList.remove("focus-chart-tooltip-measuring");
-        
-        let tooltipX = nearestPoint.x;
-        let tooltipY = nearestPoint.y - tooltipRect.height - 15;
-        
-        // 如果tooltip会超出上边界，显示在下方
-        if (tooltipY < 0) {
-          tooltipY = nearestPoint.y + 20;
-        }
-        
-        // 统一使用居中对齐，计算tooltip的左右边界，确保不超出canvas
-        const tooltipHalfWidth = tooltipRect.width / 2;
-        const minX = tooltipHalfWidth;
-        const maxX = width - tooltipHalfWidth;
-        
-        // 限制tooltipX在有效范围内
-        tooltipX = Math.max(minX, Math.min(maxX, tooltipX));
-        
-        // 如果tooltip在右侧且可能超出边界，调整位置
-        // 确保tooltip有足够的空间显示，不会因为位置限制导致换行
-        if (tooltipX + tooltipHalfWidth > width - 5) {
-          // 如果右侧空间不足，向左调整，但保持居中对齐
-          tooltipX = Math.max(tooltipHalfWidth, width - tooltipHalfWidth - 5);
-        }
-        if (tooltipX - tooltipHalfWidth < 5) {
-          // 如果左侧空间不足，向右调整
-          tooltipX = Math.min(width - tooltipHalfWidth, tooltipHalfWidth + 5);
-        }
-        
-        // 设置tooltip位置，使用CSS变量来避免影响容器宽度
-        tooltip.style.setProperty('--focus-tooltip-left', tooltipX + 'px');
-        tooltip.style.setProperty('--focus-tooltip-top', tooltipY + 'px');
-        tooltip.classList.add('focus-chart-tooltip-centered');
-      } else {
-        tooltip.classList.add("focus-chart-tooltip-hidden");
-        tooltip.classList.remove("focus-chart-tooltip-right", "focus-chart-tooltip-centered");
-      }
-    });
-    
-    canvas.addEventListener("mouseleave", () => {
-      tooltip.classList.add("focus-chart-tooltip-hidden");
-      tooltip.classList.remove("focus-chart-tooltip-centered");
-    });
-  }
-
-  // 使用共享的图表绘制函数（交互模式）
-  createLineChartInteractive(container, data, opts = { showTime: true, showCount: true }) {
-    return createLineChart(container, data, opts, true);
+    createLineChart(container, data, { ...opts, interactive: true });
   }
 }
 
 class FocusTimerSettingTab extends PluginSettingTab {
   plugin;
-  updateViewDebounceTimer = null; // 防抖定时器
-
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -2950,7 +2554,21 @@ class FocusTimerSettingTab extends PluginSettingTab {
           });
       });
 
-    // 2. 键盘快捷键设置
+    // 2. 倒计时允许提前完成
+    new Setting(containerEl)
+      .setName(t("allowCompleteCountdownEarly"))
+      .setDesc(t("allowCompleteCountdownEarlyDesc"))
+      .addToggle(toggle => {
+        toggle
+          .setValue(this.plugin.settings.allowCompleteCountdownEarly ?? false)
+          .onChange(async (value) => {
+            this.plugin.settings.allowCompleteCountdownEarly = value;
+            await this.plugin.saveSettings();
+            this.plugin.updateView();
+          });
+      });
+
+    // 3. 键盘快捷键设置
     new Setting(containerEl)
       .setName(t("keyboardShortcuts"))
       .setDesc(t("keyboardShortcutsDesc"))
@@ -2963,7 +2581,36 @@ class FocusTimerSettingTab extends PluginSettingTab {
           });
       });
 
-    // 3. 默认模式设置
+    // 4. 状态栏显示专注情况
+    new Setting(containerEl)
+      .setName(t("statusBarShowFocus"))
+      .setDesc(t("statusBarShowFocusDesc"))
+      .addToggle(toggle => {
+        toggle
+          .setValue(this.plugin.settings.statusBarShowFocus !== false)
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarShowFocus = value;
+            await this.plugin.saveSettings();
+            if (value) {
+              if (!this.plugin.statusBarEl) {
+                this.plugin.statusBarEl = this.plugin.addStatusBarItem();
+                this.plugin.statusBarEl.setText(getLanguage() === 'zh' ? "专注计时器" : "Focus Timer");
+                this.plugin.statusBarEl.addClass("focus-timer-statusbar");
+                this.plugin.statusBarEl.onClickEvent(() => this.plugin.openView());
+              }
+              this.plugin.updateStatusBarDisplay();
+              this.plugin.startStatusBarTimer();
+            } else {
+              this.plugin.stopStatusBarTimer();
+              if (this.plugin.statusBarEl) {
+                this.plugin.statusBarEl.remove();
+                this.plugin.statusBarEl = null;
+              }
+            }
+          });
+      });
+
+    // 5. 默认模式设置
     new Setting(containerEl)
       .setName(t("defaultMode"))
       .setDesc(t("defaultModeDesc"))
@@ -3027,14 +2674,11 @@ class FocusTimerSettingTab extends PluginSettingTab {
             }
           }
           await this.plugin.saveSettings();
-          // 防抖更新视图，最多500ms刷新一次
-          if (this.updateViewDebounceTimer) {
-            clearTimeout(this.updateViewDebounceTimer);
-          }
-          this.updateViewDebounceTimer = setTimeout(() => {
+          // 防抖更新视图，最多500ms刷新一次（使用统一定时器管理器）
+          this.plugin.timerManager.clear("setting-view-debounce");
+          this.plugin.timerManager.setTimeout("setting-view-debounce", 500, () => {
             this.plugin.updateView();
-            this.updateViewDebounceTimer = null;
-          }, 500);
+          });
         });
       });
 
@@ -3393,7 +3037,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
       .addTextArea(text => {
         const list = this.plugin.settings.suggestTasks || [];
         text
-          .setPlaceholder("写代码\n阅读\n运动")
+          .setPlaceholder(t("suggestTasksPlaceholder"))
           .setValue(Array.isArray(list) ? list.join("\n") : "");
         text.inputEl.rows = 6;
         text.inputEl.classList.add("focus-settings-textarea");
@@ -3541,11 +3185,10 @@ class FocusTimerSettingTab extends PluginSettingTab {
 
 module.exports = class FocusTimerPlugin extends Plugin {
   statusBarEl = null;
+  timerManager = new TimerManager();
   statusBarStartTime = null; // 本地记录的开始时间
   statusBarPlannedSec = null; // 计划时长
   statusBarMode = null; // "focus" | "rest" | null
-  timerManager = new TimerManager(); // 集中管理所有定时器
-  eventManager = new EventListenerManager(); // 集中管理事件监听器
   settings = {
     autoContinue: false, // 倒计时结束后是否自动继续计时
     defaultMode: "countdown", // 默认模式：countdown（倒计时）或 stopwatch（正计时）
@@ -3558,6 +3201,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
     autoRest: false, // 是否在计时结束后自动进入休息
     defaultRestMinutes: 5, // 默认休息时间（分钟）
     keyboardShortcuts: false, // 聚焦面板时：Enter 开始，上/下 加减时间
+    statusBarShowFocus: true, // 状态栏是否显示专注/休息计时
+    allowCompleteCountdownEarly: false, // 倒计时进行时是否允许提前完成（关则只显示放弃、命令完成不可用）
     suggestTasks: [], // 联想任务列表（专注事项输入时联想；新任务开始后自动加入）
     codeBlockChartShowTime: true, // focus 代码块图表默认：显示专注时间
     codeBlockChartShowCount: true // focus 代码块图表默认：显示任务数量
@@ -3567,14 +3212,43 @@ module.exports = class FocusTimerPlugin extends Plugin {
     // 保险：若无 data.json 则创建默认模板，防止启动失败
     await ensureDataFileExists(this.app);
 
-    // 初始化语言检测（延迟执行以确保 DOM 已加载）
-    setTimeout(() => {
+    // 初始化语言检测（延迟执行以确保 DOM 已加载，使用统一定时器管理器）
+    this.timerManager.setTimeout("init-language", 100, () => {
       resetLanguageCache();
-      // 强制检测一次语言
       getLanguage();
-    }, 100);
+    });
     
-    // CSS 样式文件 (styles.css) 由 Obsidian 自动加载
+    // 加载CSS样式文件
+    try {
+      // 方法1: 尝试使用vault adapter读取（适用于iCloud同步的vault）
+      const cssPath = ".obsidian/plugins/obsidian-focus-timer/style.css";
+      try {
+        const cssContent = await this.app.vault.adapter.read(cssPath);
+        const styleEl = document.createElement("style");
+        styleEl.textContent = cssContent;
+        document.head.appendChild(styleEl);
+        this.styleEl = styleEl;
+      } catch (vaultError) {
+        // 方法2: 如果vault adapter失败，使用Node.js fs模块
+        const fs = require("fs");
+        const path = require("path");
+        // 尝试从vault根目录读取
+        const vaultPath = this.app.vault.adapter.basePath;
+        const fullPath = path.join(vaultPath, ".obsidian", "plugins", "obsidian-focus-timer", "style.css");
+        
+        if (fs.existsSync(fullPath)) {
+          const cssContent = fs.readFileSync(fullPath, "utf8");
+          const styleEl = document.createElement("style");
+          styleEl.textContent = cssContent;
+          document.head.appendChild(styleEl);
+          this.styleEl = styleEl;
+        }
+      }
+    } catch (error) {
+      // 忽略CSS加载错误
+    }
+
+    await ensureDataFileExists(this.app);
 
     // 加载设置
     await this.loadSettings();
@@ -3582,7 +3256,6 @@ module.exports = class FocusTimerPlugin extends Plugin {
     // 添加设置标签页
     this.addSettingTab(new FocusTimerSettingTab(this.app, this));
 
-    // 使用事件管理器注册键盘事件
     this._keydownHandler = (e) => {
       if (!this.settings.keyboardShortcuts) return;
       const leaf = this.app.workspace.getActiveViewOfType(FocusTimerView);
@@ -3601,7 +3274,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
         e.preventDefault();
       }
     };
-    this.eventManager.add(document, "keydown", this._keydownHandler, undefined, "plugin_keydown");
+    document.addEventListener("keydown", this._keydownHandler);
 
     // 注册代码块处理器
     this.registerMarkdownCodeBlockProcessor("focus", async (source, el, ctx) => {
@@ -3700,21 +3373,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       
       // 如果chartRange为null，使用默认值（需要在验证之前设置，以便正确验证）
       if (chartRange === null && showItems && !targetDate) {
-        const defaultRange = this.settings.defaultChartRange || "14天";
-        // 将设置中的中文格式转换为代码期望的格式
-        if (defaultRange === "7天" || defaultRange === "7 Days") {
-          chartRange = "7";
-        } else if (defaultRange === "14天" || defaultRange === "14 Days") {
-          chartRange = "14";
-        } else if (defaultRange === "30天" || defaultRange === "30 Days") {
-          chartRange = "30";
-        } else if (defaultRange === "本月" || defaultRange === "This Month") {
-          chartRange = "month";
-        } else if (defaultRange === "今年" || defaultRange === "This Year") {
-          chartRange = "year";
-        } else {
-          chartRange = "14"; // 默认值
-        }
+        chartRange = defaultChartRangeToShortKey(this.settings.defaultChartRange);
       }
       
       // 检查是否两个都为none
@@ -3773,7 +3432,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     this.addCommand({
       id: "focus-stop-complete",
       name: "Stop Focus (Complete)",
-      callback: () => this.stopFocus("completed"),
+      callback: () => this.stopFocus("completed"), // 内部会根据 allowCompleteCountdownEarly 拒绝倒计时提前完成
     });
 
     this.addCommand({
@@ -3794,16 +3453,15 @@ module.exports = class FocusTimerPlugin extends Plugin {
     // 添加快捷Timer命令（可在设置中配置，支持快捷键绑定）
     this.registerQuickTimerCommands();
 
-    // 添加状态栏按钮
-    this.statusBarEl = this.addStatusBarItem();
-    this.statusBarEl.setText(getLanguage() === 'zh' ? "专注计时器" : "Focus Timer");
-    this.statusBarEl.addClass("focus-timer-statusbar");
-    this.statusBarEl.onClickEvent(() => this.openView());
-    
-    // 初始化状态栏显示
-    this.updateStatusBarDisplay();
-    // 启动状态栏计时器（每秒更新文本，不读取文件）
-    this.startStatusBarTimer();
+    // 状态栏：仅当设置开启时添加并显示专注情况
+    if (this.settings.statusBarShowFocus !== false) {
+      this.statusBarEl = this.addStatusBarItem();
+      this.statusBarEl.setText(getLanguage() === 'zh' ? "专注计时器" : "Focus Timer");
+      this.statusBarEl.addClass("focus-timer-statusbar");
+      this.statusBarEl.onClickEvent(() => this.openView());
+      this.updateStatusBarDisplay();
+      this.startStatusBarTimer();
+    }
   }
 
   async openView() {
@@ -3878,7 +3536,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       
       if (elapsedMinutes >= 600) {
         // 达到600分钟，自动完成
-        this.stopStatusBarTimer();
+        this.timerManager.clear("status-bar");
         new Notice(t("stopwatchOver10Hours"), 5000);
         this.stopFocus("completed");
         return;
@@ -3893,7 +3551,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       const elapsed = Math.floor((now - this.statusBarStartTime) / 1000);
       // 开关关闭时：倒计时结束时自动完成
       if (elapsed >= this.statusBarPlannedSec && !this.settings.autoContinue) {
-        this.stopStatusBarTimer();
+        this.timerManager.clear("status-bar");
         this.stopFocus("completed");
         return;
       }
@@ -3901,19 +3559,16 @@ module.exports = class FocusTimerPlugin extends Plugin {
     }
   }
 
-  // 启动状态栏计时器（每秒更新文本）
+  // 启动状态栏计时器（每秒更新文本，使用统一定时器管理器）
   startStatusBarTimer() {
-    this.timerManager.setInterval(() => {
-      this.updateStatusBarText();
-    }, 1000, "statusBar");
-    
-    // 立即更新一次
+    this.timerManager.clear("status-bar");
+    this.timerManager.setInterval("status-bar", 1000, () => this.updateStatusBarText());
     this.updateStatusBarText();
   }
 
   // 停止状态栏计时器
   stopStatusBarTimer() {
-    this.timerManager.clear("statusBar");
+    this.timerManager.clear("status-bar");
   }
 
   async startFocus(plannedSec, mode = null, note = "") {
@@ -3976,6 +3631,16 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (!state.active || state.resting) {
       new Notice(t("focusStopFailed"));
       return; // 已结束或正在休息（如倒计时自动完成时可能被重复调用）
+    }
+    // 若以「完成」结束且当前是倒计时且不允许提前完成，则拒绝（超时后允许完成）
+    if (status === "completed" && this.settings.allowCompleteCountdownEarly !== true) {
+      const isCountdown = state.mode === "countdown" || state.plannedSec != null;
+      const elapsedSec = Math.floor(clamp0(msBetween(state.start, nowISO())) / 1000);
+      const isOvertime = state.plannedSec != null && elapsedSec >= state.plannedSec;
+      if (isCountdown && !isOvertime) {
+        new Notice(t("completeCountdownEarlyDisabled"));
+        return;
+      }
     }
 
     const end = nowISO();
@@ -4080,6 +3745,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
         autoRest: false,
         defaultRestMinutes: 5,
         keyboardShortcuts: false,
+        statusBarShowFocus: true,
+        allowCompleteCountdownEarly: false,
         suggestTasks: [],
         codeBlockChartShowTime: true,
         codeBlockChartShowCount: true
@@ -4087,6 +3754,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
       const mergedSettings = { ...defaultSettings, ...settings };
       this.settings = { ...this.settings, ...mergedSettings };
       if (this.settings.keyboardShortcuts === undefined) this.settings.keyboardShortcuts = false;
+      if (this.settings.statusBarShowFocus === undefined) this.settings.statusBarShowFocus = true;
+      if (this.settings.allowCompleteCountdownEarly === undefined) this.settings.allowCompleteCountdownEarly = false;
       if (!Array.isArray(this.settings.suggestTasks)) this.settings.suggestTasks = [];
       this.settings.suggestTasks = this.settings.suggestTasks.slice(0, MAX_SUGGEST_TASKS);
       if (this.settings.codeBlockChartShowTime === undefined) this.settings.codeBlockChartShowTime = true;
@@ -4316,28 +3985,27 @@ module.exports = class FocusTimerPlugin extends Plugin {
     container.appendChild(card);
   }
 
-  // 设置每天0:00自动刷新
+  // 设置每天0:00自动刷新（使用统一定时器管理器）
   setupDailyRefresh(el, ctx, showRecord = true, showItems = true, height = null, chartRange = null, chartMetric = null) {
-    // 清除之前的定时器
-    if (el._dailyRefreshTimer) {
-      clearTimeout(el._dailyRefreshTimer);
+    if (!el._focusDailyRefreshId) {
+      this._dailyRefreshCounter = (this._dailyRefreshCounter ?? 0) + 1;
+      el._focusDailyRefreshId = "daily-refresh-" + this._dailyRefreshCounter;
     }
-    
+    const id = el._focusDailyRefreshId;
+    this.timerManager.clear(id);
+
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
-    
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
-    
-    el._dailyRefreshTimer = setTimeout(async () => {
-      // 刷新组件，使用存储的高度值
+
+    this.timerManager.setTimeout(id, msUntilMidnight, async () => {
       const todayKey = getDateKey(new Date());
       const storedHeight = el._focusBlockHeight || height;
       await this.renderFocusBlock(el, ctx, todayKey, true, showRecord, showItems, storedHeight, chartRange, chartMetric);
-      // 设置下一次刷新（24小时后）
       this.setupDailyRefresh(el, ctx, showRecord, showItems, storedHeight, chartRange, chartMetric);
-    }, msUntilMidnight);
+    });
   }
 
   async renderFocusBlock(el, ctx, targetDate = null, isToday = false, showRecord = true, showItems = true, height = null, chartRange = null, chartMetric = null) {
@@ -4598,48 +4266,9 @@ module.exports = class FocusTimerPlugin extends Plugin {
         const chartContainer = document.createElement('div');
         chartContainer.className = 'focus-code-chart';
         
-        // 计算图表范围标签和用于计算数据的范围值
-        let rangeLabel;
-        let rangeForCalculation; // 用于传递给calculateChartData的参数
-        if (chartRange === "7") {
-          rangeLabel = t("days7");
-          rangeForCalculation = "7天";
-        } else if (chartRange === "14") {
-          rangeLabel = t("days14");
-          rangeForCalculation = "14天";
-        } else if (chartRange === "30") {
-          rangeLabel = t("days30");
-          rangeForCalculation = "30天";
-        } else if (chartRange === "month") {
-          rangeLabel = t("thisMonth");
-          rangeForCalculation = "本月";
-        } else if (chartRange === "year") {
-          rangeLabel = t("thisYear");
-          rangeForCalculation = "今年";
-        } else {
-          // 未指定时，回退到设置中的默认值
-          const defaultRange = this.settings.defaultChartRange || "14天";
-          // 将设置中的中文格式转换为标签和计算值
-          if (defaultRange === "7天" || defaultRange === "7 Days") {
-            rangeLabel = t("days7");
-            rangeForCalculation = "7天";
-          } else if (defaultRange === "14天" || defaultRange === "14 Days") {
-            rangeLabel = t("days14");
-            rangeForCalculation = "14天";
-          } else if (defaultRange === "30天" || defaultRange === "30 Days") {
-            rangeLabel = t("days30");
-            rangeForCalculation = "30天";
-          } else if (defaultRange === "本月" || defaultRange === "This Month") {
-            rangeLabel = t("thisMonth");
-            rangeForCalculation = "本月";
-          } else if (defaultRange === "今年" || defaultRange === "This Year") {
-            rangeLabel = t("thisYear");
-            rangeForCalculation = "今年";
-          } else {
-            rangeLabel = t("days14");
-            rangeForCalculation = "14天";
-          }
-        }
+        // 计算图表范围标签和用于计算数据的范围值（统一走 chartRangeToLabelAndCalculation）
+        const shortKey = CHART_RANGE_CONFIG.some(c => c.shortKey === chartRange) ? chartRange : defaultChartRangeToShortKey(this.settings.defaultChartRange);
+        const { rangeLabel, rangeForCalculation } = chartRangeToLabelAndCalculation(shortKey);
 
         const chartHeader = document.createElement('div');
         chartHeader.className = 'focus-code-chart-header';
@@ -4679,29 +4308,18 @@ module.exports = class FocusTimerPlugin extends Plugin {
         // 计算指定范围的图表数据（使用中文格式的范围值）
         const chartData = calculateChartData(sessions, rangeForCalculation);
         
-        // 创建图表
+        // 创建图表（使用共享 createLineChart 函数，代码块为静态无 tooltip）
         if (chartData && chartData.length > 0) {
-          // 直接调用createLineChart，不需要创建view实例
-          // 创建一个简单的对象来调用方法
-
-        
-        // 根据 chartMetric 决定显示专注时长还是任务数量
-        let showTime = this.settings.codeBlockChartShowTime ?? true;
-        let showCount = this.settings.codeBlockChartShowCount ?? true;
-        if (chartMetric === "time") {
-          showTime = true;
-          showCount = false;
-        } else if (chartMetric === "task") {
-          showTime = false;
-          showCount = true;
-        }
-
-        const opts = {
-          showTime,
-          showCount
-        };
-        // 使用共享的图表绘制函数（非交互模式）
-        createLineChart(chartCanvasContainer, chartData, opts, false);
+          let showTime = this.settings.codeBlockChartShowTime ?? true;
+          let showCount = this.settings.codeBlockChartShowCount ?? true;
+          if (chartMetric === "time") {
+            showTime = true;
+            showCount = false;
+          } else if (chartMetric === "task") {
+            showTime = false;
+            showCount = true;
+          }
+          createLineChart(chartCanvasContainer, chartData, { showTime, showCount, interactive: false });
         } else {
           const emptyMsg = document.createElement('div');
           emptyMsg.className = 'focus-code-history-empty';
@@ -4718,20 +4336,13 @@ module.exports = class FocusTimerPlugin extends Plugin {
   }
 
   onunload() {
-    // 使用管理器统一清理所有事件监听器
-    this.eventManager.removeAll();
-    this._keydownHandler = null;
-    
-    // 使用管理器统一清理所有定时器
+    if (this._keydownHandler) {
+      document.removeEventListener("keydown", this._keydownHandler);
+      this._keydownHandler = null;
+    }
     this.timerManager.clearAll();
-    
-    // 清理所有代码块的定时器（这些是挂在 DOM 元素上的）
-    const codeBlocks = document.querySelectorAll('.focus-code-block');
-    codeBlocks.forEach(el => {
-      if (el._dailyRefreshTimer) {
-        clearTimeout(el._dailyRefreshTimer);
-        el._dailyRefreshTimer = null;
-      }
-    });
+    if (this.styleEl && this.styleEl.parentNode) {
+      this.styleEl.parentNode.removeChild(this.styleEl);
+    }
   }
 };
