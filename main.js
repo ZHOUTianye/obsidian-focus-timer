@@ -45,6 +45,132 @@ const MAX_SUGGEST_TASKS = 100;
 function nowISO() { return new Date().toISOString(); }
 function clamp0(n) { return Math.max(0, n); }
 
+// ========== 文件操作锁机制 ==========
+// 防止并发读写导致数据不一致
+class FileLock {
+  constructor() {
+    this._locked = false;
+    this._queue = [];
+  }
+
+  async acquire() {
+    return new Promise((resolve) => {
+      if (!this._locked) {
+        this._locked = true;
+        resolve();
+      } else {
+        this._queue.push(resolve);
+      }
+    });
+  }
+
+  release() {
+    if (this._queue.length > 0) {
+      const next = this._queue.shift();
+      next();
+    } else {
+      this._locked = false;
+    }
+  }
+
+  async withLock(fn) {
+    await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      this.release();
+    }
+  }
+}
+
+const dataFileLock = new FileLock();
+
+// ========== 定时器管理器 ==========
+// 集中管理所有定时器，便于统一清理
+class TimerManager {
+  constructor() {
+    this._timers = new Map(); // id -> { type: 'interval'|'timeout', handle }
+    this._nextId = 1;
+  }
+
+  setInterval(callback, delay, name = null) {
+    const id = name || `interval_${this._nextId++}`;
+    this.clear(id); // 清除同名的旧定时器
+    const handle = setInterval(callback, delay);
+    this._timers.set(id, { type: 'interval', handle });
+    return id;
+  }
+
+  setTimeout(callback, delay, name = null) {
+    const id = name || `timeout_${this._nextId++}`;
+    this.clear(id); // 清除同名的旧定时器
+    const handle = setTimeout(() => {
+      this._timers.delete(id);
+      callback();
+    }, delay);
+    this._timers.set(id, { type: 'timeout', handle });
+    return id;
+  }
+
+  clear(id) {
+    const timer = this._timers.get(id);
+    if (timer) {
+      if (timer.type === 'interval') {
+        clearInterval(timer.handle);
+      } else {
+        clearTimeout(timer.handle);
+      }
+      this._timers.delete(id);
+    }
+  }
+
+  clearAll() {
+    for (const [id, timer] of this._timers) {
+      if (timer.type === 'interval') {
+        clearInterval(timer.handle);
+      } else {
+        clearTimeout(timer.handle);
+      }
+    }
+    this._timers.clear();
+  }
+
+  has(id) {
+    return this._timers.has(id);
+  }
+}
+
+// ========== 事件监听器管理器 ==========
+// 集中管理文档级事件监听器，便于统一清理
+class EventListenerManager {
+  constructor() {
+    this._listeners = new Map(); // id -> { target, event, handler, options }
+  }
+
+  add(target, event, handler, options = undefined, id = null) {
+    const listenerId = id || `listener_${Date.now()}_${Math.random()}`;
+    this.remove(listenerId); // 清除同名的旧监听器
+    target.addEventListener(event, handler, options);
+    this._listeners.set(listenerId, { target, event, handler, options });
+    return listenerId;
+  }
+
+  remove(id) {
+    const listener = this._listeners.get(id);
+    if (listener) {
+      listener.target.removeEventListener(listener.event, listener.handler, listener.options);
+      this._listeners.delete(id);
+    }
+  }
+
+  removeAll() {
+    for (const [id, listener] of this._listeners) {
+      listener.target.removeEventListener(listener.event, listener.handler, listener.options);
+    }
+    this._listeners.clear();
+  }
+}
+
 // ========== 国际化支持 ==========
 // 翻译对象
 const translations = {
@@ -378,7 +504,7 @@ class ConfirmModal extends Modal {
     titleEl.setText(this.titleText);
     contentEl.empty();
 
-    const msgEl = contentEl.createEl("p", { text: this.messageText, cls: "focus-confirm-message" });
+    contentEl.createEl("p", { text: this.messageText, cls: "focus-confirm-message" });
 
     const buttons = contentEl.createDiv({ cls: "focus-confirm-buttons" });
 
@@ -460,10 +586,12 @@ function limitInputLength(text) {
 }
 
 async function ensureJsonFile(app, path, fallbackObj) {
-  const exists = await app.vault.adapter.exists(path);
-  if (!exists) {
-    await app.vault.adapter.write(path, JSON.stringify(fallbackObj, null, 2));
-  }
+  return dataFileLock.withLock(async () => {
+    const exists = await app.vault.adapter.exists(path);
+    if (!exists) {
+      await app.vault.adapter.write(path, JSON.stringify(fallbackObj, null, 2));
+    }
+  });
 }
 
 async function readJson(app, path, fallbackObj) {
@@ -480,13 +608,16 @@ async function writeJson(app, path, obj) {
 }
 
 // 读取整个 data.json 文件（文件缺失或解析失败时返回默认模板）
+// 注意：读操作不需要锁，因为我们使用写时锁定来保证一致性
 async function readDataFile(app) {
   return await readJson(app, DATA_PATH, getDefaultDataTemplate());
 }
 
-// 写入整个 data.json 文件
+// 写入整个 data.json 文件（使用锁防止并发写入）
 async function writeDataFile(app, data) {
-  await writeJson(app, DATA_PATH, data);
+  return dataFileLock.withLock(async () => {
+    await writeJson(app, DATA_PATH, data);
+  });
 }
 
 // 读取 state
@@ -495,11 +626,13 @@ async function readState(app) {
   return data.state || { active: false, resting: false };
 }
 
-// 写入 state（合并更新）
+// 写入 state（合并更新，使用锁保证原子性）
 async function writeState(app, state) {
-  const data = await readDataFile(app);
-  data.state = { ...data.state, ...state };
-  await writeDataFile(app, data);
+  return dataFileLock.withLock(async () => {
+    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+    data.state = { ...data.state, ...state };
+    await writeJson(app, DATA_PATH, data);
+  });
 }
 
 // 读取 sessions
@@ -508,11 +641,13 @@ async function readSessions(app) {
   return Array.isArray(data.sessions) ? data.sessions : [];
 }
 
-// 写入 sessions（完全替换）
+// 写入 sessions（完全替换，使用锁保证原子性）
 async function writeSessions(app, sessions) {
-  const data = await readDataFile(app);
-  data.sessions = sessions;
-  await writeDataFile(app, data);
+  return dataFileLock.withLock(async () => {
+    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+    data.sessions = sessions;
+    await writeJson(app, DATA_PATH, data);
+  });
 }
 
 // 读取 settings
@@ -521,18 +656,26 @@ async function readSettings(app) {
   return data.settings || {};
 }
 
-// 写入 settings（合并更新）
+// 写入 settings（合并更新，使用锁保证原子性）
 async function writeSettings(app, settings) {
-  const data = await readDataFile(app);
-  data.settings = { ...data.settings, ...settings };
-  await writeDataFile(app, data);
+  return dataFileLock.withLock(async () => {
+    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+    data.settings = { ...data.settings, ...settings };
+    await writeJson(app, DATA_PATH, data);
+  });
 }
 
+// 追加 session（使用锁保证原子性）
 async function appendSession(app, session) {
-  await ensureDataFileExists(app);
-  const sessions = await readSessions(app);
-  sessions.push(session);
-  await writeSessions(app, sessions);
+  return dataFileLock.withLock(async () => {
+    await ensureJsonFile(app, DATA_PATH, getDefaultDataTemplate());
+    const data = await readJson(app, DATA_PATH, getDefaultDataTemplate());
+    if (!Array.isArray(data.sessions)) {
+      data.sessions = [];
+    }
+    data.sessions.push(session);
+    await writeJson(app, DATA_PATH, data);
+  });
 }
 
 function msBetween(aIso, bIso) {
@@ -555,7 +698,8 @@ function formatTime(seconds) {
 
 function formatDate(isoString) {
   const date = new Date(isoString);
-  return date.toLocaleString('zh-CN', {
+  const locale = getLanguage() === 'zh' ? 'zh-CN' : 'en-US';
+  return date.toLocaleString(locale, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
@@ -921,6 +1065,315 @@ function calculateChartData(sessions, range) {
   return data;
 }
 
+// ========== 共享图表绘制函数 ==========
+// 提取为独立函数，供 FocusTimerView 和代码块处理器共用
+function createLineChart(container, data, opts = { showTime: true, showCount: true }, interactive = true) {
+  // 确保container是有效的DOM元素
+  if (!container || !(container instanceof Element || container instanceof HTMLElement)) {
+    return { drawChart: () => {}, timePoints: [], countPoints: [] };
+  }
+  
+  // 确保data是有效的数组
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return { drawChart: () => {}, timePoints: [], countPoints: [] };
+  }
+  
+  // 如果container已经有canvas，先移除
+  const existingCanvas = container.querySelector("canvas");
+  if (existingCanvas) {
+    existingCanvas.remove();
+  }
+  
+  // 移除现有的tooltip
+  const existingTooltip = container.querySelector(".focus-chart-tooltip");
+  if (existingTooltip) {
+    existingTooltip.remove();
+  }
+  
+  const canvas = document.createElement("canvas");
+  canvas.className = "focus-line-chart";
+  // 使用高DPI支持
+  const dpr = window.devicePixelRatio || 1;
+  const width = 600;
+  const height = 200;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.setProperty('--focus-canvas-width', width + 'px');
+  canvas.style.setProperty('--focus-canvas-height', height + 'px');
+  canvas.classList.add(interactive ? "focus-line-chart-interactive" : "focus-line-chart-static");
+  container.appendChild(canvas);
+  
+  // 创建tooltip元素（仅在交互模式下）
+  let tooltip = null;
+  if (interactive) {
+    tooltip = document.createElement("div");
+    tooltip.className = "focus-chart-tooltip focus-chart-tooltip-hidden";
+    container.appendChild(tooltip);
+  }
+  
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  
+  // 图表布局参数
+  const leftPadding = 40;
+  const rightPadding = 70;
+  const bottomPadding = 50;
+  const topPadding = 20;
+  const chartWidth = width - leftPadding - rightPadding;
+  const chartHeight = height - topPadding - bottomPadding;
+  
+  // 计算最大值
+  const maxValue = Math.max(...data.map(d => d.value || 0), 1);
+  const showTime = opts?.showTime !== false;
+  const showCount = opts?.showCount !== false;
+  const maxHours = showTime ? (Math.ceil(maxValue / 3600) || 1) : 1;
+  const maxCompleted = showCount ? (Math.max(...data.map(d => d.completed || 0), 1)) : 1;
+  
+  // 存储数据点位置
+  const timePoints = [];
+  const countPoints = [];
+  
+  // 获取主题色
+  const getAccentColor = () => {
+    let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--text-accent');
+    if (accentColor) accentColor = accentColor.trim();
+    if (!accentColor || accentColor === '') {
+      accentColor = getComputedStyle(document.documentElement).getPropertyValue('--interactive-accent');
+      if (accentColor) accentColor = accentColor.trim();
+    }
+    if (!accentColor || accentColor === '') {
+      accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+      if (accentColor) accentColor = accentColor.trim();
+    }
+    if (!accentColor || accentColor === '') {
+      try {
+        const testEl = document.createElement('div');
+        testEl.className = 'focus-test-element';
+        document.body.appendChild(testEl);
+        const computedColor = getComputedStyle(testEl).color;
+        document.body.removeChild(testEl);
+        if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
+          accentColor = computedColor;
+        }
+      } catch (e) {
+        // 忽略错误
+      }
+    }
+    return accentColor || '#008f32';
+  };
+  
+  // 绘制函数
+  const drawChart = () => {
+    ctx.clearRect(0, 0, width, height);
+
+    if (!showTime && !showCount) {
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
+      ctx.font = "14px var(--font-text)";
+      ctx.textAlign = "center";
+      ctx.fillText(t("noItemSelected"), width / 2, height / 2);
+      ctx.textAlign = "left";
+      return;
+    }
+    
+    // 绘制网格和标签
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-modifier-border') || '#e0e0e0';
+    ctx.lineWidth = 1;
+    ctx.font = "11px var(--font-text)";
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
+    
+    for (let i = 0; i <= 5; i++) {
+      const y = topPadding + (chartHeight / 5) * i;
+      if (showTime) {
+        const valueH = maxHours * (1 - i / 5);
+        ctx.textAlign = "left";
+        ctx.fillText(valueH.toFixed(1) + "h", 5, y + 4);
+      }
+      if (showCount) {
+        const valueC = Math.round(maxCompleted * (1 - i / 5));
+        ctx.textAlign = "left";
+        const lang = getLanguage();
+        const countLabel = lang === 'zh' ? valueC + "个" : valueC.toString();
+        ctx.fillText(countLabel, width - rightPadding + 6, y + 4);
+      }
+      ctx.beginPath();
+      ctx.moveTo(leftPadding, y);
+      ctx.lineTo(width - rightPadding, y);
+      ctx.stroke();
+    }
+    ctx.textAlign = "left";
+    
+    const accentColor = getAccentColor();
+    const countColor = "#ff9800";
+
+    // 折线1：专注时长（左轴）
+    timePoints.length = 0;
+    if (showTime) {
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+
+      data.forEach((point, index) => {
+        const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
+        const y = topPadding + chartHeight - (point.value / 3600 / maxHours) * chartHeight;
+        timePoints.push({ x, y, point, index });
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.fillStyle = accentColor;
+      timePoints.forEach(({ x, y }) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = accentColor;
+      });
+    }
+
+    // 折线2：任务数量（右轴）
+    countPoints.length = 0;
+    if (showCount) {
+      ctx.strokeStyle = countColor;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+
+      data.forEach((point, index) => {
+        const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
+        const c = point.completed || 0;
+        const y = topPadding + chartHeight - (c / maxCompleted) * chartHeight;
+        countPoints.push({ x, y, point, index });
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.fillStyle = countColor;
+      countPoints.forEach(({ x, y }) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = countColor;
+      });
+    }
+    
+    // X轴标签（日期）
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
+    ctx.font = "10px var(--font-text)";
+    data.forEach((point, index) => {
+      if (index % 2 === 0 || index === data.length - 1) {
+        const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
+        const date = new Date(point.date);
+        const label = `${date.getMonth() + 1}/${date.getDate()}`;
+        ctx.save();
+        ctx.translate(x, height - bottomPadding + 15);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+      }
+    });
+  };
+  
+  // 初始绘制
+  drawChart();
+  
+  // 添加交互事件（仅在交互模式下）
+  if (interactive && tooltip) {
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      let nearestPoint = null;
+      let minDistance = Infinity;
+      
+      [...timePoints, ...countPoints].forEach(({ x: px, y: py, point, index }) => {
+        const distance = Math.sqrt(Math.pow(x - px, 2) + Math.pow(y - py, 2));
+        if (distance < 15 && distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = { x: px, y: py, point };
+        }
+      });
+      
+      if (nearestPoint) {
+        tooltip.classList.remove("focus-chart-tooltip-right");
+        
+        const date = new Date(nearestPoint.point.date);
+        const lang = getLanguage();
+        const dateStr = lang === 'zh' 
+          ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+          : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+        const hours = Math.floor(nearestPoint.point.value / 3600);
+        const minutes = Math.floor((nearestPoint.point.value % 3600) / 60);
+        const timeStr = lang === 'zh' 
+          ? (hours > 0 ? `${hours}时${minutes}分` : `${minutes}分`)
+          : (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`);
+        const completedCount = nearestPoint.point.completed || 0;
+        
+        while (tooltip.firstChild) {
+          tooltip.removeChild(tooltip.firstChild);
+        }
+        const titleDiv = document.createElement("div");
+        titleDiv.className = "focus-chart-tooltip-title";
+        titleDiv.textContent = dateStr;
+        tooltip.appendChild(titleDiv);
+        if (showTime) {
+          const timeDiv = document.createElement("div");
+          timeDiv.className = "focus-chart-tooltip-line";
+          timeDiv.textContent = `${t("focusTime")}: ${timeStr}`;
+          tooltip.appendChild(timeDiv);
+        }
+        if (showCount) {
+          const countDiv = document.createElement("div");
+          countDiv.className = "focus-chart-tooltip-line";
+          countDiv.textContent = `${t("completedTasks")}: ${completedCount}${lang === 'zh' ? '个' : ''}`;
+          tooltip.appendChild(countDiv);
+        }
+        
+        tooltip.classList.remove("focus-chart-tooltip-hidden");
+        tooltip.classList.add("focus-chart-tooltip-measuring");
+        const tooltipRect = tooltip.getBoundingClientRect();
+        tooltip.classList.remove("focus-chart-tooltip-measuring");
+        
+        let tooltipX = nearestPoint.x;
+        let tooltipY = nearestPoint.y - tooltipRect.height - 15;
+        
+        if (tooltipY < 0) {
+          tooltipY = nearestPoint.y + 20;
+        }
+        
+        const tooltipHalfWidth = tooltipRect.width / 2;
+        tooltipX = Math.max(tooltipHalfWidth, Math.min(width - tooltipHalfWidth, tooltipX));
+        
+        tooltip.style.setProperty('--focus-tooltip-left', tooltipX + 'px');
+        tooltip.style.setProperty('--focus-tooltip-top', tooltipY + 'px');
+        tooltip.classList.add('focus-chart-tooltip-centered');
+      } else {
+        tooltip.classList.add("focus-chart-tooltip-hidden");
+        tooltip.classList.remove("focus-chart-tooltip-right", "focus-chart-tooltip-centered");
+      }
+    });
+    
+    canvas.addEventListener("mouseleave", () => {
+      tooltip.classList.add("focus-chart-tooltip-hidden");
+      tooltip.classList.remove("focus-chart-tooltip-centered");
+    });
+  }
+  
+  return { drawChart, timePoints, countPoints };
+}
+
 // 侧边栏视图
 class FocusTimerView extends ItemView {
   constructor(leaf, plugin) {
@@ -935,6 +1388,7 @@ class FocusTimerView extends ItemView {
     this.currentView = "stats"; // 当前视图："stats" 或 "history"
     this.restStartTime = null; // 休息开始时间
     this.restSec = null; // 休息时长（秒）
+    this.eventManager = new EventListenerManager(); // 管理视图级别的事件监听器
   }
 
   getViewType() {
@@ -1091,6 +1545,10 @@ class FocusTimerView extends ItemView {
 
   async onClose() {
     this.stopTimer();
+    // 使用事件管理器清理所有注册的监听器
+    this.eventManager.removeAll();
+    this._autocompleteClickOutside = null;
+    this._timeEditorClickOutside = null;
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
@@ -1400,64 +1858,6 @@ class FocusTimerView extends ItemView {
       completeBtn.onclick = () => this.plugin.stopFocus("completed");
       const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-btn-secondary" });
       abandonBtn.onclick = () => this.plugin.stopFocus("abandoned");
-    } else if (state.resting) {
-      // 休息状态
-      this.startTime = null;
-      this.plannedSec = null;
-      this.timerMode = null;
-      
-      // 休息倒计时显示
-      const restStartTime = new Date(state.restStart).getTime();
-      const restSec = state.restSec || 300; // 默认5分钟
-      this.restStartTime = restStartTime;
-      this.restSec = restSec;
-      
-      // 圆环SVG（休息倒计时）
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("class", "focus-circle-svg");
-      svg.setAttribute("viewBox", "0 0 100 100");
-      
-      const bgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      bgCircle.setAttribute("cx", "50");
-      bgCircle.setAttribute("cy", "50");
-      bgCircle.setAttribute("r", "45");
-      bgCircle.setAttribute("fill", "none");
-      bgCircle.setAttribute("stroke", "var(--background-modifier-border)");
-      bgCircle.setAttribute("stroke-width", "8");
-      svg.appendChild(bgCircle);
-      
-      const progressCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      progressCircle.setAttribute("cx", "50");
-      progressCircle.setAttribute("cy", "50");
-      progressCircle.setAttribute("r", "45");
-      progressCircle.setAttribute("fill", "none");
-      progressCircle.setAttribute("stroke", "var(--text-accent)");
-      progressCircle.setAttribute("stroke-width", "8");
-      progressCircle.setAttribute("stroke-linecap", "round");
-      progressCircle.setAttribute("stroke-dasharray", "283");
-      progressCircle.setAttribute("transform", "rotate(-90 50 50)");
-      progressCircle.setAttribute("class", "focus-progress-circle");
-      svg.appendChild(progressCircle);
-      
-      circleContainer.appendChild(svg);
-      this.timerElements = {};
-      this.timerElements.circleEl = progressCircle;
-      
-      // 时间显示
-      const timeDisplay = circleContainer.createDiv("focus-time-display");
-      const now = Date.now();
-      const elapsed = Math.floor((now - restStartTime) / 1000);
-      const remaining = Math.max(0, restSec - elapsed);
-      const timeEl = timeDisplay.createEl("div", {
-        text: formatTime(remaining),
-        cls: "focus-elapsed-time"
-      });
-      this.timerElements.timeEl = timeEl;
-      
-      // 按钮：结束休息
-      const btnContainer = timerSection.createDiv("focus-btn-container");
-      const endRestBtn = btnContainer.createEl("button", { text: t("endRest"), cls: "focus-btn-primary" });
-      endRestBtn.onclick = () => this.plugin.stopRest();
     } else {
       // 非专注状态
       this.startTime = null;
@@ -1543,10 +1943,9 @@ class FocusTimerView extends ItemView {
             editorContainer.classList.add("focus-time-editor-hidden");
             defaultTimeEl.classList.remove("focus-time-display-hidden");
             this.timeEditorOpen = false;
-            if (this._timeEditorClickOutside) {
-              document.removeEventListener("click", this._timeEditorClickOutside);
-              this._timeEditorClickOutside = null;
-            }
+            // 使用事件管理器移除监听器
+            this.eventManager.remove("time_editor_click_outside");
+            this._timeEditorClickOutside = null;
           };
           const closeEditor = this._timeEditorClose;
           this._timeEditorClickOutside = (e) => {
@@ -1554,7 +1953,8 @@ class FocusTimerView extends ItemView {
               closeEditor(true);
             }
           };
-          document.addEventListener("click", this._timeEditorClickOutside);
+          // 使用事件管理器注册监听器
+          this.eventManager.add(document, "click", this._timeEditorClickOutside, undefined, "time_editor_click_outside");
           minutesInput.focus();
         };
 
@@ -1714,14 +2114,15 @@ class FocusTimerView extends ItemView {
         }
       });
       
-      // 点击外部关闭下拉列表
-      document.addEventListener("click", (e) => {
+      // 点击外部关闭下拉列表（使用事件管理器避免泄漏）
+      this._autocompleteClickOutside = (e) => {
         if (!noteInputContainer.contains(e.target)) {
           autocompleteList.classList.add("focus-autocomplete-list-hidden");
           selectedIndex = -1;
         }
-      });
-      
+      };
+      this.eventManager.add(document, "click", this._autocompleteClickOutside, undefined, "autocomplete_click_outside");
+
       // 按钮容器：模式切换按钮（在开始按钮左侧）+ 开始、加、减
       const btnContainer = timerSection.createDiv("focus-btn-container");
       
@@ -2085,7 +2486,7 @@ class FocusTimerView extends ItemView {
       const redrawAll = () => {
         const opts = { showTime: showTimeCb.checked, showCount: showCountCb.checked };
         charts.forEach(({ container, data }) => {
-          this.createLineChart(container, data, opts);
+          createLineChart(container, data, opts, true);
         });
       };
       showTimeCb.addEventListener("change", redrawAll);
@@ -2138,7 +2539,7 @@ class FocusTimerView extends ItemView {
           if (chartData && Array.isArray(chartData) && chartData.length > 0) {
             try {
               charts.push({ container: chartContainer, data: chartData });
-              this.createLineChart(chartContainer, chartData, { showTime: showTimeCb.checked, showCount: showCountCb.checked });
+              createLineChart(chartContainer, chartData, { showTime: showTimeCb.checked, showCount: showCountCb.checked }, true);
             } catch (drawError) {
               const errorMsg = document.createElement("div");
               errorMsg.textContent = `${t("chartError")}: ${drawError.message}`;
@@ -2509,6 +2910,11 @@ class FocusTimerView extends ItemView {
       tooltip.classList.add("focus-chart-tooltip-hidden");
       tooltip.classList.remove("focus-chart-tooltip-centered");
     });
+  }
+
+  // 使用共享的图表绘制函数（交互模式）
+  createLineChartInteractive(container, data, opts = { showTime: true, showCount: true }) {
+    return createLineChart(container, data, opts, true);
   }
 }
 
@@ -3019,11 +3425,11 @@ class FocusTimerSettingTab extends PluginSettingTab {
 
     // 导出数据
     new Setting(containerEl)
-      .setName("导出数据")
-      .setDesc("将专注记录数据导出为CSV格式文件")
+      .setName(t("exportData"))
+      .setDesc(t("exportDataDesc"))
       .addButton(button => {
         button
-          .setButtonText("导出CSV")
+          .setButtonText(t("exportCSV"))
           .setCta()
           .onClick(async () => {
             try {
@@ -3135,10 +3541,11 @@ class FocusTimerSettingTab extends PluginSettingTab {
 
 module.exports = class FocusTimerPlugin extends Plugin {
   statusBarEl = null;
-  statusBarTimer = null;
   statusBarStartTime = null; // 本地记录的开始时间
   statusBarPlannedSec = null; // 计划时长
   statusBarMode = null; // "focus" | "rest" | null
+  timerManager = new TimerManager(); // 集中管理所有定时器
+  eventManager = new EventListenerManager(); // 集中管理事件监听器
   settings = {
     autoContinue: false, // 倒计时结束后是否自动继续计时
     defaultMode: "countdown", // 默认模式：countdown（倒计时）或 stopwatch（正计时）
@@ -3167,37 +3574,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       getLanguage();
     }, 100);
     
-    // 加载CSS样式文件
-    try {
-      // 方法1: 尝试使用vault adapter读取（适用于iCloud同步的vault）
-      const cssPath = ".obsidian/plugins/obsidian-focus-timer/style.css";
-      try {
-        const cssContent = await this.app.vault.adapter.read(cssPath);
-        const styleEl = document.createElement("style");
-        styleEl.textContent = cssContent;
-        document.head.appendChild(styleEl);
-        this.styleEl = styleEl;
-      } catch (vaultError) {
-        // 方法2: 如果vault adapter失败，使用Node.js fs模块
-        const fs = require("fs");
-        const path = require("path");
-        // 尝试从vault根目录读取
-        const vaultPath = this.app.vault.adapter.basePath;
-        const fullPath = path.join(vaultPath, ".obsidian", "plugins", "obsidian-focus-timer", "style.css");
-        
-        if (fs.existsSync(fullPath)) {
-          const cssContent = fs.readFileSync(fullPath, "utf8");
-          const styleEl = document.createElement("style");
-          styleEl.textContent = cssContent;
-          document.head.appendChild(styleEl);
-          this.styleEl = styleEl;
-        }
-      }
-    } catch (error) {
-      // 忽略CSS加载错误
-    }
-
-    await ensureDataFileExists(this.app);
+    // CSS 样式文件 (styles.css) 由 Obsidian 自动加载
 
     // 加载设置
     await this.loadSettings();
@@ -3205,6 +3582,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     // 添加设置标签页
     this.addSettingTab(new FocusTimerSettingTab(this.app, this));
 
+    // 使用事件管理器注册键盘事件
     this._keydownHandler = (e) => {
       if (!this.settings.keyboardShortcuts) return;
       const leaf = this.app.workspace.getActiveViewOfType(FocusTimerView);
@@ -3223,7 +3601,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
         e.preventDefault();
       }
     };
-    document.addEventListener("keydown", this._keydownHandler);
+    this.eventManager.add(document, "keydown", this._keydownHandler, undefined, "plugin_keydown");
 
     // 注册代码块处理器
     this.registerMarkdownCodeBlockProcessor("focus", async (source, el, ctx) => {
@@ -3500,10 +3878,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       
       if (elapsedMinutes >= 600) {
         // 达到600分钟，自动完成
-        if (this.statusBarTimer) {
-          clearInterval(this.statusBarTimer);
-          this.statusBarTimer = null;
-        }
+        this.stopStatusBarTimer();
         new Notice(t("stopwatchOver10Hours"), 5000);
         this.stopFocus("completed");
         return;
@@ -3518,10 +3893,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       const elapsed = Math.floor((now - this.statusBarStartTime) / 1000);
       // 开关关闭时：倒计时结束时自动完成
       if (elapsed >= this.statusBarPlannedSec && !this.settings.autoContinue) {
-        if (this.statusBarTimer) {
-          clearInterval(this.statusBarTimer);
-          this.statusBarTimer = null;
-        }
+        this.stopStatusBarTimer();
         this.stopFocus("completed");
         return;
       }
@@ -3531,13 +3903,9 @@ module.exports = class FocusTimerPlugin extends Plugin {
 
   // 启动状态栏计时器（每秒更新文本）
   startStatusBarTimer() {
-    if (this.statusBarTimer) {
-      clearInterval(this.statusBarTimer);
-    }
-    
-    this.statusBarTimer = setInterval(() => {
+    this.timerManager.setInterval(() => {
       this.updateStatusBarText();
-    }, 1000);
+    }, 1000, "statusBar");
     
     // 立即更新一次
     this.updateStatusBarText();
@@ -3545,10 +3913,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
 
   // 停止状态栏计时器
   stopStatusBarTimer() {
-    if (this.statusBarTimer) {
-      clearInterval(this.statusBarTimer);
-      this.statusBarTimer = null;
-    }
+    this.timerManager.clear("statusBar");
   }
 
   async startFocus(plannedSec, mode = null, note = "") {
@@ -4318,211 +4683,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
         if (chartData && chartData.length > 0) {
           // 直接调用createLineChart，不需要创建view实例
           // 创建一个简单的对象来调用方法
-          const chartHelper = {
-          createLineChart: (container, data, opts = { showTime: true, showCount: true }) => {
-            if (!container || !(container instanceof Element || container instanceof HTMLElement)) {
-              return;
-            }
-            
-            if (!data || !Array.isArray(data) || data.length === 0) {
-              return;
-            }
-            
-            const existingCanvas = container.querySelector("canvas");
-            if (existingCanvas) {
-              existingCanvas.remove();
-            }
-            
-            // 移除现有的tooltip
-            const existingTooltip = container.querySelector(".focus-chart-tooltip");
-            if (existingTooltip) {
-              existingTooltip.remove();
-            }
-            
-            const canvas = document.createElement("canvas");
-            canvas.className = "focus-line-chart";
-            const dpr = window.devicePixelRatio || 1;
-            const width = 600;
-            const height = 200;
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            canvas.style.setProperty('--focus-canvas-width', width + 'px');
-            canvas.style.setProperty('--focus-canvas-height', height + 'px');
-            canvas.classList.add("focus-line-chart-static");
-            container.appendChild(canvas);
-            
-            const ctx = canvas.getContext("2d");
-            ctx.scale(dpr, dpr);
-            
-            // 增加右侧padding，避免右侧数据点/右轴标签被挤压
-            const leftPadding = 40;
-            const rightPadding = 70; // 右侧增加：用于“任务数量”第二纵轴
-            const bottomPadding = 50; // 增加底部padding以容纳旋转的标签
-            const topPadding = 20;
-            const chartWidth = width - leftPadding - rightPadding;
-            const chartHeight = height - topPadding - bottomPadding;
 
-            const showTime = opts?.showTime !== false;
-            const showCount = opts?.showCount !== false;
-
-            const maxValue = Math.max(...data.map(d => d.value || 0), 1);
-            const maxHours = showTime ? (Math.ceil(maxValue / 3600) || 1) : 1;
-            const maxCompleted = showCount ? Math.max(...data.map(d => d.completed || 0), 1) : 1;
-            
-            // 绘制函数
-            const drawChart = () => {
-              ctx.clearRect(0, 0, width, height);
-
-              if (!showTime && !showCount) {
-                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-                ctx.font = "14px var(--font-text)";
-                ctx.textAlign = "center";
-                ctx.fillText(t("noItemSelected"), width / 2, height / 2);
-                ctx.textAlign = "left";
-                return;
-              }
-              
-              ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-modifier-border') || '#e0e0e0';
-              ctx.lineWidth = 1;
-              ctx.font = "11px var(--font-text)";
-              ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-              
-              for (let i = 0; i <= 5; i++) {
-                const y = topPadding + (chartHeight / 5) * i;
-                if (showTime) {
-                  const valueH = maxHours * (1 - i / 5);
-                  ctx.textAlign = "left";
-                  ctx.fillText(valueH.toFixed(1) + "h", 5, y + 4);
-                }
-                if (showCount) {
-                  const valueC = Math.round(maxCompleted * (1 - i / 5));
-                  ctx.textAlign = "left";
-                  const lang = getLanguage();
-                  const countLabel = lang === 'zh' ? valueC + "个" : valueC.toString();
-                  ctx.fillText(countLabel, width - rightPadding + 6, y + 4);
-                }
-                ctx.beginPath();
-                ctx.moveTo(leftPadding, y);
-                ctx.lineTo(width - rightPadding, y);
-                ctx.stroke();
-              }
-              ctx.textAlign = "left";
-              
-              // 使用主题色绘制折线
-              // 尝试多种方式获取主题色
-              let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--text-accent');
-              if (accentColor) accentColor = accentColor.trim();
-              if (!accentColor || accentColor === '') {
-                accentColor = getComputedStyle(document.documentElement).getPropertyValue('--interactive-accent');
-                if (accentColor) accentColor = accentColor.trim();
-              }
-              if (!accentColor || accentColor === '') {
-                accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
-                if (accentColor) accentColor = accentColor.trim();
-              }
-              // 如果还是获取不到，尝试从实际渲染的颜色获取
-              if (!accentColor || accentColor === '') {
-                try {
-                  const testEl = document.createElement('div');
-                  testEl.className = 'focus-test-element';
-                  document.body.appendChild(testEl);
-                  const computedColor = getComputedStyle(testEl).color;
-                  document.body.removeChild(testEl);
-                  if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
-                    accentColor = computedColor;
-                  }
-                } catch (e) {
-                  // 忽略获取主题色的错误
-                }
-              }
-              // 最后的fallback
-              if (!accentColor || accentColor === '') {
-                accentColor = '#008f32'; // 默认绿色（从appearance.json看到的）
-              }
-              ctx.strokeStyle = accentColor;
-              ctx.lineWidth = 2.5;
-              ctx.lineCap = "round";
-              ctx.lineJoin = "round";
-              ctx.beginPath();
-              
-              const countColor = "#ff9800";
-              const dataPoints = [];
-              const countPoints = [];
-              if (showTime) {
-                ctx.strokeStyle = accentColor;
-                ctx.lineWidth = 2.5;
-                ctx.lineCap = "round";
-                ctx.lineJoin = "round";
-                ctx.beginPath();
-                data.forEach((point, index) => {
-                  const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
-                  const y = topPadding + chartHeight - (point.value / 3600 / maxHours) * chartHeight;
-                  dataPoints.push({ x, y });
-                  if (index === 0) ctx.moveTo(x, y);
-                  else ctx.lineTo(x, y);
-                });
-                ctx.stroke();
-                ctx.fillStyle = accentColor;
-                dataPoints.forEach(({ x, y }) => {
-                  ctx.beginPath();
-                  ctx.arc(x, y, 5, 0, Math.PI * 2);
-                  ctx.fill();
-                  ctx.fillStyle = "#fff";
-                  ctx.beginPath();
-                  ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-                  ctx.fill();
-                  ctx.fillStyle = accentColor;
-                });
-              }
-
-              // 绘制任务数量折线（右轴）
-              if (showCount) {
-                ctx.strokeStyle = countColor;
-                ctx.lineWidth = 2.5;
-                ctx.lineCap = "round";
-                ctx.lineJoin = "round";
-                ctx.beginPath();
-                data.forEach((point, index) => {
-                  const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
-                  const c = point.completed || 0;
-                  const y = topPadding + chartHeight - (c / maxCompleted) * chartHeight;
-                  countPoints.push({ x, y });
-                  if (index === 0) ctx.moveTo(x, y);
-                  else ctx.lineTo(x, y);
-                });
-                ctx.stroke();
-                ctx.fillStyle = countColor;
-                countPoints.forEach(({ x, y }) => {
-                  ctx.beginPath();
-                  ctx.arc(x, y, 4, 0, Math.PI * 2);
-                  ctx.fill();
-                  ctx.fillStyle = "#fff";
-                  ctx.beginPath();
-                  ctx.arc(x, y, 2, 0, Math.PI * 2);
-                  ctx.fill();
-                  ctx.fillStyle = countColor;
-                });
-              }
-              
-              ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted') || '#999';
-              ctx.font = "10px var(--font-text)";
-              data.forEach((point, index) => {
-                if (index % 2 === 0 || index === data.length - 1) { // 显示偶数索引和最后一个
-                  const x = leftPadding + (chartWidth / Math.max(1, data.length - 1)) * index;
-                  const date = new Date(point.date);
-                  const label = `${date.getMonth() + 1}/${date.getDate()}`;
-                  ctx.save();
-                  ctx.translate(x, height - bottomPadding + 15);
-                  ctx.rotate(-Math.PI / 4);
-                  ctx.fillText(label, 0, 0);
-                  ctx.restore();
-                }
-              });
-            };
-            
-            drawChart();
-          }
-        };
         
         // 根据 chartMetric 决定显示专注时长还是任务数量
         let showTime = this.settings.codeBlockChartShowTime ?? true;
@@ -4539,7 +4700,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
           showTime,
           showCount
         };
-        chartHelper.createLineChart(chartCanvasContainer, chartData, opts);
+        // 使用共享的图表绘制函数（非交互模式）
+        createLineChart(chartCanvasContainer, chartData, opts, false);
         } else {
           const emptyMsg = document.createElement('div');
           emptyMsg.className = 'focus-code-history-empty';
@@ -4556,13 +4718,14 @@ module.exports = class FocusTimerPlugin extends Plugin {
   }
 
   onunload() {
-    if (this._keydownHandler) {
-      document.removeEventListener("keydown", this._keydownHandler);
-      this._keydownHandler = null;
-    }
-    this.stopStatusBarTimer();
+    // 使用管理器统一清理所有事件监听器
+    this.eventManager.removeAll();
+    this._keydownHandler = null;
     
-    // 清理所有代码块的定时器
+    // 使用管理器统一清理所有定时器
+    this.timerManager.clearAll();
+    
+    // 清理所有代码块的定时器（这些是挂在 DOM 元素上的）
     const codeBlocks = document.querySelectorAll('.focus-code-block');
     codeBlocks.forEach(el => {
       if (el._dailyRefreshTimer) {
@@ -4570,10 +4733,5 @@ module.exports = class FocusTimerPlugin extends Plugin {
         el._dailyRefreshTimer = null;
       }
     });
-    
-    // 移除注入的CSS样式
-    if (this.styleEl && this.styleEl.parentNode) {
-      this.styleEl.parentNode.removeChild(this.styleEl);
-    }
   }
 };

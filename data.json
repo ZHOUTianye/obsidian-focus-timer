@@ -1,0 +1,32 @@
+{
+  "state": {
+    "active": false,
+    "resting": false
+  },
+  "sessions": [],
+  "settings": {
+    "autoContinue": false,
+    "defaultMode": "countdown",
+    "adjustStepMinutes": 5,
+    "defaultChartRange": "14天",
+    "defaultDurationMinutes": 25,
+    "quickTimer1": {
+      "name": "",
+      "minutes": 25
+    },
+    "quickTimer2": {
+      "name": "",
+      "minutes": 25
+    },
+    "quickTimer3": {
+      "name": "",
+      "minutes": 25
+    },
+    "autoRest": false,
+    "defaultRestMinutes": 5,
+    "keyboardShortcuts": false,
+    "suggestTasks": [],
+    "codeBlockChartShowTime": true,
+    "codeBlockChartShowCount": true
+  }
+}

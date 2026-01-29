@@ -105,4 +105,4 @@ Displays that day's statistics and limits the display box height to 400px.
 
 ---
 
-*Note: This plugin supports desktop only and requires Obsidian 1.8.0 or higher.*
+*Note: This plugin supports desktop only and requires Obsidian 1.4.5 or higher.*

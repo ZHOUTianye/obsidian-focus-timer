@@ -1,11 +1,11 @@
 {
-    "id": "obsidian-focus-timer",
-    "name": "Focus Timer",
-    "version": "0.0.1",
-    "minAppVersion": "1.8.0",
-    "description": "Local dedicated timer, supporting statistical analysis and card view, can embed data display in notes",
-    "author": "Tianye Zhou",
-    "authorUrl": "https://tianyezhou.com",
-    "helpUrl": "https://tianyezhou.com/focus-timer",
-    "isDesktopOnly": true
-  }
+  "id": "obsidian-focus-timer",
+  "name": "Focus Timer",
+  "version": "0.0.1",
+  "minAppVersion": "1.4.5",
+  "description": "Local dedicated timer, supporting statistical analysis and card view, can embed data display in notes",
+  "author": "Tianye Zhou",
+  "authorUrl": "https://tianyezhou.com",
+  "helpUrl": "https://tianyezhou.com/focus-timer",
+  "isDesktopOnly": true
+}
