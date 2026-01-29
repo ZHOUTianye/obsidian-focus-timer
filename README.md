@@ -1,79 +1,77 @@
 # Focus Timer Plugin - User Guide
 
-一个专为 Obsidian 设计的本地专注计时器插件，支持统计分析、卡片视图和在笔记中嵌入数据展示。
+A local focus timer plugin designed for Obsidian, with support for statistical analysis, card view, and embedding data display in notes.
 
-## 快速开始
+## Quick Start
 
-**打开计时器**：点击左侧边栏图标 / 底部状态栏 / 命令面板 `Open Focus Timer View`
+**Open the timer**: Click the left sidebar icon / bottom status bar / command palette `Open Focus Timer View`
 
-**开始专注**：
-1. 输入任务名称（可选，最多40字符）
-2. 选择模式：**倒计时**（默认25分钟）或 **正计时**
-3. 使用 +/- 按钮调整或点击时间设置专注时长
-4. 点击"开始"或按回车键（如果启用键盘快捷键）
+**Start focusing**:
+1. Enter a task name (optional, up to 40 characters)
+2. Choose mode: **Countdown** (default 25 minutes) or **Stopwatch**
+3. Use +/- buttons to adjust or click the time to set focus duration
+4. Click "Start" or press Enter (if keyboard shortcuts are enabled)
 
-**结束会话**：
-- **完成**：标记为已完成并保存记录
-- **放弃**：标记为已放弃并保存记录
-- 倒计时结束后可启动休息时段
+**End a session**:
+- **Complete**: Mark as completed and save the record
+- **Abandon**: Mark as abandoned and save the record
+- When countdown ends, you can start a break period
 
-## 计时器模式
+## Timer Modes
 
-| 模式 | 说明 | 特性 |
-|------|------|------|
-| **倒计时** | 设定特定时长倒数 | 可自动切换为正计时 / 启动休息时段 |
-| **正计时** | 从零开始计时 | 无预设时长，可暂停/恢复 |
+| Mode | Description | Features |
+|------|-------------|----------|
+| **Countdown** | Count down from a set duration | Can auto-switch to stopwatch / start break period |
+| **Stopwatch** | Count up from zero | No preset duration, can pause/resume |
 
-## 命令
+## Commands
 
-通过命令面板（`Cmd/Ctrl + P`）访问：
+Access via command palette (`Cmd/Ctrl + P`):
 
-- `Start Focus (25m/50m)` - 快速启动计时器
-- `Stop Focus (Complete)` - 完成当前会话
-- `Abandon Focus` - 放弃当前会话
-- `Open Focus Timer View` - 打开计时器面板
-- `Start Quick Timer 1/2/3` - 启动预设快捷计时器
+- `Start Focus (25m/50m)` - Quick start the timer
+- `Stop Focus (Complete)` - Complete current session
+- `Abandon Focus` - Abandon current session
+- `Open Focus Timer View` - Open timer panel
+- `Start Quick Timer 1/2/3` - Start preset quick timer 1/2/3
 
+## Statistics and Views
 
-## 统计与视图
+**Focus history**: Card-style layout to view all sessions, filterable by date
+**Statistics**: Today's focus duration / completed task count / 7-day average / monthly average / yearly total
+**Charts**: Visualize focus data (7/14/30 days, this month, this year), supports both duration and task count metrics
 
-**专注历史**：卡片式布局查看所有会话，可按日期筛选
-**统计指标**：今日专注时长 / 完成任务数 / 7天平均 / 月度平均 / 年度总计
-**图表**：可视化专注数据（7天/14天/30天/本月/本年），支持时长和任务数量双指标
+## Embed in Notes
 
-## 在笔记中嵌入
-使用代码块在笔记中嵌入专注计时器数据和图表。
+Use code blocks to embed focus timer data and charts in notes.
 
-### 基础语法
+### Basic Syntax
 
 ````markdown
 ```focus
 ```
 ````
 
-显示今日专注统计，默认统计图表。
+Displays today's focus statistics and the default statistics chart.
 
 ````markdown
 ```focus
 date: today
 ```
 ````
-显示今日专注统计，今日专注事项列表。
+Displays today's focus statistics and today's focus items list.
 
-### 配置参数
+### Configuration Parameters
 
-| 参数 | 说明 | 可选值 | 
-|------|------|--------|
-| `date` | 指定日期 | `today`, `yesterday`, `2026-01-20`（具体日期） |
-| `chart` | 图表展示范围（适用于不带date参数） | `7`, `14`, `30`, `month`, `year`, `none` |
-| `chart` | 图表展示范围+指标（适用于不带date参数） | `30 time`, `30 task`（第一个参数选择上行所示参数，第二个参数在time和task中选择，如果不填写则专注时间和完成任务数量都显示） |
-| `record` | 隐藏记录（带不带date参数均适用） | `none` （不指定时默认显示） |
-| `items` | 隐藏专注事项列表（适用于带date参数） | `none`（不指定时默认显示） |
-| `height` | 自定义高度（像素）（带不带date参数均适用） | `300`, `500` ...|
+| Parameter | Description | Optional Values |
+|-----------|-------------|-----------------|
+| `date` | Specify date | `today`, `yesterday`, `2026-01-20` (specific date) |
+| `chart` | Chart display range (when no date parameter) | `7`, `14`, `30`, `month`, `year`, `none` |
+| `chart` | Chart display range + metric (when no date parameter) | `30 time`, `30 task` (first parameter selects from the options above, second parameter chooses between time and task; if omitted, both focus time and completed task count are shown) |
+| `record` | Hide records (applies with or without date parameter) | `none` (default: shown when not specified) |
+| `items` | Hide focus items list (when date parameter is used) | `none` (default: shown when not specified) |
+| `height` | Custom height in pixels (applies with or without date parameter) | `300`, `500` ... |
 
-
-
-### 示例
+### Examples
 
 ````markdown
 ```focus
@@ -81,7 +79,7 @@ chart: 7 task
 height: 500
 ```
 ````
-显示今日专注统计，和7天任务完成数量统计图表，并限制显示框高度为500px。
+Displays today's focus statistics and 7-day completed task count chart, with display box height limited to 500px.
 
 ````markdown
 ```focus
@@ -90,21 +88,21 @@ items: none
 height: 400
 ```
 ````
-显示当日统计，并限制显示框高度为400px。
+Displays that day's statistics and limits the display box height to 400px.
 
-## 使用技巧
+## Tips
 
-- **任务建议**：插件会记住最近的任务并在输入时提示
-- **快捷访问**：使用边栏图标、状态栏或快捷键
-- **快捷计时器**：设置常用的计时器为快捷计时器 1/2/3
-- **番茄工作法**：启用自动休息功能
-- **嵌入到处**：在日记、项目页面或回顾文档中添加 focus 代码块
+- **Task suggestions**: The plugin remembers recent tasks and suggests them when typing
+- **Quick access**: Use sidebar icon, status bar, or keyboard shortcuts
+- **Quick timers**: Set commonly used timers as quick timer 1/2/3
+- **Pomodoro**: Enable auto-break feature
+- **Embed anywhere**: Add focus code blocks in journals, project pages, or review documents
 
-## 支持
+## Support
 
-- **帮助**: https://tianyezhou.com/focus-timer
-- **作者**: Tianye Zhou (https://tianyezhou.com)
+- **Help**: https://tianyezhou.com/focus-timer
+- **Author**: Tianye Zhou (https://tianyezhou.com)
 
 ---
 
-*注意：此插件仅支持桌面端，需要 Obsidian 1.x.0 或更高版本。*
+*Note: This plugin supports desktop only and requires Obsidian 1.8.0 or higher.*
