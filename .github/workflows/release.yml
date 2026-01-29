@@ -13,18 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create plugin zip
+      - name: Build plugin
         run: |
-          zip -r "${{ github.event.repository.name }}.zip" \
-            manifest.json \
-            main.js \
-            styles.css \
-            data.json
+          npm install
+          npm run build
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ github.event.repository.name }}.zip
+          files: |
+            dist/main.js
+            dist/manifest.json
+            dist/styles.css
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
