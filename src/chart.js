@@ -138,12 +138,12 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
 
   const existingCanvas = container.querySelector("canvas");
   if (existingCanvas) existingCanvas.remove();
-  const existingTooltip = container.querySelector(".focus-chart-tooltip");
+  const existingTooltip = container.querySelector(".focus-timer-plugin-chart-tooltip");
   if (existingTooltip) existingTooltip.remove();
 
   const interactive = opts.interactive !== false;
   const canvas = document.createElement("canvas");
-  canvas.className = "focus-line-chart";
+  canvas.className = "focus-timer-plugin-line-chart";
   const dpr = window.devicePixelRatio || 1;
   const width = 600;
   const height = 200;
@@ -151,13 +151,13 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
   canvas.height = height * dpr;
   canvas.style.setProperty("--focus-canvas-width", width + "px");
   canvas.style.setProperty("--focus-canvas-height", height + "px");
-  canvas.classList.add(interactive ? "focus-line-chart-interactive" : "focus-line-chart-static");
+  canvas.classList.add(interactive ? "focus-timer-plugin-line-chart-interactive" : "focus-timer-plugin-line-chart-static");
   container.appendChild(canvas);
 
   let tooltip = null;
   if (interactive) {
     tooltip = document.createElement("div");
-    tooltip.className = "focus-chart-tooltip focus-chart-tooltip-hidden";
+    tooltip.className = "focus-timer-plugin-chart-tooltip focus-timer-plugin-chart-tooltip-hidden";
     container.appendChild(tooltip);
   }
 
@@ -192,7 +192,7 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
     if (!accentColor || accentColor === "") {
       try {
         const testEl = document.createElement("div");
-        testEl.className = "focus-test-element";
+        testEl.className = "focus-timer-plugin-test-element";
         document.body.appendChild(testEl);
         const computedColor = getComputedStyle(testEl).color;
         document.body.removeChild(testEl);
@@ -324,7 +324,7 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         }
       });
       if (nearestPoint) {
-        tooltip.classList.remove("focus-chart-tooltip-right");
+        tooltip.classList.remove("focus-timer-plugin-chart-tooltip-right");
         const date = new Date(nearestPoint.point.date);
         const lang = getLanguage();
         const dateStr = lang === "zh" ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日` : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
@@ -334,25 +334,25 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         const completedCount = nearestPoint.point.completed || 0;
         while (tooltip.firstChild) tooltip.removeChild(tooltip.firstChild);
         const titleDiv = document.createElement("div");
-        titleDiv.className = "focus-chart-tooltip-title";
+        titleDiv.className = "focus-timer-plugin-chart-tooltip-title";
         titleDiv.textContent = dateStr;
         tooltip.appendChild(titleDiv);
         if (showTime) {
           const timeDiv = document.createElement("div");
-          timeDiv.className = "focus-chart-tooltip-line";
+          timeDiv.className = "focus-timer-plugin-chart-tooltip-line";
           timeDiv.textContent = `${t("focusTime")}: ${timeStr}`;
           tooltip.appendChild(timeDiv);
         }
         if (showCount) {
           const countDiv = document.createElement("div");
-          countDiv.className = "focus-chart-tooltip-line";
+          countDiv.className = "focus-timer-plugin-chart-tooltip-line";
           countDiv.textContent = `${t("completedTasks")}: ${completedCount}${lang === "zh" ? "个" : ""}`;
           tooltip.appendChild(countDiv);
         }
-        tooltip.classList.remove("focus-chart-tooltip-hidden");
-        tooltip.classList.add("focus-chart-tooltip-measuring");
+        tooltip.classList.remove("focus-timer-plugin-chart-tooltip-hidden");
+        tooltip.classList.add("focus-timer-plugin-chart-tooltip-measuring");
         const tooltipRect = tooltip.getBoundingClientRect();
-        tooltip.classList.remove("focus-chart-tooltip-measuring");
+        tooltip.classList.remove("focus-timer-plugin-chart-tooltip-measuring");
         let tooltipX = nearestPoint.x;
         let tooltipY = nearestPoint.y - tooltipRect.height - 15;
         if (tooltipY < 0) tooltipY = nearestPoint.y + 20;
@@ -362,15 +362,15 @@ function createLineChart(container, data, opts = { showTime: true, showCount: tr
         if (tooltipX - tooltipHalfWidth < 5) tooltipX = Math.min(width - tooltipHalfWidth, tooltipHalfWidth + 5);
         tooltip.style.setProperty("--focus-tooltip-left", tooltipX + "px");
         tooltip.style.setProperty("--focus-tooltip-top", tooltipY + "px");
-        tooltip.classList.add("focus-chart-tooltip-centered");
+        tooltip.classList.add("focus-timer-plugin-chart-tooltip-centered");
       } else {
-        tooltip.classList.add("focus-chart-tooltip-hidden");
-        tooltip.classList.remove("focus-chart-tooltip-right", "focus-chart-tooltip-centered");
+        tooltip.classList.add("focus-timer-plugin-chart-tooltip-hidden");
+        tooltip.classList.remove("focus-timer-plugin-chart-tooltip-right", "focus-timer-plugin-chart-tooltip-centered");
       }
     });
     canvas.addEventListener("mouseleave", () => {
-      tooltip.classList.add("focus-chart-tooltip-hidden");
-      tooltip.classList.remove("focus-chart-tooltip-centered");
+      tooltip.classList.add("focus-timer-plugin-chart-tooltip-hidden");
+      tooltip.classList.remove("focus-timer-plugin-chart-tooltip-centered");
     });
   }
 }

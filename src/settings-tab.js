@@ -77,7 +77,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
               if (!this.plugin.statusBarEl) {
                 this.plugin.statusBarEl = this.plugin.addStatusBarItem();
                 this.plugin.statusBarEl.setText(getLanguage() === 'zh' ? "专注计时器" : "Focus Timer");
-                this.plugin.statusBarEl.addClass("focus-timer-statusbar");
+                this.plugin.statusBarEl.addClass("focus-timer-plugin-timer-statusbar");
                 this.plugin.statusBarEl.onClickEvent(() => this.plugin.openView());
               }
               this.plugin.updateStatusBarDisplay();
@@ -522,7 +522,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
           .setPlaceholder(t("suggestTasksPlaceholder"))
           .setValue(Array.isArray(list) ? list.join("\n") : "");
         text.inputEl.rows = 6;
-        text.inputEl.classList.add("focus-settings-textarea");
+        text.inputEl.classList.add("focus-timer-plugin-settings-textarea");
         text.inputEl.addEventListener("input", (e) => {
           const ta = e.target;
           let v = ta.value;

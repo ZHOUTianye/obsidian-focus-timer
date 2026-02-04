@@ -232,9 +232,9 @@ module.exports = class FocusTimerPlugin extends Plugin {
         while (el.firstChild) {
           el.removeChild(el.firstChild);
         }
-        el.className = 'focus-code-block';
+        el.className = 'focus-timer-plugin-code-block';
         const errorDiv = document.createElement('div');
-        errorDiv.className = 'focus-code-error';
+        errorDiv.className = 'focus-timer-plugin-code-error';
         errorDiv.textContent = t("bothCannotBeNone");
         el.appendChild(errorDiv);
         return;
@@ -292,7 +292,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (this.settings.statusBarShowFocus !== false) {
       this.statusBarEl = this.addStatusBarItem();
       this.statusBarEl.setText(getLanguage() === 'zh' ? "专注计时器" : "Focus Timer");
-      this.statusBarEl.addClass("focus-timer-statusbar");
+      this.statusBarEl.addClass("focus-timer-plugin-timer-statusbar");
       this.statusBarEl.onClickEvent(() => this.openView());
       this.updateStatusBarDisplay();
     }
@@ -347,14 +347,14 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (!this.statusBarEl) return;
     
     if (state.active && !state.resting) {
-      this.statusBarEl.addClass("focus-timer-active");
+      this.statusBarEl.addClass("focus-timer-plugin-timer-active");
       // 立即刷新一次文本（正计时/倒计时都实时显示）
       this.updateStatusBarText();
     } else if (state.resting) {
-      this.statusBarEl.removeClass("focus-timer-active");
+      this.statusBarEl.removeClass("focus-timer-plugin-timer-active");
       this.updateStatusBarText();
     } else {
-      this.statusBarEl.removeClass("focus-timer-active");
+      this.statusBarEl.removeClass("focus-timer-plugin-timer-active");
       this.statusBarEl.setText(getLanguage() === 'zh' ? "专注计时器" : "Focus Timer");
     }
   }
@@ -775,39 +775,39 @@ module.exports = class FocusTimerPlugin extends Plugin {
   // 为代码块创建统计卡片的辅助方法（使用标准DOM API）
   createStatCardForCodeBlock(container, title, mainValue, comparison, average) {
     const card = document.createElement('div');
-    card.className = 'focus-stat-card';
+    card.className = 'focus-timer-plugin-stat-card';
     
     const titleEl = document.createElement('div');
-    titleEl.className = 'focus-stat-card-title';
+    titleEl.className = 'focus-timer-plugin-stat-card-title';
     titleEl.textContent = title;
     card.appendChild(titleEl);
     
     const mainValueRow = document.createElement('div');
-    mainValueRow.className = 'focus-stat-main-row';
+    mainValueRow.className = 'focus-timer-plugin-stat-main-row';
     const mainValueEl = document.createElement('div');
-    mainValueEl.className = 'focus-stat-main-value';
+    mainValueEl.className = 'focus-timer-plugin-stat-main-value';
     
     // 如果mainValue是对象（包含数字和单位），分开显示
     if (typeof mainValue === 'object' && mainValue.number) {
       const numberSpan = document.createElement('span');
-      numberSpan.className = 'focus-stat-number';
+      numberSpan.className = 'focus-timer-plugin-stat-number';
       numberSpan.textContent = mainValue.number;
       mainValueEl.appendChild(numberSpan);
       if (mainValue.unit) {
         const unitSpan = document.createElement('span');
-        unitSpan.className = 'focus-stat-unit';
+        unitSpan.className = 'focus-timer-plugin-stat-unit';
         unitSpan.textContent = mainValue.unit;
         mainValueEl.appendChild(unitSpan);
       }
       if (mainValue.number2) {
         const number2Span = document.createElement('span');
-        number2Span.className = 'focus-stat-number';
+        number2Span.className = 'focus-timer-plugin-stat-number';
         number2Span.textContent = mainValue.number2;
         mainValueEl.appendChild(number2Span);
       }
       if (mainValue.unit2) {
         const unit2Span = document.createElement('span');
-        unit2Span.className = 'focus-stat-unit';
+        unit2Span.className = 'focus-timer-plugin-stat-unit';
         unit2Span.textContent = mainValue.unit2;
         mainValueEl.appendChild(unit2Span);
       }
@@ -817,12 +817,12 @@ module.exports = class FocusTimerPlugin extends Plugin {
       parts.forEach(part => {
         if (part && !isNaN(part)) {
           const numberSpan = document.createElement('span');
-          numberSpan.className = 'focus-stat-number';
+          numberSpan.className = 'focus-timer-plugin-stat-number';
           numberSpan.textContent = part;
           mainValueEl.appendChild(numberSpan);
         } else if (part) {
           const unitSpan = document.createElement('span');
-          unitSpan.className = 'focus-stat-unit';
+          unitSpan.className = 'focus-timer-plugin-stat-unit';
           unitSpan.textContent = part;
           mainValueEl.appendChild(unitSpan);
         }
@@ -850,22 +850,22 @@ module.exports = class FocusTimerPlugin extends Plugin {
         const isPositive = sign === '+';
         
         const comparisonEl = document.createElement('div');
-        comparisonEl.className = `focus-stat-comparison ${isPositive ? 'comparison-positive' : 'comparison-negative'}`;
+        comparisonEl.className = `focus-timer-plugin-stat-comparison ${isPositive ? 'focus-timer-plugin-comparison-positive' : 'focus-timer-plugin-comparison-negative'}`;
         
         const labelEl = document.createElement('div');
-        labelEl.className = 'comparison-label';
+        labelEl.className = 'focus-timer-plugin-comparison-label';
         labelEl.textContent = label;
         comparisonEl.appendChild(labelEl);
         
         const valueEl = document.createElement('div');
-        valueEl.className = 'comparison-value';
+        valueEl.className = 'focus-timer-plugin-comparison-value';
         valueEl.textContent = `${sign}${value}`;
         comparisonEl.appendChild(valueEl);
         
         mainValueRow.appendChild(comparisonEl);
       } else {
         const comparisonEl = document.createElement('div');
-        comparisonEl.className = 'focus-stat-comparison';
+        comparisonEl.className = 'focus-timer-plugin-stat-comparison';
         comparisonEl.textContent = comparison;
         mainValueRow.appendChild(comparisonEl);
       }
@@ -877,7 +877,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (average) {
       // 检查是否是"全年累计完成"，如果是则添加额外的类
       const isYearlyTotal = average.includes(t("yearlyTotalCompleted")) || average.includes("全年累计完成");
-      const averageClasses = isYearlyTotal ? "focus-stat-average focus-stat-average-yearly" : "focus-stat-average";
+      const averageClasses = isYearlyTotal ? "focus-timer-plugin-stat-average focus-timer-plugin-stat-average-yearly" : "focus-timer-plugin-stat-average";
       const averageEl = document.createElement('div');
       averageEl.className = averageClasses;
       averageEl.textContent = average;
@@ -916,7 +916,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       while (el.firstChild) {
         el.removeChild(el.firstChild);
       }
-      el.className = 'focus-code-block';
+      el.className = 'focus-timer-plugin-code-block';
 
       // 把当前 chart 配置挂在元素上，供刷新按钮复用
       el._chartRange = chartRange;
@@ -925,12 +925,12 @@ module.exports = class FocusTimerPlugin extends Plugin {
       // 如果指定了高度，应用到容器
       if (height !== null && height > 0) {
         el.style.setProperty('--focus-block-height', height + 'px');
-        el.classList.add('focus-code-block-with-height');
+        el.classList.add('focus-timer-plugin-code-block-with-height');
         // 存储高度值，供后续刷新使用
         el._focusBlockHeight = height;
       } else {
         el.style.removeProperty('--focus-block-height');
-        el.classList.remove('focus-code-block-with-height');
+        el.classList.remove('focus-timer-plugin-code-block-with-height');
         el._focusBlockHeight = null;
       }
       
@@ -965,36 +965,36 @@ module.exports = class FocusTimerPlugin extends Plugin {
       // 创建统计区域（仅在showRecord为true时）
       if (showRecord) {
         const statsSection = document.createElement('div');
-        statsSection.className = 'focus-code-stats-section';
+        statsSection.className = 'focus-timer-plugin-code-stats-section';
         
         // 如果设置了高度，statsSection不应该收缩
         if (height !== null && height > 0) {
-          statsSection.classList.add('focus-code-stats-section-no-shrink');
+          statsSection.classList.add('focus-timer-plugin-code-stats-section-no-shrink');
         }
         
         const statsHeader = document.createElement('div');
-        statsHeader.className = 'focus-code-stats-header';
+        statsHeader.className = 'focus-timer-plugin-code-stats-header';
         
         const title = document.createElement('h3');
-        title.className = 'focus-code-stats-title';
+        title.className = 'focus-timer-plugin-code-stats-title';
         title.textContent = t("focusHistory");
         statsHeader.appendChild(title);
         
         // 刷新按钮
         const refreshBtn = document.createElement('button');
-        refreshBtn.className = 'focus-code-refresh-btn';
+        refreshBtn.className = 'focus-timer-plugin-code-refresh-btn';
         refreshBtn.setAttribute('aria-label', '刷新数据');
         refreshBtn.textContent = '↻';
         refreshBtn.title = '刷新数据';
         refreshBtn.addEventListener('click', async (e) => {
           e.preventDefault();
           refreshBtn.disabled = true;
-          refreshBtn.classList.add('focus-code-refresh-spin');
+          refreshBtn.classList.add('focus-timer-plugin-code-refresh-spin');
           try {
             await this.renderFocusBlock(el, ctx, targetDate, isToday, showRecord, showItems, height, el._chartRange, el._chartMetric);
           } finally {
             refreshBtn.disabled = false;
-            refreshBtn.classList.remove('focus-code-refresh-spin');
+            refreshBtn.classList.remove('focus-timer-plugin-code-refresh-spin');
           }
         });
         statsHeader.appendChild(refreshBtn);
@@ -1003,7 +1003,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
         
         // 2×2网格统计卡片
         const statsGrid = document.createElement('div');
-        statsGrid.className = 'focus-code-stats-grid';
+        statsGrid.className = 'focus-timer-plugin-code-stats-grid';
         
         // 使用专门的方法创建卡片
         // 根据是否指定日期，使用不同的标题和对比文本
@@ -1071,37 +1071,37 @@ module.exports = class FocusTimerPlugin extends Plugin {
       // 如果指定了日期且showItems为true，显示该日期的所有专注数据
       if (targetDate && showItems) {
         const historySection = document.createElement('div');
-        historySection.className = 'focus-code-history-section';
+        historySection.className = 'focus-timer-plugin-code-history-section';
         
         // 如果设置了高度，让historySection使用flex布局以便historyContent可以滚动
         if (height !== null && height > 0) {
-          historySection.classList.add('focus-code-history-section-with-height');
+          historySection.classList.add('focus-timer-plugin-code-history-section-with-height');
         }
         
         const historyHeader = document.createElement('div');
-        historyHeader.className = 'focus-code-history-header';
+        historyHeader.className = 'focus-timer-plugin-code-history-header';
         
         const historyTitle = document.createElement('h3');
-        historyTitle.className = 'focus-code-history-title';
+        historyTitle.className = 'focus-timer-plugin-code-history-title';
         historyTitle.textContent = t("dayFocus");
         historyHeader.appendChild(historyTitle);
         
         // 仅当不显示专注数据时，在此处显示刷新按钮（否则已在专注记录标题旁显示）
         if (!showRecord) {
           const refreshBtnHistory = document.createElement('button');
-          refreshBtnHistory.className = 'focus-code-refresh-btn';
+          refreshBtnHistory.className = 'focus-timer-plugin-code-refresh-btn';
           refreshBtnHistory.setAttribute('aria-label', '刷新数据');
           refreshBtnHistory.textContent = '↻';
           refreshBtnHistory.title = '刷新数据';
           refreshBtnHistory.addEventListener('click', async (e) => {
             e.preventDefault();
             refreshBtnHistory.disabled = true;
-            refreshBtnHistory.classList.add('focus-code-refresh-spin');
+            refreshBtnHistory.classList.add('focus-timer-plugin-code-refresh-spin');
             try {
               await this.renderFocusBlock(el, ctx, targetDate, isToday, showRecord, showItems, height, el._chartRange, el._chartMetric);
             } finally {
               refreshBtnHistory.disabled = false;
-              refreshBtnHistory.classList.remove('focus-code-refresh-spin');
+              refreshBtnHistory.classList.remove('focus-timer-plugin-code-refresh-spin');
             }
           });
           historyHeader.appendChild(refreshBtnHistory);
@@ -1110,11 +1110,11 @@ module.exports = class FocusTimerPlugin extends Plugin {
         historySection.appendChild(historyHeader);
         
         const historyContent = document.createElement('div');
-        historyContent.className = 'focus-code-history-content';
+        historyContent.className = 'focus-timer-plugin-code-history-content';
         
         // 如果设置了高度，让historyContent可滚动
         if (height !== null && height > 0) {
-          historyContent.classList.add('focus-code-history-content-scrollable');
+          historyContent.classList.add('focus-timer-plugin-code-history-content-scrollable');
         }
         
         // 按时间排序（倒序，最新的在上面）
@@ -1124,13 +1124,13 @@ module.exports = class FocusTimerPlugin extends Plugin {
         
         if (sortedSessions.length === 0) {
           const emptyMsg = document.createElement('div');
-          emptyMsg.className = 'focus-code-history-empty';
+          emptyMsg.className = 'focus-timer-plugin-code-history-empty';
           emptyMsg.textContent = t("noFocusRecordsToday");
           historyContent.appendChild(emptyMsg);
         } else {
           sortedSessions.forEach(session => {
             const item = document.createElement('div');
-            item.className = 'focus-code-history-item';
+            item.className = 'focus-timer-plugin-code-history-item';
             
             const time = new Date(session.end || session.start);
             const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
@@ -1153,7 +1153,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
             }
             
             const entry = document.createElement('div');
-            entry.className = `focus-code-history-entry ${session.status === "completed" ? "status-completed" : "status-abandoned"}`;
+            entry.className = `focus-timer-plugin-code-history-entry ${session.status === "completed" ? "focus-timer-plugin-status-completed" : "focus-timer-plugin-status-abandoned"}`;
             entry.textContent = entryText;
             
             item.appendChild(entry);
@@ -1166,35 +1166,35 @@ module.exports = class FocusTimerPlugin extends Plugin {
       } else if (!targetDate && showItems && chartRange !== "none") {
         // 未指定日期且showItems为true，并且 chartRange 不是 none 时，显示图表
         const chartContainer = document.createElement('div');
-        chartContainer.className = 'focus-code-chart';
+        chartContainer.className = 'focus-timer-plugin-code-chart';
         
         // 计算图表范围标签和用于计算数据的范围值（统一走 chartRangeToLabelAndCalculation）
         const shortKey = CHART_RANGE_CONFIG.some(c => c.shortKey === chartRange) ? chartRange : defaultChartRangeToShortKey(this.settings.defaultChartRange);
         const { rangeLabel, rangeForCalculation } = chartRangeToLabelAndCalculation(shortKey);
 
         const chartHeader = document.createElement('div');
-        chartHeader.className = 'focus-code-chart-header';
+        chartHeader.className = 'focus-timer-plugin-code-chart-header';
         
         const chartTitle = document.createElement('h3');
-        chartTitle.className = 'focus-code-chart-title';
+        chartTitle.className = 'focus-timer-plugin-code-chart-title';
         const lang = getLanguage();
         chartTitle.textContent = lang === 'zh' ? `${t("focusTrend")}（${rangeLabel}）` : `${t("focusTrend")} (${rangeLabel})`;
         chartHeader.appendChild(chartTitle);
         
         const refreshBtnChart = document.createElement('button');
-        refreshBtnChart.className = 'focus-code-refresh-btn';
+        refreshBtnChart.className = 'focus-timer-plugin-code-refresh-btn';
         refreshBtnChart.setAttribute('aria-label', '刷新数据');
         refreshBtnChart.textContent = '↻';
         refreshBtnChart.title = '刷新数据';
         refreshBtnChart.addEventListener('click', async (e) => {
           e.preventDefault();
           refreshBtnChart.disabled = true;
-          refreshBtnChart.classList.add('focus-code-refresh-spin');
+          refreshBtnChart.classList.add('focus-timer-plugin-code-refresh-spin');
           try {
             await this.renderFocusBlock(el, ctx, targetDate, isToday, showRecord, showItems, height, el._chartRange, el._chartMetric);
           } finally {
             refreshBtnChart.disabled = false;
-            refreshBtnChart.classList.remove('focus-code-refresh-spin');
+            refreshBtnChart.classList.remove('focus-timer-plugin-code-refresh-spin');
           }
         });
         chartHeader.appendChild(refreshBtnChart);
@@ -1202,7 +1202,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
         chartContainer.appendChild(chartHeader);
         
         const chartCanvasContainer = document.createElement('div');
-        chartCanvasContainer.className = 'focus-code-chart-canvas';
+        chartCanvasContainer.className = 'focus-timer-plugin-code-chart-canvas';
         chartContainer.appendChild(chartCanvasContainer);
         
         el.appendChild(chartContainer);
@@ -1224,14 +1224,14 @@ module.exports = class FocusTimerPlugin extends Plugin {
           createLineChart(chartCanvasContainer, chartData, { showTime, showCount, interactive: false });
         } else {
           const emptyMsg = document.createElement('div');
-          emptyMsg.className = 'focus-code-history-empty';
+          emptyMsg.className = 'focus-timer-plugin-code-history-empty';
           emptyMsg.textContent = t("noData");
           chartCanvasContainer.appendChild(emptyMsg);
         }
       }
     } catch (error) {
       const errorDiv = document.createElement('div');
-      errorDiv.className = 'focus-code-error';
+      errorDiv.className = 'focus-timer-plugin-code-error';
       errorDiv.textContent = `错误: ${error.message}`;
       el.appendChild(errorDiv);
     }

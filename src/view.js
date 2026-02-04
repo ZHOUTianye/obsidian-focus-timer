@@ -223,33 +223,33 @@ class FocusTimerView extends ItemView {
     const stats = calculateStats(sessionsForStats);
 
     // 顶部：圆环倒计时区域
-    const timerSection = container.createDiv("focus-timer-section");
+    const timerSection = container.createDiv("focus-timer-plugin-timer-section-top-status");
     
     // 状态文字和呼吸灯容器（放在圆环上方，作为独立块）
-    const statusContainer = timerSection.createDiv("focus-status-container");
+    const statusContainer = timerSection.createDiv("focus-timer-plugin-status-container");
     
     // 呼吸灯（只在专注或休息时呼吸）
-    const breathingLight = statusContainer.createDiv("focus-breathing-light");
+    const breathingLight = statusContainer.createDiv("focus-timer-plugin-timer-section-top-status-breathing-light");
     if (state.resting) {
-      breathingLight.classList.add("focus-breathing-rest");
+      breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-rest");
     } else if (state.active) {
-      breathingLight.classList.add("focus-breathing-active");
+      breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-active");
     } else {
-      breathingLight.classList.add("focus-breathing-idle");
+      breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-idle");
       // 空闲时不呼吸，只显示静态颜色
     }
     
     // 状态文字和快捷按钮容器
-    const statusTextContainer = statusContainer.createDiv("focus-status-text-container");
+    const statusTextContainer = statusContainer.createDiv("focus-timer-plugin-timer-section-top-status-text-container");
     
-    const statusText = statusTextContainer.createEl("div", { cls: "focus-status-text" });
+    const statusText = statusTextContainer.createEl("div", { cls: "focus-timer-plugin-timer-section-top-status-text" });
     
     // 检查休息状态
     if (state.resting) {
       // 休息状态
       statusText.textContent = t("resting");
-      breathingLight.classList.remove("focus-breathing-active", "focus-breathing-idle");
-      breathingLight.classList.add("focus-breathing-rest");
+      breathingLight.classList.remove("focus-timer-plugin-breathing-active", "focus-timer-plugin-breathing-idle");
+      breathingLight.classList.add("focus-timer-plugin-breathing-rest");
     } else if (state.active) {
       const mode = state.mode || "countdown";
       const modeText = mode === "stopwatch" ? t("stopwatch") : t("countdown");
@@ -275,7 +275,7 @@ class FocusTimerView extends ItemView {
           const displayName = truncateForButton(timerName, 15);
           const quickBtn = statusTextContainer.createEl("button", {
             text: displayName,
-            cls: "focus-quick-timer-btn"
+            cls: "focus-timer-plugin-quick-timer-btn"
           });
           // 添加title属性，鼠标悬停时显示完整名称
           if (timerName.length > 15) {
@@ -289,7 +289,7 @@ class FocusTimerView extends ItemView {
       });
     }
     
-    const circleContainer = timerSection.createDiv("focus-circle-container");
+    const circleContainer = timerSection.createDiv("focus-timer-plugin-circle-container");
     
     // 初始化休息相关变量
     this.restStartTime = null;
@@ -304,7 +304,7 @@ class FocusTimerView extends ItemView {
       
       // 圆环SVG（休息倒计时）
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("class", "focus-circle-svg");
+      svg.setAttribute("class", "focus-timer-plugin-circle-svg");
       svg.setAttribute("viewBox", "0 0 100 100");
       
       const bgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -326,7 +326,7 @@ class FocusTimerView extends ItemView {
       progressCircle.setAttribute("stroke-linecap", "round");
       progressCircle.setAttribute("stroke-dasharray", "283");
       progressCircle.setAttribute("transform", "rotate(-90 50 50)");
-      progressCircle.setAttribute("class", "focus-progress-circle");
+      progressCircle.setAttribute("class", "focus-timer-plugin-progress-circle");
       svg.appendChild(progressCircle);
       
       circleContainer.appendChild(svg);
@@ -334,19 +334,19 @@ class FocusTimerView extends ItemView {
       this.timerElements.circleEl = progressCircle;
       
       // 时间显示
-      const timeDisplay = circleContainer.createDiv("focus-time-display");
+      const timeDisplay = circleContainer.createDiv("focus-timer-plugin-time-display");
       const now = Date.now();
       const elapsed = Math.floor((now - restStartTime) / 1000);
       const remaining = Math.max(0, restSec - elapsed);
       const timeEl = timeDisplay.createEl("div", {
         text: formatTime(remaining),
-        cls: "focus-elapsed-time"
+        cls: "focus-timer-plugin-elapsed-time"
       });
       this.timerElements.timeEl = timeEl;
       
       // 按钮：结束休息
-      const btnContainer = timerSection.createDiv("focus-btn-container");
-      const endRestBtn = btnContainer.createEl("button", { text: t("endRest"), cls: "focus-btn-primary" });
+      const btnContainer = timerSection.createDiv("focus-timer-plugin-btn-container");
+      const endRestBtn = btnContainer.createEl("button", { text: t("endRest"), cls: "focus-timer-plugin-btn-primary" });
       endRestBtn.onclick = () => this.plugin.stopRest();
     } else if (state.active) {
       // 保存开始时间和计划时长，用于本地计时
@@ -387,7 +387,7 @@ class FocusTimerView extends ItemView {
       if (!isStopwatch && !isOvertime) {
         // 圆环SVG
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", "focus-circle-svg");
+        svg.setAttribute("class", "focus-timer-plugin-circle-svg");
         svg.setAttribute("viewBox", "0 0 100 100");
         
         // 背景圆环（浅色，表示已用时间）
@@ -412,7 +412,7 @@ class FocusTimerView extends ItemView {
         progressCircle.setAttribute("stroke-dasharray", "283");
         progressCircle.setAttribute("stroke-dashoffset", 283 * (1 - remainingRatio));
         progressCircle.setAttribute("transform", "rotate(-90 50 50)");
-        progressCircle.setAttribute("class", "focus-progress-circle");
+        progressCircle.setAttribute("class", "focus-timer-plugin-progress-circle");
         svg.appendChild(progressCircle);
         
         circleContainer.appendChild(svg);
@@ -424,7 +424,7 @@ class FocusTimerView extends ItemView {
       }
       
       // 时间显示
-      const timeDisplay = circleContainer.createDiv("focus-time-display");
+      const timeDisplay = circleContainer.createDiv("focus-timer-plugin-time-display");
       let timeText = "";
       if (isStopwatch) {
         timeText = formatTime(elapsed);
@@ -441,14 +441,14 @@ class FocusTimerView extends ItemView {
       
       const timeEl = timeDisplay.createEl("div", { 
         text: timeText,
-        cls: "focus-elapsed-time"
+        cls: "focus-timer-plugin-elapsed-time"
       });
       
       // 超时时底部红字：总时间（倒计时 + 超时）
       if (isOvertime) {
         const overtimeLabel = timeDisplay.createEl("div", {
           text: `${t("totalFocusTime")} ${formatTime(elapsed)}`,
-          cls: "focus-overtime-label"
+          cls: "focus-timer-plugin-overtime-label"
         });
         this.timerElements.overtimeLabel = overtimeLabel;
       }
@@ -456,15 +456,15 @@ class FocusTimerView extends ItemView {
       this.timerElements.timeEl = timeEl;
       
       // 按钮：完成、放弃（关闭「倒计时允许提前完成」时倒计时只显示放弃；超时后一律显示完成）
-      const btnContainer = timerSection.createDiv("focus-btn-container");
+      const btnContainer = timerSection.createDiv("focus-timer-plugin-btn-container");
       const allowEarly = this.plugin.settings.allowCompleteCountdownEarly !== false;
       const isCountdown = this.timerMode === "countdown";
       const showComplete = allowEarly || !isCountdown || isOvertime;
       if (showComplete) {
-        const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-btn-primary" });
+        const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-timer-plugin-btn-primary" });
         completeBtn.onclick = () => this.plugin.stopFocus("completed");
       }
-      const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-btn-secondary" });
+      const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-timer-plugin-btn-secondary" });
       abandonBtn.onclick = () => this.plugin.stopFocus("abandoned");
     } else {
       // 非专注状态
@@ -482,7 +482,7 @@ class FocusTimerView extends ItemView {
       if (!isStopwatch) {
         // 圆环SVG（空圆环）
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", "focus-circle-svg");
+        svg.setAttribute("class", "focus-timer-plugin-circle-svg");
         svg.setAttribute("viewBox", "0 0 100 100");
         
         const bgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -497,30 +497,30 @@ class FocusTimerView extends ItemView {
       }
       
       // 时间显示
-      const timeDisplay = circleContainer.createDiv("focus-time-display");
+      const timeDisplay = circleContainer.createDiv("focus-timer-plugin-time-display");
       if (isStopwatch) {
         const stopwatchLabel = timeDisplay.createEl("div", {
           text: "00:00",
-          cls: "focus-elapsed-time"
+          cls: "focus-timer-plugin-elapsed-time"
         });
         this.defaultTimeEl = stopwatchLabel;
       } else {
-        const timeWrapper = timeDisplay.createDiv("focus-time-wrapper");
+        const timeWrapper = timeDisplay.createDiv("focus-timer-plugin-time-wrapper");
         const defaultTimeEl = timeWrapper.createEl("div", { 
           text: formatTime(this.defaultDuration),
-          cls: "focus-elapsed-time focus-time-clickable"
+          cls: "focus-timer-plugin-elapsed-time focus-timer-plugin-time-clickable"
         });
         defaultTimeEl.setAttribute("title", t("clickToInput"));
         this.defaultTimeEl = defaultTimeEl;
 
-        const editorContainer = timeWrapper.createDiv("focus-time-editor focus-time-editor-hidden");
-        const editBoxes = editorContainer.createDiv("focus-time-edit-boxes");
-        const hoursInput = editBoxes.createEl("input", { type: "text", cls: "focus-time-box focus-time-box-input" });
+        const editorContainer = timeWrapper.createDiv("focus-timer-plugin-time-editor focus-timer-plugin-time-editor-hidden");
+        const editBoxes = editorContainer.createDiv("focus-timer-plugin-time-edit-boxes");
+        const hoursInput = editBoxes.createEl("input", { type: "text", cls: "focus-timer-plugin-time-box focus-timer-plugin-time-box-input" });
         hoursInput.maxLength = 2;
         hoursInput.setAttribute("inputmode", "numeric");
         hoursInput.setAttribute("placeholder", "00");
         editBoxes.appendText(" h ");
-        const minutesInput = editBoxes.createEl("input", { type: "text", cls: "focus-time-box focus-time-box-input" });
+        const minutesInput = editBoxes.createEl("input", { type: "text", cls: "focus-timer-plugin-time-box focus-timer-plugin-time-box-input" });
         minutesInput.maxLength = 2;
         minutesInput.setAttribute("inputmode", "numeric");
         minutesInput.setAttribute("placeholder", "00");
@@ -534,8 +534,8 @@ class FocusTimerView extends ItemView {
 
         const openEditor = () => {
           timeDigits = "0000";
-          defaultTimeEl.classList.add("focus-time-display-hidden");
-          editorContainer.classList.remove("focus-time-editor-hidden");
+          defaultTimeEl.classList.add("focus-timer-plugin-time-display-hidden");
+          editorContainer.classList.remove("focus-timer-plugin-time-editor-hidden");
           syncInputsFromDigits();
           this.timeEditorOpen = true;
           this.editingTimeDigits = timeDigits;
@@ -548,8 +548,8 @@ class FocusTimerView extends ItemView {
               this.defaultDuration = totalMinutes * 60;
               defaultTimeEl.textContent = formatTime(this.defaultDuration);
             }
-            editorContainer.classList.add("focus-time-editor-hidden");
-            defaultTimeEl.classList.remove("focus-time-display-hidden");
+            editorContainer.classList.add("focus-timer-plugin-time-editor-hidden");
+            defaultTimeEl.classList.remove("focus-timer-plugin-time-display-hidden");
             this.timeEditorOpen = false;
             if (this._timeEditorClickOutside) {
               document.removeEventListener("click", this._timeEditorClickOutside);
@@ -623,11 +623,11 @@ class FocusTimerView extends ItemView {
       }
       
       // 专注事项输入框（带自动补全功能）
-      const noteInputContainer = timerSection.createDiv("focus-note-input-container");
+      const noteInputContainer = timerSection.createDiv("focus-timer-plugin-note-input-container");
       const noteInput = noteInputContainer.createEl("input", {
         type: "text",
         placeholder: t("focusItem"),
-        cls: "focus-note-input"
+        cls: "focus-timer-plugin-note-input"
       });
       // 如果有保存的值，恢复它
       if (savedNoteValue) {
@@ -636,7 +636,7 @@ class FocusTimerView extends ItemView {
       this.noteInput = noteInput; // 保存引用
       
       // 创建自动补全下拉列表
-      const autocompleteList = noteInputContainer.createDiv("focus-autocomplete-list focus-autocomplete-list-hidden");
+      const autocompleteList = noteInputContainer.createDiv("focus-timer-plugin-autocomplete-list focus-timer-plugin-autocomplete-list-hidden");
       let selectedIndex = -1;
       let filteredSuggestions = [];
       
@@ -649,7 +649,7 @@ class FocusTimerView extends ItemView {
       // 更新下拉列表（仅从设置中的联想任务列表联想，与设置共用同一列表）
       const updateAutocomplete = (query) => {
         if (!query || query.trim() === "") {
-          autocompleteList.classList.add("focus-autocomplete-list-hidden");
+          autocompleteList.classList.add("focus-timer-plugin-autocomplete-list-hidden");
           selectedIndex = -1;
           return;
         }
@@ -661,7 +661,7 @@ class FocusTimerView extends ItemView {
         );
         
         if (filteredSuggestions.length === 0) {
-          autocompleteList.classList.add("focus-autocomplete-list-hidden");
+          autocompleteList.classList.add("focus-timer-plugin-autocomplete-list-hidden");
           selectedIndex = -1;
           return;
         }
@@ -669,20 +669,20 @@ class FocusTimerView extends ItemView {
         // 显示建议列表
         autocompleteList.empty();
         filteredSuggestions.slice(0, 5).forEach((suggestion, index) => {
-          const item = autocompleteList.createDiv("focus-autocomplete-item");
+          const item = autocompleteList.createDiv("focus-timer-plugin-autocomplete-item");
           item.textContent = suggestion;
           if (index === selectedIndex) {
-            item.classList.add("focus-autocomplete-item-selected");
+            item.classList.add("focus-timer-plugin-autocomplete-item-selected");
           }
           item.onclick = () => {
             noteInput.value = suggestion;
             this.plugin.moveSuggestToFront(suggestion);
-            autocompleteList.classList.add("focus-autocomplete-list-hidden");
+            autocompleteList.classList.add("focus-timer-plugin-autocomplete-list-hidden");
             selectedIndex = -1;
             noteInput.focus();
           };
         });
-        autocompleteList.classList.remove("focus-autocomplete-list-hidden");
+        autocompleteList.classList.remove("focus-timer-plugin-autocomplete-list-hidden");
       };
       
       // 输入事件监听
@@ -699,7 +699,7 @@ class FocusTimerView extends ItemView {
       
       // 键盘事件监听
       noteInput.addEventListener("keydown", (e) => {
-        if (autocompleteList.classList.contains("focus-autocomplete-list-hidden")) return;
+        if (autocompleteList.classList.contains("focus-timer-plugin-autocomplete-list-hidden")) return;
         
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -714,10 +714,10 @@ class FocusTimerView extends ItemView {
           const chosen = filteredSuggestions[selectedIndex];
           noteInput.value = chosen;
           this.plugin.moveSuggestToFront(chosen);
-          autocompleteList.classList.add("focus-autocomplete-list-hidden");
+          autocompleteList.classList.add("focus-timer-plugin-autocomplete-list-hidden");
           selectedIndex = -1;
         } else if (e.key === "Escape") {
-          autocompleteList.classList.add("focus-autocomplete-list-hidden");
+          autocompleteList.classList.add("focus-timer-plugin-autocomplete-list-hidden");
           selectedIndex = -1;
         }
       });
@@ -729,19 +729,19 @@ class FocusTimerView extends ItemView {
       }
       this._autocompleteClickOutsideHandler = (e) => {
         if (!noteInputContainer.contains(e.target)) {
-          autocompleteList.classList.add("focus-autocomplete-list-hidden");
+          autocompleteList.classList.add("focus-timer-plugin-autocomplete-list-hidden");
           selectedIndex = -1;
         }
       };
       document.addEventListener("click", this._autocompleteClickOutsideHandler);
       
       // 按钮容器：模式切换按钮（在开始按钮左侧）+ 开始、加、减
-      const btnContainer = timerSection.createDiv("focus-btn-container");
+      const btnContainer = timerSection.createDiv("focus-timer-plugin-btn-container");
       
       // 模式切换按钮（胶囊样式，放在开始按钮左侧）
       const modeToggleBtn = btnContainer.createEl("button", {
         text: isStopwatch ? t("stopwatch") : t("countdown"),
-        cls: "focus-mode-toggle-btn"
+        cls: "focus-timer-plugin-mode-toggle-btn"
       });
       modeToggleBtn.onclick = async () => {
         const newMode = isStopwatch ? "countdown" : "stopwatch";
@@ -750,7 +750,7 @@ class FocusTimerView extends ItemView {
         this.render();
       };
       
-      const startBtn = btnContainer.createEl("button", { text: t("start"), cls: "focus-btn-start" });
+      const startBtn = btnContainer.createEl("button", { text: t("start"), cls: "focus-timer-plugin-btn-start" });
       startBtn.onclick = () => {
         // 限制专注事项：英文字符最多40个，其他字符最多10个
         let note = noteInput.value.trim() || "";
@@ -778,14 +778,14 @@ class FocusTimerView extends ItemView {
       };
       
       if (!isStopwatch) {
-        const addBtn = btnContainer.createEl("button", { text: "+", cls: "focus-btn-control" });
+        const addBtn = btnContainer.createEl("button", { text: "+", cls: "focus-timer-plugin-btn-control" });
         addBtn.onclick = () => {
           const stepSec = (this.plugin.settings.adjustStepMinutes || 5) * 60;
           this.defaultDuration = Math.min(this.defaultDuration + stepSec, 600 * 60);
           if (this.defaultTimeEl) this.defaultTimeEl.textContent = formatTime(this.defaultDuration);
         };
         
-        const minusBtn = btnContainer.createEl("button", { text: "-", cls: "focus-btn-control" });
+        const minusBtn = btnContainer.createEl("button", { text: "-", cls: "focus-timer-plugin-btn-control" });
         minusBtn.onclick = () => {
           const stepSec = (this.plugin.settings.adjustStepMinutes || 5) * 60;
           this.defaultDuration = Math.max(this.defaultDuration - stepSec, 1 * 60);
@@ -798,17 +798,17 @@ class FocusTimerView extends ItemView {
     // 统计卡片区域和历史记录区域（仅在高度足够时显示）
     if (!isCompact) {
       // 切换视图的按钮容器
-      const viewToggleContainer = container.createDiv("focus-view-toggle-container");
+      const viewToggleContainer = container.createDiv("focus-timer-plugin-view-toggle-container");
       const statsToggleBtn = viewToggleContainer.createEl("button", { 
         text: t("focusHistory"), 
-        cls: "focus-view-toggle-btn" 
+        cls: "focus-timer-plugin-view-toggle-btn" 
       });
       const historyToggleBtn = viewToggleContainer.createEl("button", { 
         text: t("recentFocus"), 
-        cls: "focus-view-toggle-btn" 
+        cls: "focus-timer-plugin-view-toggle-btn" 
       });
       // 图表按钮放在"专注记录"按钮的右侧
-      const chartBtn = viewToggleContainer.createEl("button", { text: t("chart"), cls: "focus-chart-btn" });
+      const chartBtn = viewToggleContainer.createEl("button", { text: t("chart"), cls: "focus-timer-plugin-chart-btn" });
       chartBtn.onclick = async () => {
         try {
           await this.showChart();
@@ -818,23 +818,23 @@ class FocusTimerView extends ItemView {
       };
       
       // 视图容器
-      const viewContainer = container.createDiv("focus-view-container");
+      const viewContainer = container.createDiv("focus-timer-plugin-view-container");
       
       // 统计卡片区域
-      const statsSection = viewContainer.createDiv("focus-stats-section");
+      const statsSection = viewContainer.createDiv("focus-timer-plugin-stats-section");
       if (this.currentView !== "stats") {
-        statsSection.classList.add("focus-section-hidden");
+        statsSection.classList.add("focus-timer-plugin-section-hidden");
       }
-      const statsHeader = statsSection.createDiv("focus-stats-header");
-    //   statsHeader.createEl("h3", { text: "专注数据", cls: "focus-stats-title" });
+      const statsHeader = statsSection.createDiv("focus-timer-plugin-stats-header");
+    //   statsHeader.createEl("h3", { text: "专注数据", cls: "focus-timer-plugin-stats-title" });
       
       // 统计卡片网格（根据宽度动态调整：窄时1列，宽时2列）
-      const statsGrid = statsSection.createDiv("focus-stats-grid");
+      const statsGrid = statsSection.createDiv("focus-timer-plugin-stats-grid");
       // 根据宽度设置网格列数
       if (isNarrow) {
-        statsGrid.classList.add("focus-stats-grid-narrow");
+        statsGrid.classList.add("focus-timer-plugin-stats-grid-narrow");
       } else {
-        statsGrid.classList.remove("focus-stats-grid-narrow");
+        statsGrid.classList.remove("focus-timer-plugin-stats-grid-narrow");
       }
       
       // 今日专注
@@ -862,67 +862,67 @@ class FocusTimerView extends ItemView {
         `${t("yearlyTotalCompleted")} ${stats.yearCompleted} ${t("tasks")}`);
 
       // 专注记录
-      const historySection = viewContainer.createDiv("focus-history-section");
+      const historySection = viewContainer.createDiv("focus-timer-plugin-history-section");
       if (this.currentView !== "history") {
-        historySection.classList.add("focus-section-hidden");
+        historySection.classList.add("focus-timer-plugin-section-hidden");
       }
-      const historyContent = historySection.createDiv("focus-history-content");
+      const historyContent = historySection.createDiv("focus-timer-plugin-history-content");
       this.createRecentHistory(historyContent, sessions);
       
       // 切换按钮事件
       statsToggleBtn.onclick = () => {
         this.currentView = "stats";
-        statsSection.classList.remove("focus-section-hidden");
-        historySection.classList.add("focus-section-hidden");
-        statsToggleBtn.classList.add("focus-view-toggle-active");
-        historyToggleBtn.classList.remove("focus-view-toggle-active");
+        statsSection.classList.remove("focus-timer-plugin-section-hidden");
+        historySection.classList.add("focus-timer-plugin-section-hidden");
+        statsToggleBtn.classList.add("focus-timer-plugin-view-toggle-active");
+        historyToggleBtn.classList.remove("focus-timer-plugin-view-toggle-active");
       };
       
       historyToggleBtn.onclick = () => {
         this.currentView = "history";
-        statsSection.classList.add("focus-section-hidden");
-        historySection.classList.remove("focus-section-hidden");
-        historyToggleBtn.classList.add("focus-view-toggle-active");
-        statsToggleBtn.classList.remove("focus-view-toggle-active");
+        statsSection.classList.add("focus-timer-plugin-section-hidden");
+        historySection.classList.remove("focus-timer-plugin-section-hidden");
+        historyToggleBtn.classList.add("focus-timer-plugin-view-toggle-active");
+        statsToggleBtn.classList.remove("focus-timer-plugin-view-toggle-active");
       };
       
       // 设置初始状态
       if (this.currentView === "stats") {
-        statsToggleBtn.classList.add("focus-view-toggle-active");
+        statsToggleBtn.classList.add("focus-timer-plugin-view-toggle-active");
       } else {
-        historyToggleBtn.classList.add("focus-view-toggle-active");
+        historyToggleBtn.classList.add("focus-timer-plugin-view-toggle-active");
       }
     }
   }
 
   createStatCard(container, title, mainValue, comparison, average) {
-    const card = container.createDiv("focus-stat-card");
-    card.createEl("div", { text: title, cls: "focus-stat-card-title" });
+    const card = container.createDiv("focus-timer-plugin-stat-card");
+    card.createEl("div", { text: title, cls: "focus-timer-plugin-stat-card-title" });
     
     // 主值行：包含当前值和昨天的对比（同一行）
-    const mainValueRow = card.createDiv("focus-stat-main-row");
-    const mainValueEl = mainValueRow.createDiv("focus-stat-main-value");
+    const mainValueRow = card.createDiv("focus-timer-plugin-stat-main-row");
+    const mainValueEl = mainValueRow.createDiv("focus-timer-plugin-stat-main-value");
     
     // 如果mainValue是对象（包含数字和单位），分开显示
     if (typeof mainValue === 'object' && mainValue.number) {
-      const numberSpan = mainValueEl.createEl("span", { text: mainValue.number, cls: "focus-stat-number" });
+      const numberSpan = mainValueEl.createEl("span", { text: mainValue.number, cls: "focus-timer-plugin-stat-number" });
       if (mainValue.unit) {
-        mainValueEl.createEl("span", { text: mainValue.unit, cls: "focus-stat-unit" });
+        mainValueEl.createEl("span", { text: mainValue.unit, cls: "focus-timer-plugin-stat-unit" });
       }
       if (mainValue.number2) {
-        mainValueEl.createEl("span", { text: mainValue.number2, cls: "focus-stat-number" });
+        mainValueEl.createEl("span", { text: mainValue.number2, cls: "focus-timer-plugin-stat-number" });
       }
       if (mainValue.unit2) {
-        mainValueEl.createEl("span", { text: mainValue.unit2, cls: "focus-stat-unit" });
+        mainValueEl.createEl("span", { text: mainValue.unit2, cls: "focus-timer-plugin-stat-unit" });
       }
     } else {
       // 处理"X 个任务"这种格式
       const parts = String(mainValue).split(/(\d+)/);
       parts.forEach(part => {
         if (part && !isNaN(part)) {
-          mainValueEl.createEl("span", { text: part, cls: "focus-stat-number" });
+          mainValueEl.createEl("span", { text: part, cls: "focus-timer-plugin-stat-number" });
         } else if (part) {
-          mainValueEl.createEl("span", { text: part, cls: "focus-stat-unit" });
+          mainValueEl.createEl("span", { text: part, cls: "focus-timer-plugin-stat-unit" });
         }
       });
     }
@@ -947,15 +947,15 @@ class FocusTimerView extends ItemView {
         const isPositive = sign === '+';
         
         const comparisonEl = mainValueRow.createDiv({ 
-          cls: `focus-stat-comparison ${isPositive ? 'comparison-positive' : 'comparison-negative'}` 
+          cls: `focus-timer-plugin-stat-comparison ${isPositive ? 'focus-timer-plugin-comparison-positive' : 'focus-timer-plugin-comparison-negative'}` 
         });
         // 标签在上一行
-        comparisonEl.createEl("div", { text: label, cls: "comparison-label" });
+        comparisonEl.createEl("div", { text: label, cls: "focus-timer-plugin-comparison-label" });
         // 值在下一行
-        comparisonEl.createEl("div", { text: `${sign}${value}`, cls: "comparison-value" });
+        comparisonEl.createEl("div", { text: `${sign}${value}`, cls: "focus-timer-plugin-comparison-value" });
       } else {
         // 如果都不匹配，直接显示
-        const comparisonEl = mainValueRow.createDiv({ text: comparison, cls: "focus-stat-comparison" });
+        const comparisonEl = mainValueRow.createDiv({ text: comparison, cls: "focus-timer-plugin-stat-comparison" });
       }
     }
     
@@ -963,7 +963,7 @@ class FocusTimerView extends ItemView {
     if (average) {
       // 检查是否是"全年累计完成"，如果是则添加额外的类
       const isYearlyTotal = average.includes(t("yearlyTotalCompleted")) || average.includes("全年累计完成");
-      const averageClasses = isYearlyTotal ? "focus-stat-average focus-stat-average-yearly" : "focus-stat-average";
+      const averageClasses = isYearlyTotal ? "focus-timer-plugin-stat-average focus-timer-plugin-stat-average-yearly" : "focus-timer-plugin-stat-average";
       const averageEl = card.createEl("div", { text: average, cls: averageClasses });
     }
   }
@@ -990,7 +990,7 @@ class FocusTimerView extends ItemView {
     const dates = Object.keys(byDate).sort().reverse().slice(0, 7);
     
     if (dates.length === 0) {
-      const emptyEl = container.createDiv("focus-history-empty");
+      const emptyEl = container.createDiv("focus-timer-plugin-history-empty");
       emptyEl.textContent = t("noRecentFocus");
       return;
     }
@@ -1000,12 +1000,12 @@ class FocusTimerView extends ItemView {
       const isToday = dateKey === getDateKey(new Date());
       const dateLabel = isToday ? t("today") : (getLanguage() === 'zh' ? `${date.getMonth() + 1}月${date.getDate()}日` : `${date.getMonth() + 1}/${date.getDate()}`);
       
-      const dateGroup = container.createDiv("focus-history-date-group");
-      dateGroup.createEl("div", { text: dateLabel, cls: "focus-history-date-label" });
+      const dateGroup = container.createDiv("focus-timer-plugin-history-date-group");
+      dateGroup.createEl("div", { text: dateLabel, cls: "focus-timer-plugin-history-date-label" });
       
       // 倒序显示，最新的在上面（不reverse，因为sortedSessions已经是倒序的）
       byDate[dateKey].forEach(session => {
-        const item = dateGroup.createDiv("focus-history-item");
+        const item = dateGroup.createDiv("focus-timer-plugin-history-item");
         const time = new Date(session.end || session.start);
         const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
         
@@ -1028,7 +1028,7 @@ class FocusTimerView extends ItemView {
         
         item.createEl("div", { 
           text: entryText,
-          cls: `focus-history-entry ${session.status === "completed" ? "status-completed" : "status-abandoned"}`
+          cls: `focus-timer-plugin-history-entry ${session.status === "completed" ? "focus-timer-plugin-status-completed" : "focus-timer-plugin-status-abandoned"}`
         });
       });
     });
@@ -1038,29 +1038,29 @@ class FocusTimerView extends ItemView {
     try {
       // 创建图表视图（模态框）
       const chartModal = document.createElement("div");
-      chartModal.className = "focus-chart-modal";
+      chartModal.className = "focus-timer-plugin-chart-modal";
       
       const chartContent = document.createElement("div");
-      chartContent.className = "focus-chart-content";
+      chartContent.className = "focus-timer-plugin-chart-content";
       
       const closeBtn = document.createElement("button");
       closeBtn.textContent = t("close");
-      closeBtn.className = "focus-chart-close-btn";
+      closeBtn.className = "focus-timer-plugin-chart-close-btn";
       closeBtn.onclick = () => chartModal.remove();
       
       const title = document.createElement("h3");
       title.textContent = t("focusTrendChart");
-      title.className = "focus-chart-modal-title";
+      title.className = "focus-timer-plugin-chart-modal-title";
       
       chartContent.appendChild(closeBtn);
       chartContent.appendChild(title);
 
       // 显示选项（默认都勾选）：专注时间 / 任务数量
       const controls = document.createElement("div");
-      controls.className = "focus-chart-modal-controls";
+      controls.className = "focus-timer-plugin-chart-modal-controls";
       const makeCheckbox = (labelText, checked) => {
         const label = document.createElement("label");
-        label.className = "focus-chart-modal-checkbox-label";
+        label.className = "focus-timer-plugin-chart-modal-checkbox-label";
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.checked = checked;
@@ -1109,19 +1109,19 @@ class FocusTimerView extends ItemView {
         const rangeLabel = chartRangeLabels[index];
         try {
           const chartSection = document.createElement("div");
-          chartSection.className = "focus-chart-section";
+          chartSection.className = "focus-timer-plugin-chart-section";
           
           const chartTitle = document.createElement("h4");
           chartTitle.textContent = `${t("focusTrend")} (${rangeLabel})`;
-          chartTitle.className = "focus-chart-section-title";
+          chartTitle.className = "focus-timer-plugin-chart-section-title";
           
           const chartContainer = document.createElement("div");
-          chartContainer.className = "focus-chart-container";
+          chartContainer.className = "focus-timer-plugin-chart-container";
           
           // 下载按钮
           const downloadBtn = document.createElement("button");
           downloadBtn.textContent = t("download");
-          downloadBtn.className = "focus-chart-download-btn focus-chart-download-btn-positioned";
+          downloadBtn.className = "focus-timer-plugin-chart-download-btn focus-timer-plugin-chart-download-btn-positioned";
           downloadBtn.onclick = () => {
             const canvas = chartContainer.querySelector("canvas");
             if (canvas) {
@@ -1155,26 +1155,26 @@ class FocusTimerView extends ItemView {
             } catch (drawError) {
               const errorMsg = document.createElement("div");
               errorMsg.textContent = `${t("chartError")}: ${drawError.message}`;
-              errorMsg.className = "focus-chart-error-message";
+              errorMsg.className = "focus-timer-plugin-chart-error-message";
               chartContainer.appendChild(errorMsg);
             }
           } else {
             const emptyMsg = document.createElement("div");
             emptyMsg.textContent = t("noData");
-            emptyMsg.className = "focus-chart-empty-message";
+            emptyMsg.className = "focus-timer-plugin-chart-empty-message";
             chartContainer.appendChild(emptyMsg);
           }
           
           chartContent.appendChild(chartSection);
         } catch (error) {
           const errorSection = document.createElement("div");
-          errorSection.className = "focus-chart-section";
+          errorSection.className = "focus-timer-plugin-chart-section";
           const errorMsg = document.createElement("div");
           const lang = getLanguage();
           errorMsg.textContent = lang === 'zh' 
             ? `创建图表（${rangeLabel}）时出错: ${error.message}`
             : `Error creating chart (${rangeLabel}): ${error.message}`;
-          errorMsg.className = "focus-chart-error-message";
+          errorMsg.className = "focus-timer-plugin-chart-error-message";
           errorSection.appendChild(errorMsg);
           chartContent.appendChild(errorSection);
         }

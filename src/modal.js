@@ -15,9 +15,9 @@ class ConfirmModal extends Modal {
     titleEl.setText(this.titleText);
     contentEl.empty();
 
-    contentEl.createEl("p", { text: this.messageText, cls: "focus-confirm-message" });
+    contentEl.createEl("p", { text: this.messageText, cls: "focus-timer-plugin-confirm-message" });
 
-    const buttons = contentEl.createDiv({ cls: "focus-confirm-buttons" });
+    const buttons = contentEl.createDiv({ cls: "focus-timer-plugin-confirm-buttons" });
 
     const cancelBtn = buttons.createEl("button", { text: t("cancel") });
     cancelBtn.onclick = () => this.close();
