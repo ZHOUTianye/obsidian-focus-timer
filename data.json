@@ -1,0 +1,2655 @@
+{
+  "state": {
+    "active": false,
+    "resting": false,
+    "start": "2026-02-04T02:27:26.811Z",
+    "end": "2026-02-04T02:52:26.811Z",
+    "plannedSec": 1500,
+    "mode": "countdown",
+    "note": "",
+    "restStart": "2026-02-04T02:52:33.037Z",
+    "restEnd": "2026-02-04T02:57:33.036Z",
+    "restSec": 300
+  },
+  "sessions": [
+    {
+      "id": "2025-07-29T08:29:24.156Z",
+      "start": "2025-07-29T08:29:24.625Z",
+      "end": "2025-07-29T08:44:01.094Z",
+      "plannedSec": 1800,
+      "actualSec": 877,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-07-29T08:44:01.467Z"
+    },
+    {
+      "id": "2025-07-29T09:38:29.313Z",
+      "start": "2025-07-29T09:38:29.069Z",
+      "end": "2025-07-29T09:54:13.975Z",
+      "plannedSec": 900,
+      "actualSec": 944,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-07-29T09:54:13.962Z"
+    },
+    {
+      "id": "2025-07-29T20:34:55.362Z",
+      "start": "2025-07-29T20:34:55.363Z",
+      "end": "2025-07-29T20:50:42.162Z",
+      "plannedSec": 900,
+      "actualSec": 947,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-07-29T20:50:42.595Z"
+    },
+    {
+      "id": "2025-07-31T06:26:23.896Z",
+      "start": "2025-07-31T06:26:23.158Z",
+      "end": "2025-07-31T06:27:27.436Z",
+      "plannedSec": 60,
+      "actualSec": 64,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-07-31T06:27:27.163Z"
+    },
+    {
+      "id": "2025-07-31T20:46:07.998Z",
+      "start": "2025-07-31T20:46:07.894Z",
+      "end": "2025-07-31T21:11:24.684Z",
+      "plannedSec": 1500,
+      "actualSec": 1517,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2025-07-31T21:11:24.191Z"
+    },
+    {
+      "id": "2025-08-02T06:29:17.182Z",
+      "start": "2025-08-02T06:29:17.151Z",
+      "end": "2025-08-02T06:30:18.666Z",
+      "plannedSec": 60,
+      "actualSec": 61,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-08-02T06:30:18.634Z"
+    },
+    {
+      "id": "2025-08-03T00:02:04.410Z",
+      "start": "2025-08-03T00:02:04.258Z",
+      "end": "2025-08-03T00:17:56.002Z",
+      "plannedSec": null,
+      "actualSec": 952,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-03T00:17:56.285Z"
+    },
+    {
+      "id": "2025-08-03T07:49:35.901Z",
+      "start": "2025-08-03T07:49:35.713Z",
+      "end": "2025-08-03T08:07:56.262Z",
+      "plannedSec": null,
+      "actualSec": 1101,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-08-03T08:07:56.490Z"
+    },
+    {
+      "id": "2025-08-03T10:26:42.589Z",
+      "start": "2025-08-03T10:26:42.530Z",
+      "end": "2025-08-03T10:49:26.582Z",
+      "plannedSec": 1500,
+      "actualSec": 1364,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-03T10:49:26.210Z"
+    },
+    {
+      "id": "2025-08-03T15:46:43.442Z",
+      "start": "2025-08-03T15:46:43.498Z",
+      "end": "2025-08-03T16:18:06.739Z",
+      "plannedSec": 1800,
+      "actualSec": 1883,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-03T16:18:06.175Z"
+    },
+    {
+      "id": "2025-08-04T05:17:29.582Z",
+      "start": "2025-08-04T05:17:29.771Z",
+      "end": "2025-08-04T05:20:29.618Z",
+      "plannedSec": 1800,
+      "actualSec": 180,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-08-04T05:20:29.159Z"
+    },
+    {
+      "id": "2025-08-05T11:39:52.153Z",
+      "start": "2025-08-05T11:39:52.781Z",
+      "end": "2025-08-05T11:55:36.113Z",
+      "plannedSec": null,
+      "actualSec": 944,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-08-05T11:55:36.216Z"
+    },
+    {
+      "id": "2025-08-09T03:53:13.689Z",
+      "start": "2025-08-09T03:53:13.540Z",
+      "end": "2025-08-09T03:54:15.775Z",
+      "plannedSec": 60,
+      "actualSec": 62,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-08-09T03:54:15.235Z"
+    },
+    {
+      "id": "2025-08-09T08:22:57.202Z",
+      "start": "2025-08-09T08:22:57.346Z",
+      "end": "2025-08-09T08:46:26.330Z",
+      "plannedSec": 1500,
+      "actualSec": 1409,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-08-09T08:46:26.162Z"
+    },
+    {
+      "id": "2025-08-09T10:03:22.991Z",
+      "start": "2025-08-09T10:03:22.333Z",
+      "end": "2025-08-09T10:29:22.698Z",
+      "plannedSec": 1500,
+      "actualSec": 1560,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-08-09T10:29:22.620Z"
+    },
+    {
+      "id": "2025-08-09T18:14:03.367Z",
+      "start": "2025-08-09T18:14:03.409Z",
+      "end": "2025-08-09T18:19:32.770Z",
+      "plannedSec": 300,
+      "actualSec": 329,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-09T18:19:32.800Z"
+    },
+    {
+      "id": "2025-08-10T00:32:37.008Z",
+      "start": "2025-08-10T00:32:37.362Z",
+      "end": "2025-08-10T01:04:41.972Z",
+      "plannedSec": 1800,
+      "actualSec": 1924,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-08-10T01:04:41.263Z"
+    },
+    {
+      "id": "2025-08-12T15:25:22.009Z",
+      "start": "2025-08-12T15:25:22.375Z",
+      "end": "2025-08-12T15:40:15.263Z",
+      "plannedSec": 900,
+      "actualSec": 893,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-08-12T15:40:15.379Z"
+    },
+    {
+      "id": "2025-08-13T22:34:13.552Z",
+      "start": "2025-08-13T22:34:13.094Z",
+      "end": "2025-08-13T22:36:10.710Z",
+      "plannedSec": 300,
+      "actualSec": 117,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-08-13T22:36:10.160Z"
+    },
+    {
+      "id": "2025-08-14T09:01:22.775Z",
+      "start": "2025-08-14T09:01:22.345Z",
+      "end": "2025-08-14T09:02:26.948Z",
+      "plannedSec": 60,
+      "actualSec": 64,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-08-14T09:02:26.054Z"
+    },
+    {
+      "id": "2025-08-15T06:11:18.953Z",
+      "start": "2025-08-15T06:11:18.826Z",
+      "end": "2025-08-15T07:07:46.957Z",
+      "plannedSec": null,
+      "actualSec": 3388,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-08-15T07:07:46.438Z"
+    },
+    {
+      "id": "2025-08-16T08:56:29.119Z",
+      "start": "2025-08-16T08:56:29.007Z",
+      "end": "2025-08-16T09:12:54.060Z",
+      "plannedSec": 900,
+      "actualSec": 985,
+      "status": "completed",
+      "note": "会议",
+      "createdAt": "2025-08-16T09:12:54.802Z"
+    },
+    {
+      "id": "2025-08-17T20:54:09.197Z",
+      "start": "2025-08-17T20:54:09.729Z",
+      "end": "2025-08-17T20:55:10.313Z",
+      "plannedSec": 60,
+      "actualSec": 61,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-08-17T20:55:10.281Z"
+    },
+    {
+      "id": "2025-08-20T03:47:39.930Z",
+      "start": "2025-08-20T03:47:39.965Z",
+      "end": "2025-08-20T03:48:38.243Z",
+      "plannedSec": 1800,
+      "actualSec": 59,
+      "status": "abandoned",
+      "note": "Github笔记完成",
+      "createdAt": "2025-08-20T03:48:38.223Z"
+    },
+    {
+      "id": "2025-08-20T13:32:12.963Z",
+      "start": "2025-08-20T13:32:12.138Z",
+      "end": "2025-08-20T13:32:35.745Z",
+      "plannedSec": 60,
+      "actualSec": 23,
+      "status": "abandoned",
+      "note": "阅读",
+      "createdAt": "2025-08-20T13:32:35.468Z"
+    },
+    {
+      "id": "2025-08-20T14:09:52.801Z",
+      "start": "2025-08-20T14:09:52.720Z",
+      "end": "2025-08-20T14:39:15.023Z",
+      "plannedSec": 1800,
+      "actualSec": 1763,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-08-20T14:39:15.739Z"
+    },
+    {
+      "id": "2025-08-21T11:49:09.665Z",
+      "start": "2025-08-21T11:49:09.279Z",
+      "end": "2025-08-21T12:47:17.246Z",
+      "plannedSec": null,
+      "actualSec": 3488,
+      "status": "abandoned",
+      "note": "学习笔记",
+      "createdAt": "2025-08-21T12:47:17.826Z"
+    },
+    {
+      "id": "2025-08-21T23:03:41.493Z",
+      "start": "2025-08-21T23:03:41.860Z",
+      "end": "2025-08-21T23:30:45.300Z",
+      "plannedSec": 1800,
+      "actualSec": 1624,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-21T23:30:45.400Z"
+    },
+    {
+      "id": "2025-08-21T23:42:16.914Z",
+      "start": "2025-08-21T23:42:16.736Z",
+      "end": "2025-08-22T00:13:16.074Z",
+      "plannedSec": 1800,
+      "actualSec": 1860,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-08-22T00:13:16.910Z"
+    },
+    {
+      "id": "2025-08-22T10:36:25.278Z",
+      "start": "2025-08-22T10:36:25.979Z",
+      "end": "2025-08-22T10:48:25.062Z",
+      "plannedSec": null,
+      "actualSec": 720,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-22T10:48:25.485Z"
+    },
+    {
+      "id": "2025-08-24T08:48:05.966Z",
+      "start": "2025-08-24T08:48:05.556Z",
+      "end": "2025-08-24T09:10:44.547Z",
+      "plannedSec": null,
+      "actualSec": 1359,
+      "status": "abandoned",
+      "note": "阅读",
+      "createdAt": "2025-08-24T09:10:44.153Z"
+    },
+    {
+      "id": "2025-08-26T02:40:47.108Z",
+      "start": "2025-08-26T02:40:47.344Z",
+      "end": "2025-08-26T03:08:15.911Z",
+      "plannedSec": null,
+      "actualSec": 1648,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-08-26T03:08:15.016Z"
+    },
+    {
+      "id": "2025-08-27T05:03:51.232Z",
+      "start": "2025-08-27T05:03:51.353Z",
+      "end": "2025-08-27T05:54:59.748Z",
+      "plannedSec": null,
+      "actualSec": 3068,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-08-27T05:54:59.441Z"
+    },
+    {
+      "id": "2025-08-27T11:21:11.177Z",
+      "start": "2025-08-27T11:21:11.473Z",
+      "end": "2025-08-27T11:46:55.566Z",
+      "plannedSec": 1500,
+      "actualSec": 1544,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-08-27T11:46:55.280Z"
+    },
+    {
+      "id": "2025-08-28T06:22:43.051Z",
+      "start": "2025-08-28T06:22:43.745Z",
+      "end": "2025-08-28T06:23:05.651Z",
+      "plannedSec": 60,
+      "actualSec": 22,
+      "status": "abandoned",
+      "note": "复习",
+      "createdAt": "2025-08-28T06:23:05.555Z"
+    },
+    {
+      "id": "2025-08-28T10:36:14.419Z",
+      "start": "2025-08-28T10:36:14.744Z",
+      "end": "2025-08-28T10:39:31.063Z",
+      "plannedSec": null,
+      "actualSec": 197,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-08-28T10:39:31.431Z"
+    },
+    {
+      "id": "2025-08-30T20:41:12.928Z",
+      "start": "2025-08-30T20:41:12.773Z",
+      "end": "2025-08-30T21:07:06.837Z",
+      "plannedSec": 1500,
+      "actualSec": 1554,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2025-08-30T21:07:06.539Z"
+    },
+    {
+      "id": "2025-08-31T12:30:16.435Z",
+      "start": "2025-08-31T12:30:16.476Z",
+      "end": "2025-08-31T12:32:11.591Z",
+      "plannedSec": 300,
+      "actualSec": 115,
+      "status": "abandoned",
+      "note": "复习",
+      "createdAt": "2025-08-31T12:32:11.539Z"
+    },
+    {
+      "id": "2025-08-31T20:56:21.156Z",
+      "start": "2025-08-31T20:56:21.623Z",
+      "end": "2025-08-31T21:18:55.947Z",
+      "plannedSec": 1500,
+      "actualSec": 1354,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2025-08-31T21:18:55.799Z"
+    },
+    {
+      "id": "2025-09-01T17:10:22.622Z",
+      "start": "2025-09-01T17:10:22.478Z",
+      "end": "2025-09-01T17:39:51.263Z",
+      "plannedSec": 1800,
+      "actualSec": 1769,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-01T17:39:51.997Z"
+    },
+    {
+      "id": "2025-09-01T19:46:35.368Z",
+      "start": "2025-09-01T19:46:35.158Z",
+      "end": "2025-09-01T20:38:17.353Z",
+      "plannedSec": null,
+      "actualSec": 3102,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-09-01T20:38:17.374Z"
+    },
+    {
+      "id": "2025-09-02T12:03:22.353Z",
+      "start": "2025-09-02T12:03:22.092Z",
+      "end": "2025-09-02T12:18:39.116Z",
+      "plannedSec": 900,
+      "actualSec": 917,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-09-02T12:18:39.384Z"
+    },
+    {
+      "id": "2025-09-02T19:53:46.417Z",
+      "start": "2025-09-02T19:53:46.938Z",
+      "end": "2025-09-02T19:58:35.332Z",
+      "plannedSec": null,
+      "actualSec": 289,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-02T19:58:35.976Z"
+    },
+    {
+      "id": "2025-09-03T21:33:38.247Z",
+      "start": "2025-09-03T21:33:38.451Z",
+      "end": "2025-09-03T21:56:24.462Z",
+      "plannedSec": 1500,
+      "actualSec": 1366,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-09-03T21:56:24.666Z"
+    },
+    {
+      "id": "2025-09-04T18:59:38.838Z",
+      "start": "2025-09-04T18:59:38.216Z",
+      "end": "2025-09-04T19:08:36.726Z",
+      "plannedSec": 1500,
+      "actualSec": 538,
+      "status": "abandoned",
+      "note": "写作",
+      "createdAt": "2025-09-04T19:08:36.251Z"
+    },
+    {
+      "id": "2025-09-07T08:56:53.177Z",
+      "start": "2025-09-07T08:56:53.534Z",
+      "end": "2025-09-07T09:08:52.237Z",
+      "plannedSec": 1800,
+      "actualSec": 719,
+      "status": "abandoned",
+      "note": "阅读",
+      "createdAt": "2025-09-07T09:08:52.077Z"
+    },
+    {
+      "id": "2025-09-08T09:11:06.066Z",
+      "start": "2025-09-08T09:11:06.017Z",
+      "end": "2025-09-08T09:31:45.300Z",
+      "plannedSec": null,
+      "actualSec": 1239,
+      "status": "completed",
+      "note": "会议",
+      "createdAt": "2025-09-08T09:31:45.605Z"
+    },
+    {
+      "id": "2025-09-09T07:57:07.481Z",
+      "start": "2025-09-09T07:57:07.747Z",
+      "end": "2025-09-09T08:26:17.305Z",
+      "plannedSec": 1800,
+      "actualSec": 1750,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-09T08:26:17.164Z"
+    },
+    {
+      "id": "2025-09-09T22:47:21.744Z",
+      "start": "2025-09-09T22:47:21.394Z",
+      "end": "2025-09-09T23:13:38.705Z",
+      "plannedSec": null,
+      "actualSec": 1577,
+      "status": "abandoned",
+      "note": "复习",
+      "createdAt": "2025-09-09T23:13:38.134Z"
+    },
+    {
+      "id": "2025-09-10T09:32:26.403Z",
+      "start": "2025-09-10T09:32:26.114Z",
+      "end": "2025-09-10T10:00:30.977Z",
+      "plannedSec": 1800,
+      "actualSec": 1684,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-10T10:00:30.915Z"
+    },
+    {
+      "id": "2025-09-11T14:54:53.478Z",
+      "start": "2025-09-11T14:54:53.085Z",
+      "end": "2025-09-11T15:11:21.803Z",
+      "plannedSec": 900,
+      "actualSec": 988,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-11T15:11:21.632Z"
+    },
+    {
+      "id": "2025-09-11T21:52:35.034Z",
+      "start": "2025-09-11T21:52:35.818Z",
+      "end": "2025-09-11T22:15:55.973Z",
+      "plannedSec": 1500,
+      "actualSec": 1400,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-09-11T22:15:55.072Z"
+    },
+    {
+      "id": "2025-09-12T06:49:50.308Z",
+      "start": "2025-09-12T06:49:50.492Z",
+      "end": "2025-09-12T07:22:35.566Z",
+      "plannedSec": 1800,
+      "actualSec": 1965,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-12T07:22:35.650Z"
+    },
+    {
+      "id": "2025-09-12T12:04:11.499Z",
+      "start": "2025-09-12T12:04:11.008Z",
+      "end": "2025-09-12T12:18:29.107Z",
+      "plannedSec": 900,
+      "actualSec": 858,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-12T12:18:29.754Z"
+    },
+    {
+      "id": "2025-09-13T13:10:55.434Z",
+      "start": "2025-09-13T13:10:55.087Z",
+      "end": "2025-09-13T13:10:58.926Z",
+      "plannedSec": 60,
+      "actualSec": 3,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-09-13T13:10:58.759Z"
+    },
+    {
+      "id": "2025-09-17T19:41:01.414Z",
+      "start": "2025-09-17T19:41:01.401Z",
+      "end": "2025-09-17T19:46:11.423Z",
+      "plannedSec": 300,
+      "actualSec": 310,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-17T19:46:11.707Z"
+    },
+    {
+      "id": "2025-09-18T21:14:50.850Z",
+      "start": "2025-09-18T21:14:50.855Z",
+      "end": "2025-09-18T21:38:12.148Z",
+      "plannedSec": 1500,
+      "actualSec": 1402,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-09-18T21:38:12.442Z"
+    },
+    {
+      "id": "2025-09-24T00:08:47.046Z",
+      "start": "2025-09-24T00:08:47.098Z",
+      "end": "2025-09-24T00:09:50.606Z",
+      "plannedSec": 60,
+      "actualSec": 63,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-24T00:09:50.457Z"
+    },
+    {
+      "id": "2025-09-25T14:53:13.440Z",
+      "start": "2025-09-25T14:53:13.128Z",
+      "end": "2025-09-25T15:21:22.328Z",
+      "plannedSec": null,
+      "actualSec": 1689,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-09-25T15:21:22.403Z"
+    },
+    {
+      "id": "2025-09-26T04:19:41.514Z",
+      "start": "2025-09-26T04:19:41.585Z",
+      "end": "2025-09-26T04:25:08.493Z",
+      "plannedSec": 300,
+      "actualSec": 327,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-26T04:25:08.228Z"
+    },
+    {
+      "id": "2025-09-26T05:15:15.696Z",
+      "start": "2025-09-26T05:15:15.612Z",
+      "end": "2025-09-26T05:16:15.399Z",
+      "plannedSec": 60,
+      "actualSec": 60,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-26T05:16:15.154Z"
+    },
+    {
+      "id": "2025-09-26T12:49:30.826Z",
+      "start": "2025-09-26T12:49:30.682Z",
+      "end": "2025-09-26T12:54:53.624Z",
+      "plannedSec": 300,
+      "actualSec": 323,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-09-26T12:54:53.138Z"
+    },
+    {
+      "id": "2025-09-26T18:50:15.819Z",
+      "start": "2025-09-26T18:50:15.048Z",
+      "end": "2025-09-26T18:55:16.264Z",
+      "plannedSec": 300,
+      "actualSec": 301,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-09-26T18:55:16.767Z"
+    },
+    {
+      "id": "2025-09-26T20:36:33.937Z",
+      "start": "2025-09-26T20:36:33.594Z",
+      "end": "2025-09-26T20:48:29.925Z",
+      "plannedSec": null,
+      "actualSec": 716,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-09-26T20:48:29.801Z"
+    },
+    {
+      "id": "2025-09-29T07:47:30.975Z",
+      "start": "2025-09-29T07:47:30.836Z",
+      "end": "2025-09-29T07:52:49.363Z",
+      "plannedSec": 300,
+      "actualSec": 319,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-09-29T07:52:49.407Z"
+    },
+    {
+      "id": "2025-09-29T19:59:52.976Z",
+      "start": "2025-09-29T19:59:52.052Z",
+      "end": "2025-09-29T20:00:46.241Z",
+      "plannedSec": 60,
+      "actualSec": 54,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-09-29T20:00:46.675Z"
+    },
+    {
+      "id": "2025-09-30T01:24:16.227Z",
+      "start": "2025-09-30T01:24:16.727Z",
+      "end": "2025-09-30T02:22:28.510Z",
+      "plannedSec": null,
+      "actualSec": 3492,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-09-30T02:22:28.911Z"
+    },
+    {
+      "id": "2025-10-01T12:12:50.173Z",
+      "start": "2025-10-01T12:12:50.928Z",
+      "end": "2025-10-01T12:42:07.023Z",
+      "plannedSec": 1800,
+      "actualSec": 1757,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-10-01T12:42:07.092Z"
+    },
+    {
+      "id": "2025-10-01T15:56:22.865Z",
+      "start": "2025-10-01T15:56:22.180Z",
+      "end": "2025-10-01T15:57:21.430Z",
+      "plannedSec": 60,
+      "actualSec": 59,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-10-01T15:57:21.861Z"
+    },
+    {
+      "id": "2025-10-03T13:45:38.452Z",
+      "start": "2025-10-03T13:45:38.034Z",
+      "end": "2025-10-03T13:50:24.110Z",
+      "plannedSec": 300,
+      "actualSec": 286,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-10-03T13:50:24.252Z"
+    },
+    {
+      "id": "2025-10-06T13:07:31.354Z",
+      "start": "2025-10-06T13:07:31.832Z",
+      "end": "2025-10-06T13:39:42.259Z",
+      "plannedSec": 1800,
+      "actualSec": 1931,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-10-06T13:39:42.362Z"
+    },
+    {
+      "id": "2025-10-08T21:30:18.648Z",
+      "start": "2025-10-08T21:30:18.464Z",
+      "end": "2025-10-08T21:45:24.420Z",
+      "plannedSec": null,
+      "actualSec": 906,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-10-08T21:45:24.720Z"
+    },
+    {
+      "id": "2025-10-09T09:06:04.967Z",
+      "start": "2025-10-09T09:06:04.974Z",
+      "end": "2025-10-09T09:07:04.861Z",
+      "plannedSec": 60,
+      "actualSec": 60,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-10-09T09:07:04.403Z"
+    },
+    {
+      "id": "2025-10-10T17:17:48.620Z",
+      "start": "2025-10-10T17:17:48.798Z",
+      "end": "2025-10-10T17:33:28.298Z",
+      "plannedSec": 900,
+      "actualSec": 940,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-10-10T17:33:28.741Z"
+    },
+    {
+      "id": "2025-10-11T08:15:31.738Z",
+      "start": "2025-10-11T08:15:31.954Z",
+      "end": "2025-10-11T08:17:00.363Z",
+      "plannedSec": 1800,
+      "actualSec": 89,
+      "status": "abandoned",
+      "note": "Github笔记完成",
+      "createdAt": "2025-10-11T08:17:00.010Z"
+    },
+    {
+      "id": "2025-10-13T04:41:11.163Z",
+      "start": "2025-10-13T04:41:11.360Z",
+      "end": "2025-10-13T05:08:15.080Z",
+      "plannedSec": 1800,
+      "actualSec": 1624,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-10-13T05:08:15.012Z"
+    },
+    {
+      "id": "2025-10-13T05:09:07.720Z",
+      "start": "2025-10-13T05:09:07.290Z",
+      "end": "2025-10-13T05:33:10.965Z",
+      "plannedSec": 1500,
+      "actualSec": 1443,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-10-13T05:33:10.188Z"
+    },
+    {
+      "id": "2025-10-14T08:46:46.478Z",
+      "start": "2025-10-14T08:46:46.735Z",
+      "end": "2025-10-14T09:02:27.624Z",
+      "plannedSec": 900,
+      "actualSec": 941,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-10-14T09:02:27.608Z"
+    },
+    {
+      "id": "2025-10-14T21:48:39.578Z",
+      "start": "2025-10-14T21:48:39.285Z",
+      "end": "2025-10-14T22:17:35.640Z",
+      "plannedSec": 1800,
+      "actualSec": 1736,
+      "status": "completed",
+      "note": "会议",
+      "createdAt": "2025-10-14T22:17:35.834Z"
+    },
+    {
+      "id": "2025-10-17T07:56:51.296Z",
+      "start": "2025-10-17T07:56:51.424Z",
+      "end": "2025-10-17T08:18:43.085Z",
+      "plannedSec": null,
+      "actualSec": 1312,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-10-17T08:18:43.811Z"
+    },
+    {
+      "id": "2025-10-18T14:41:17.940Z",
+      "start": "2025-10-18T14:41:17.207Z",
+      "end": "2025-10-18T14:44:34.043Z",
+      "plannedSec": 1500,
+      "actualSec": 197,
+      "status": "abandoned",
+      "note": "整理",
+      "createdAt": "2025-10-18T14:44:34.483Z"
+    },
+    {
+      "id": "2025-10-19T01:07:02.264Z",
+      "start": "2025-10-19T01:07:02.131Z",
+      "end": "2025-10-19T01:33:00.803Z",
+      "plannedSec": 1500,
+      "actualSec": 1558,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-10-19T01:33:00.764Z"
+    },
+    {
+      "id": "2025-10-19T11:50:26.154Z",
+      "start": "2025-10-19T11:50:26.713Z",
+      "end": "2025-10-19T11:55:00.567Z",
+      "plannedSec": 300,
+      "actualSec": 274,
+      "status": "completed",
+      "note": "会议",
+      "createdAt": "2025-10-19T11:55:00.612Z"
+    },
+    {
+      "id": "2025-10-21T01:32:13.782Z",
+      "start": "2025-10-21T01:32:13.475Z",
+      "end": "2025-10-21T01:32:31.719Z",
+      "plannedSec": 300,
+      "actualSec": 18,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-10-21T01:32:31.412Z"
+    },
+    {
+      "id": "2025-10-21T11:08:35.292Z",
+      "start": "2025-10-21T11:08:35.028Z",
+      "end": "2025-10-21T11:13:51.881Z",
+      "plannedSec": 300,
+      "actualSec": 316,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-10-21T11:13:51.239Z"
+    },
+    {
+      "id": "2025-10-21T21:43:19.261Z",
+      "start": "2025-10-21T21:43:19.765Z",
+      "end": "2025-10-21T22:00:41.338Z",
+      "plannedSec": null,
+      "actualSec": 1042,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-10-21T22:00:41.940Z"
+    },
+    {
+      "id": "2025-10-22T20:58:04.334Z",
+      "start": "2025-10-22T20:58:04.194Z",
+      "end": "2025-10-22T21:03:09.689Z",
+      "plannedSec": 300,
+      "actualSec": 305,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-10-22T21:03:09.914Z"
+    },
+    {
+      "id": "2025-10-23T01:38:39.228Z",
+      "start": "2025-10-23T01:38:39.648Z",
+      "end": "2025-10-23T01:39:43.065Z",
+      "plannedSec": 60,
+      "actualSec": 64,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-10-23T01:39:43.267Z"
+    },
+    {
+      "id": "2025-10-23T01:58:14.601Z",
+      "start": "2025-10-23T01:58:14.731Z",
+      "end": "2025-10-23T02:29:03.868Z",
+      "plannedSec": 1800,
+      "actualSec": 1849,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-10-23T02:29:03.849Z"
+    },
+    {
+      "id": "2025-10-23T07:34:57.465Z",
+      "start": "2025-10-23T07:34:57.134Z",
+      "end": "2025-10-23T07:36:24.046Z",
+      "plannedSec": 300,
+      "actualSec": 87,
+      "status": "abandoned",
+      "note": "会议",
+      "createdAt": "2025-10-23T07:36:24.332Z"
+    },
+    {
+      "id": "2025-10-24T11:31:10.581Z",
+      "start": "2025-10-24T11:31:10.039Z",
+      "end": "2025-10-24T12:00:29.869Z",
+      "plannedSec": 1800,
+      "actualSec": 1759,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-10-24T12:00:29.824Z"
+    },
+    {
+      "id": "2025-10-25T14:03:20.951Z",
+      "start": "2025-10-25T14:03:20.764Z",
+      "end": "2025-10-25T14:05:13.483Z",
+      "plannedSec": 300,
+      "actualSec": 113,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-10-25T14:05:13.513Z"
+    },
+    {
+      "id": "2025-10-26T03:30:30.620Z",
+      "start": "2025-10-26T03:30:30.259Z",
+      "end": "2025-10-26T03:30:32.655Z",
+      "plannedSec": 60,
+      "actualSec": 2,
+      "status": "abandoned",
+      "note": "阅读",
+      "createdAt": "2025-10-26T03:30:32.460Z"
+    },
+    {
+      "id": "2025-10-27T04:00:16.427Z",
+      "start": "2025-10-27T04:00:16.090Z",
+      "end": "2025-10-27T04:23:17.945Z",
+      "plannedSec": 1500,
+      "actualSec": 1381,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-10-27T04:23:17.203Z"
+    },
+    {
+      "id": "2025-10-28T19:56:03.402Z",
+      "start": "2025-10-28T19:56:03.711Z",
+      "end": "2025-10-28T20:11:59.693Z",
+      "plannedSec": 900,
+      "actualSec": 956,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-10-28T20:11:59.405Z"
+    },
+    {
+      "id": "2025-10-29T15:01:19.098Z",
+      "start": "2025-10-29T15:01:19.807Z",
+      "end": "2025-10-29T15:28:35.208Z",
+      "plannedSec": 1500,
+      "actualSec": 1636,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-10-29T15:28:35.862Z"
+    },
+    {
+      "id": "2025-10-29T20:57:01.727Z",
+      "start": "2025-10-29T20:57:01.206Z",
+      "end": "2025-10-29T20:57:24.880Z",
+      "plannedSec": 60,
+      "actualSec": 23,
+      "status": "abandoned",
+      "note": "阅读",
+      "createdAt": "2025-10-29T20:57:24.446Z"
+    },
+    {
+      "id": "2025-10-31T00:25:30.411Z",
+      "start": "2025-10-31T00:25:30.626Z",
+      "end": "2025-10-31T00:25:52.687Z",
+      "plannedSec": 60,
+      "actualSec": 22,
+      "status": "abandoned",
+      "note": "会议",
+      "createdAt": "2025-10-31T00:25:52.529Z"
+    },
+    {
+      "id": "2025-10-31T01:11:49.418Z",
+      "start": "2025-10-31T01:11:49.203Z",
+      "end": "2025-10-31T01:39:48.999Z",
+      "plannedSec": null,
+      "actualSec": 1679,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-10-31T01:39:48.042Z"
+    },
+    {
+      "id": "2025-11-01T07:36:36.912Z",
+      "start": "2025-11-01T07:36:36.863Z",
+      "end": "2025-11-01T07:36:41.469Z",
+      "plannedSec": 60,
+      "actualSec": 5,
+      "status": "abandoned",
+      "note": "学习笔记",
+      "createdAt": "2025-11-01T07:36:41.111Z"
+    },
+    {
+      "id": "2025-11-01T22:19:56.253Z",
+      "start": "2025-11-01T22:19:56.506Z",
+      "end": "2025-11-01T22:21:00.112Z",
+      "plannedSec": 60,
+      "actualSec": 64,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-11-01T22:21:00.677Z"
+    },
+    {
+      "id": "2025-11-02T01:14:48.523Z",
+      "start": "2025-11-02T01:14:48.690Z",
+      "end": "2025-11-02T01:15:45.526Z",
+      "plannedSec": 60,
+      "actualSec": 57,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2025-11-02T01:15:45.986Z"
+    },
+    {
+      "id": "2025-11-04T08:44:34.631Z",
+      "start": "2025-11-04T08:44:34.370Z",
+      "end": "2025-11-04T08:53:21.829Z",
+      "plannedSec": 1500,
+      "actualSec": 527,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-11-04T08:53:21.966Z"
+    },
+    {
+      "id": "2025-11-04T16:15:21.495Z",
+      "start": "2025-11-04T16:15:21.362Z",
+      "end": "2025-11-04T16:16:24.386Z",
+      "plannedSec": 900,
+      "actualSec": 63,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-11-04T16:16:24.352Z"
+    },
+    {
+      "id": "2025-11-04T23:42:21.489Z",
+      "start": "2025-11-04T23:42:21.882Z",
+      "end": "2025-11-05T00:11:36.897Z",
+      "plannedSec": 1800,
+      "actualSec": 1755,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-11-05T00:11:36.407Z"
+    },
+    {
+      "id": "2025-11-05T00:31:37.011Z",
+      "start": "2025-11-05T00:31:37.165Z",
+      "end": "2025-11-05T00:32:35.654Z",
+      "plannedSec": 60,
+      "actualSec": 58,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-05T00:32:35.662Z"
+    },
+    {
+      "id": "2025-11-05T01:00:48.857Z",
+      "start": "2025-11-05T01:00:48.197Z",
+      "end": "2025-11-05T01:15:10.979Z",
+      "plannedSec": 900,
+      "actualSec": 862,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-11-05T01:15:10.786Z"
+    },
+    {
+      "id": "2025-11-06T17:11:21.210Z",
+      "start": "2025-11-06T17:11:21.806Z",
+      "end": "2025-11-06T17:12:15.479Z",
+      "plannedSec": 60,
+      "actualSec": 54,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-11-06T17:12:15.344Z"
+    },
+    {
+      "id": "2025-11-07T11:25:20.153Z",
+      "start": "2025-11-07T11:25:20.464Z",
+      "end": "2025-11-07T11:26:20.219Z",
+      "plannedSec": 60,
+      "actualSec": 60,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-07T11:26:20.616Z"
+    },
+    {
+      "id": "2025-11-08T05:25:10.383Z",
+      "start": "2025-11-08T05:25:10.090Z",
+      "end": "2025-11-08T05:53:54.477Z",
+      "plannedSec": 1800,
+      "actualSec": 1724,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-11-08T05:53:54.401Z"
+    },
+    {
+      "id": "2025-11-10T22:40:16.926Z",
+      "start": "2025-11-10T22:40:16.445Z",
+      "end": "2025-11-10T22:41:11.105Z",
+      "plannedSec": 60,
+      "actualSec": 55,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-10T22:41:11.614Z"
+    },
+    {
+      "id": "2025-11-14T16:41:03.387Z",
+      "start": "2025-11-14T16:41:03.701Z",
+      "end": "2025-11-14T17:05:26.583Z",
+      "plannedSec": 1500,
+      "actualSec": 1463,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-11-14T17:05:26.182Z"
+    },
+    {
+      "id": "2025-11-16T02:30:05.733Z",
+      "start": "2025-11-16T02:30:05.873Z",
+      "end": "2025-11-16T03:01:34.516Z",
+      "plannedSec": 1800,
+      "actualSec": 1889,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-11-16T03:01:34.314Z"
+    },
+    {
+      "id": "2025-11-16T14:04:59.697Z",
+      "start": "2025-11-16T14:04:59.789Z",
+      "end": "2025-11-16T14:17:56.076Z",
+      "plannedSec": null,
+      "actualSec": 777,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-11-16T14:17:56.830Z"
+    },
+    {
+      "id": "2025-11-18T12:14:44.674Z",
+      "start": "2025-11-18T12:14:44.324Z",
+      "end": "2025-11-18T12:45:53.883Z",
+      "plannedSec": 1800,
+      "actualSec": 1869,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-11-18T12:45:53.621Z"
+    },
+    {
+      "id": "2025-11-20T07:13:19.915Z",
+      "start": "2025-11-20T07:13:19.791Z",
+      "end": "2025-11-20T07:38:37.107Z",
+      "plannedSec": 1500,
+      "actualSec": 1518,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-20T07:38:37.316Z"
+    },
+    {
+      "id": "2025-11-20T12:04:17.894Z",
+      "start": "2025-11-20T12:04:17.640Z",
+      "end": "2025-11-20T12:16:49.507Z",
+      "plannedSec": 1800,
+      "actualSec": 752,
+      "status": "abandoned",
+      "note": "整理",
+      "createdAt": "2025-11-20T12:16:49.132Z"
+    },
+    {
+      "id": "2025-11-21T00:47:34.167Z",
+      "start": "2025-11-21T00:47:34.842Z",
+      "end": "2025-11-21T00:51:06.950Z",
+      "plannedSec": null,
+      "actualSec": 212,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-21T00:51:06.543Z"
+    },
+    {
+      "id": "2025-11-21T22:44:08.009Z",
+      "start": "2025-11-21T22:44:08.640Z",
+      "end": "2025-11-21T23:33:37.514Z",
+      "plannedSec": null,
+      "actualSec": 2969,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-11-21T23:33:37.025Z"
+    },
+    {
+      "id": "2025-11-22T14:14:26.613Z",
+      "start": "2025-11-22T14:14:26.785Z",
+      "end": "2025-11-22T14:27:58.634Z",
+      "plannedSec": 900,
+      "actualSec": 812,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-22T14:27:58.859Z"
+    },
+    {
+      "id": "2025-11-25T18:51:32.420Z",
+      "start": "2025-11-25T18:51:32.776Z",
+      "end": "2025-11-25T19:17:59.308Z",
+      "plannedSec": 1500,
+      "actualSec": 1587,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-11-25T19:17:59.935Z"
+    },
+    {
+      "id": "2025-11-27T00:37:15.263Z",
+      "start": "2025-11-27T00:37:15.176Z",
+      "end": "2025-11-27T01:04:24.646Z",
+      "plannedSec": 1500,
+      "actualSec": 1629,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-11-27T01:04:24.245Z"
+    },
+    {
+      "id": "2025-11-27T16:35:07.589Z",
+      "start": "2025-11-27T16:35:07.803Z",
+      "end": "2025-11-27T17:13:32.400Z",
+      "plannedSec": null,
+      "actualSec": 2305,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2025-11-27T17:13:32.424Z"
+    },
+    {
+      "id": "2025-11-28T18:49:49.798Z",
+      "start": "2025-11-28T18:49:49.421Z",
+      "end": "2025-11-28T19:37:37.032Z",
+      "plannedSec": null,
+      "actualSec": 2868,
+      "status": "abandoned",
+      "note": "会议",
+      "createdAt": "2025-11-28T19:37:37.281Z"
+    },
+    {
+      "id": "2025-11-28T19:21:26.570Z",
+      "start": "2025-11-28T19:21:26.282Z",
+      "end": "2025-11-28T19:45:58.540Z",
+      "plannedSec": 1500,
+      "actualSec": 1472,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-28T19:45:58.982Z"
+    },
+    {
+      "id": "2025-11-30T05:25:50.920Z",
+      "start": "2025-11-30T05:25:50.710Z",
+      "end": "2025-11-30T05:26:47.683Z",
+      "plannedSec": 60,
+      "actualSec": 57,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-30T05:26:47.870Z"
+    },
+    {
+      "id": "2025-11-30T06:39:41.082Z",
+      "start": "2025-11-30T06:39:41.808Z",
+      "end": "2025-11-30T07:24:58.733Z",
+      "plannedSec": null,
+      "actualSec": 2717,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-11-30T07:24:58.841Z"
+    },
+    {
+      "id": "2025-11-30T11:47:37.731Z",
+      "start": "2025-11-30T11:47:37.474Z",
+      "end": "2025-11-30T11:47:40.841Z",
+      "plannedSec": 1500,
+      "actualSec": 3,
+      "status": "abandoned",
+      "note": "Github笔记完成",
+      "createdAt": "2025-11-30T11:47:40.041Z"
+    },
+    {
+      "id": "2025-12-02T00:09:04.471Z",
+      "start": "2025-12-02T00:09:04.955Z",
+      "end": "2025-12-02T00:11:19.280Z",
+      "plannedSec": 900,
+      "actualSec": 135,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-02T00:11:19.266Z"
+    },
+    {
+      "id": "2025-12-02T20:00:38.218Z",
+      "start": "2025-12-02T20:00:38.283Z",
+      "end": "2025-12-02T20:12:49.798Z",
+      "plannedSec": 1500,
+      "actualSec": 731,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-02T20:12:49.214Z"
+    },
+    {
+      "id": "2025-12-03T15:02:30.170Z",
+      "start": "2025-12-03T15:02:30.625Z",
+      "end": "2025-12-03T15:02:58.074Z",
+      "plannedSec": 1500,
+      "actualSec": 28,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-03T15:02:58.341Z"
+    },
+    {
+      "id": "2025-12-05T05:42:23.062Z",
+      "start": "2025-12-05T05:42:23.923Z",
+      "end": "2025-12-05T05:43:55.398Z",
+      "plannedSec": 300,
+      "actualSec": 92,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-05T05:43:55.509Z"
+    },
+    {
+      "id": "2025-12-06T02:55:19.048Z",
+      "start": "2025-12-06T02:55:19.295Z",
+      "end": "2025-12-06T03:26:50.880Z",
+      "plannedSec": null,
+      "actualSec": 1891,
+      "status": "abandoned",
+      "note": "整理",
+      "createdAt": "2025-12-06T03:26:50.448Z"
+    },
+    {
+      "id": "2025-12-06T09:27:33.449Z",
+      "start": "2025-12-06T09:27:33.753Z",
+      "end": "2025-12-06T09:32:41.114Z",
+      "plannedSec": 300,
+      "actualSec": 308,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-12-06T09:32:41.235Z"
+    },
+    {
+      "id": "2025-12-08T18:26:43.368Z",
+      "start": "2025-12-08T18:26:43.222Z",
+      "end": "2025-12-08T18:27:44.344Z",
+      "plannedSec": 60,
+      "actualSec": 61,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-08T18:27:44.747Z"
+    },
+    {
+      "id": "2025-12-09T18:54:17.193Z",
+      "start": "2025-12-09T18:54:17.523Z",
+      "end": "2025-12-09T19:10:09.524Z",
+      "plannedSec": 900,
+      "actualSec": 952,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-09T19:10:09.763Z"
+    },
+    {
+      "id": "2025-12-10T07:32:22.903Z",
+      "start": "2025-12-10T07:32:22.936Z",
+      "end": "2025-12-10T07:57:58.725Z",
+      "plannedSec": 1500,
+      "actualSec": 1536,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-10T07:57:58.740Z"
+    },
+    {
+      "id": "2025-12-10T15:08:05.142Z",
+      "start": "2025-12-10T15:08:05.291Z",
+      "end": "2025-12-10T15:14:06.034Z",
+      "plannedSec": 1500,
+      "actualSec": 361,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-10T15:14:06.949Z"
+    },
+    {
+      "id": "2025-12-10T23:57:11.003Z",
+      "start": "2025-12-10T23:57:11.583Z",
+      "end": "2025-12-11T00:05:45.177Z",
+      "plannedSec": 1500,
+      "actualSec": 514,
+      "status": "abandoned",
+      "note": "整理",
+      "createdAt": "2025-12-11T00:05:45.298Z"
+    },
+    {
+      "id": "2025-12-13T11:10:21.733Z",
+      "start": "2025-12-13T11:10:21.047Z",
+      "end": "2025-12-13T11:11:15.294Z",
+      "plannedSec": 60,
+      "actualSec": 54,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-12-13T11:11:15.843Z"
+    },
+    {
+      "id": "2025-12-13T15:15:37.803Z",
+      "start": "2025-12-13T15:15:37.794Z",
+      "end": "2025-12-13T15:16:38.861Z",
+      "plannedSec": 60,
+      "actualSec": 61,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-13T15:16:38.811Z"
+    },
+    {
+      "id": "2025-12-15T06:52:51.480Z",
+      "start": "2025-12-15T06:52:51.974Z",
+      "end": "2025-12-15T06:54:17.195Z",
+      "plannedSec": 1800,
+      "actualSec": 86,
+      "status": "abandoned",
+      "note": "整理",
+      "createdAt": "2025-12-15T06:54:17.486Z"
+    },
+    {
+      "id": "2025-12-15T09:56:32.856Z",
+      "start": "2025-12-15T09:56:32.182Z",
+      "end": "2025-12-15T09:57:31.026Z",
+      "plannedSec": 60,
+      "actualSec": 59,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-12-15T09:57:31.054Z"
+    },
+    {
+      "id": "2025-12-16T10:34:39.290Z",
+      "start": "2025-12-16T10:34:39.329Z",
+      "end": "2025-12-16T10:50:52.704Z",
+      "plannedSec": 900,
+      "actualSec": 973,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-16T10:50:52.687Z"
+    },
+    {
+      "id": "2025-12-16T12:11:48.274Z",
+      "start": "2025-12-16T12:11:48.201Z",
+      "end": "2025-12-16T12:25:42.345Z",
+      "plannedSec": 900,
+      "actualSec": 834,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-16T12:25:42.881Z"
+    },
+    {
+      "id": "2025-12-18T04:51:45.851Z",
+      "start": "2025-12-18T04:51:45.188Z",
+      "end": "2025-12-18T04:52:49.623Z",
+      "plannedSec": 60,
+      "actualSec": 64,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-12-18T04:52:49.491Z"
+    },
+    {
+      "id": "2025-12-19T08:19:10.924Z",
+      "start": "2025-12-19T08:19:10.674Z",
+      "end": "2025-12-19T08:42:30.224Z",
+      "plannedSec": 1500,
+      "actualSec": 1400,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-12-19T08:42:30.958Z"
+    },
+    {
+      "id": "2025-12-21T13:15:20.980Z",
+      "start": "2025-12-21T13:15:20.547Z",
+      "end": "2025-12-21T13:39:24.517Z",
+      "plannedSec": 1500,
+      "actualSec": 1444,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2025-12-21T13:39:24.682Z"
+    },
+    {
+      "id": "2025-12-21T15:33:18.909Z",
+      "start": "2025-12-21T15:33:18.852Z",
+      "end": "2025-12-21T15:57:52.995Z",
+      "plannedSec": 1500,
+      "actualSec": 1474,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-21T15:57:52.506Z"
+    },
+    {
+      "id": "2025-12-23T09:31:44.752Z",
+      "start": "2025-12-23T09:31:44.068Z",
+      "end": "2025-12-23T09:46:09.881Z",
+      "plannedSec": 900,
+      "actualSec": 865,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-23T09:46:09.640Z"
+    },
+    {
+      "id": "2025-12-23T20:12:46.494Z",
+      "start": "2025-12-23T20:12:46.471Z",
+      "end": "2025-12-23T20:28:40.957Z",
+      "plannedSec": 900,
+      "actualSec": 954,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-12-23T20:28:40.901Z"
+    },
+    {
+      "id": "2025-12-23T21:13:09.828Z",
+      "start": "2025-12-23T21:13:09.680Z",
+      "end": "2025-12-23T21:20:45.333Z",
+      "plannedSec": null,
+      "actualSec": 456,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-12-23T21:20:45.076Z"
+    },
+    {
+      "id": "2025-12-24T19:46:53.698Z",
+      "start": "2025-12-24T19:46:53.437Z",
+      "end": "2025-12-24T20:18:47.800Z",
+      "plannedSec": 1800,
+      "actualSec": 1914,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2025-12-24T20:18:47.290Z"
+    },
+    {
+      "id": "2025-12-25T08:08:18.194Z",
+      "start": "2025-12-25T08:08:18.093Z",
+      "end": "2025-12-25T08:50:12.216Z",
+      "plannedSec": null,
+      "actualSec": 2514,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-12-25T08:50:12.076Z"
+    },
+    {
+      "id": "2025-12-26T03:50:23.775Z",
+      "start": "2025-12-26T03:50:23.200Z",
+      "end": "2025-12-26T04:38:12.201Z",
+      "plannedSec": null,
+      "actualSec": 2869,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-26T04:38:12.054Z"
+    },
+    {
+      "id": "2025-12-26T08:29:17.838Z",
+      "start": "2025-12-26T08:29:17.890Z",
+      "end": "2025-12-26T08:29:28.823Z",
+      "plannedSec": 300,
+      "actualSec": 11,
+      "status": "abandoned",
+      "note": "写代码",
+      "createdAt": "2025-12-26T08:29:28.644Z"
+    },
+    {
+      "id": "2025-12-26T08:51:00.354Z",
+      "start": "2025-12-26T08:51:00.784Z",
+      "end": "2025-12-26T08:55:49.038Z",
+      "plannedSec": null,
+      "actualSec": 289,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2025-12-26T08:55:49.208Z"
+    },
+    {
+      "id": "2025-12-26T15:00:34.543Z",
+      "start": "2025-12-26T15:00:34.770Z",
+      "end": "2025-12-26T15:15:38.384Z",
+      "plannedSec": 900,
+      "actualSec": 904,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-12-26T15:15:38.821Z"
+    },
+    {
+      "id": "2025-12-26T16:21:33.900Z",
+      "start": "2025-12-26T16:21:33.065Z",
+      "end": "2025-12-26T16:36:48.902Z",
+      "plannedSec": 900,
+      "actualSec": 915,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2025-12-26T16:36:48.230Z"
+    },
+    {
+      "id": "2025-12-28T02:44:14.770Z",
+      "start": "2025-12-28T02:44:14.672Z",
+      "end": "2025-12-28T03:09:53.302Z",
+      "plannedSec": 1500,
+      "actualSec": 1539,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2025-12-28T03:09:53.105Z"
+    },
+    {
+      "id": "2025-12-28T10:03:44.533Z",
+      "start": "2025-12-28T10:03:44.222Z",
+      "end": "2025-12-28T10:27:05.110Z",
+      "plannedSec": 1500,
+      "actualSec": 1401,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2025-12-28T10:27:05.960Z"
+    },
+    {
+      "id": "2025-12-29T01:07:51.361Z",
+      "start": "2025-12-29T01:07:51.163Z",
+      "end": "2025-12-29T01:16:40.518Z",
+      "plannedSec": 1800,
+      "actualSec": 529,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-29T01:16:40.743Z"
+    },
+    {
+      "id": "2025-12-29T14:14:44.670Z",
+      "start": "2025-12-29T14:14:44.038Z",
+      "end": "2025-12-29T14:37:17.654Z",
+      "plannedSec": 1500,
+      "actualSec": 1353,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2025-12-29T14:37:17.854Z"
+    },
+    {
+      "id": "2025-12-30T10:43:33.559Z",
+      "start": "2025-12-30T10:43:33.663Z",
+      "end": "2025-12-30T11:06:53.493Z",
+      "plannedSec": null,
+      "actualSec": 1400,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2025-12-30T11:06:53.779Z"
+    },
+    {
+      "id": "2026-01-02T08:26:59.211Z",
+      "start": "2026-01-02T08:26:59.304Z",
+      "end": "2026-01-02T09:01:55.283Z",
+      "plannedSec": null,
+      "actualSec": 2096,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-02T09:01:55.766Z"
+    },
+    {
+      "id": "2026-01-02T16:52:24.131Z",
+      "start": "2026-01-02T16:52:24.242Z",
+      "end": "2026-01-02T16:52:35.445Z",
+      "plannedSec": 60,
+      "actualSec": 11,
+      "status": "abandoned",
+      "note": "Github笔记完成",
+      "createdAt": "2026-01-02T16:52:35.230Z"
+    },
+    {
+      "id": "2026-01-03T15:51:14.594Z",
+      "start": "2026-01-03T15:51:14.385Z",
+      "end": "2026-01-03T15:58:47.837Z",
+      "plannedSec": 1500,
+      "actualSec": 453,
+      "status": "abandoned",
+      "note": "写作",
+      "createdAt": "2026-01-03T15:58:47.198Z"
+    },
+    {
+      "id": "2026-01-04T00:38:07.040Z",
+      "start": "2026-01-04T00:38:07.226Z",
+      "end": "2026-01-04T00:44:38.872Z",
+      "plannedSec": null,
+      "actualSec": 391,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-04T00:44:38.460Z"
+    },
+    {
+      "id": "2026-01-06T05:37:10.680Z",
+      "start": "2026-01-06T05:37:10.677Z",
+      "end": "2026-01-06T05:37:37.334Z",
+      "plannedSec": 60,
+      "actualSec": 27,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-06T05:37:37.764Z"
+    },
+    {
+      "id": "2026-01-06T18:54:39.157Z",
+      "start": "2026-01-06T18:54:39.869Z",
+      "end": "2026-01-06T19:09:53.650Z",
+      "plannedSec": null,
+      "actualSec": 914,
+      "status": "completed",
+      "note": "会议",
+      "createdAt": "2026-01-06T19:09:53.318Z"
+    },
+    {
+      "id": "2026-01-09T07:43:59.496Z",
+      "start": "2026-01-09T07:43:59.166Z",
+      "end": "2026-01-09T07:48:25.111Z",
+      "plannedSec": 900,
+      "actualSec": 266,
+      "status": "abandoned",
+      "note": "整理",
+      "createdAt": "2026-01-09T07:48:25.910Z"
+    },
+    {
+      "id": "2026-01-09T11:07:34.717Z",
+      "start": "2026-01-09T11:07:34.216Z",
+      "end": "2026-01-09T11:38:11.436Z",
+      "plannedSec": 1800,
+      "actualSec": 1837,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-09T11:38:11.199Z"
+    },
+    {
+      "id": "2026-01-10T04:44:39.243Z",
+      "start": "2026-01-10T04:44:39.030Z",
+      "end": "2026-01-10T04:45:34.845Z",
+      "plannedSec": 60,
+      "actualSec": 55,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2026-01-10T04:45:34.109Z"
+    },
+    {
+      "id": "2026-01-10T17:07:31.692Z",
+      "start": "2026-01-10T17:07:31.523Z",
+      "end": "2026-01-10T17:07:50.614Z",
+      "plannedSec": 300,
+      "actualSec": 19,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-10T17:07:50.053Z"
+    },
+    {
+      "id": "2026-01-10T17:47:03.870Z",
+      "start": "2026-01-10T17:47:03.354Z",
+      "end": "2026-01-10T18:11:32.694Z",
+      "plannedSec": 1500,
+      "actualSec": 1469,
+      "status": "completed",
+      "note": "写代码",
+      "createdAt": "2026-01-10T18:11:32.406Z"
+    },
+    {
+      "id": "2026-01-12T17:02:28.535Z",
+      "start": "2026-01-12T17:02:28.899Z",
+      "end": "2026-01-12T17:31:52.885Z",
+      "plannedSec": null,
+      "actualSec": 1764,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2026-01-12T17:31:52.298Z"
+    },
+    {
+      "id": "2026-01-12T17:36:44.034Z",
+      "start": "2026-01-12T17:36:44.773Z",
+      "end": "2026-01-12T18:03:05.899Z",
+      "plannedSec": 1500,
+      "actualSec": 1581,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2026-01-12T18:03:05.093Z"
+    },
+    {
+      "id": "2026-01-12T18:23:21.837Z",
+      "start": "2026-01-12T18:23:21.595Z",
+      "end": "2026-01-12T18:27:29.499Z",
+      "plannedSec": null,
+      "actualSec": 248,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2026-01-12T18:27:29.827Z"
+    },
+    {
+      "id": "2026-01-12T19:40:08.700Z",
+      "start": "2026-01-12T19:40:08.107Z",
+      "end": "2026-01-12T19:53:42.942Z",
+      "plannedSec": 900,
+      "actualSec": 814,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2026-01-12T19:53:42.878Z"
+    },
+    {
+      "id": "2026-01-14T05:46:18.219Z",
+      "start": "2026-01-14T05:46:18.473Z",
+      "end": "2026-01-14T05:51:04.930Z",
+      "plannedSec": 900,
+      "actualSec": 286,
+      "status": "abandoned",
+      "note": "复习",
+      "createdAt": "2026-01-14T05:51:04.175Z"
+    },
+    {
+      "id": "2026-01-15T05:39:07.577Z",
+      "start": "2026-01-15T05:39:07.030Z",
+      "end": "2026-01-15T06:04:16.328Z",
+      "plannedSec": 1500,
+      "actualSec": 1509,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2026-01-15T06:04:16.584Z"
+    },
+    {
+      "id": "2026-01-15T06:35:45.960Z",
+      "start": "2026-01-15T06:35:45.485Z",
+      "end": "2026-01-15T06:37:56.741Z",
+      "plannedSec": 300,
+      "actualSec": 131,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-15T06:37:56.717Z"
+    },
+    {
+      "id": "2026-01-15T20:31:09.129Z",
+      "start": "2026-01-15T20:31:09.003Z",
+      "end": "2026-01-15T20:45:17.894Z",
+      "plannedSec": null,
+      "actualSec": 848,
+      "status": "completed",
+      "note": "阅读",
+      "createdAt": "2026-01-15T20:45:17.966Z"
+    },
+    {
+      "id": "2026-01-15T21:51:54.779Z",
+      "start": "2026-01-15T21:51:54.286Z",
+      "end": "2026-01-15T21:52:05.399Z",
+      "plannedSec": 60,
+      "actualSec": 11,
+      "status": "abandoned",
+      "note": "写代码",
+      "createdAt": "2026-01-15T21:52:05.222Z"
+    },
+    {
+      "id": "2026-01-16T03:48:43.810Z",
+      "start": "2026-01-16T03:48:43.227Z",
+      "end": "2026-01-16T04:03:17.377Z",
+      "plannedSec": 900,
+      "actualSec": 874,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2026-01-16T04:03:17.214Z"
+    },
+    {
+      "id": "2026-01-16T05:36:21.257Z",
+      "start": "2026-01-16T05:36:21.577Z",
+      "end": "2026-01-16T05:52:04.713Z",
+      "plannedSec": null,
+      "actualSec": 943,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2026-01-16T05:52:04.849Z"
+    },
+    {
+      "id": "2026-01-17T09:38:08.942Z",
+      "start": "2026-01-17T09:38:08.292Z",
+      "end": "2026-01-17T09:42:57.347Z",
+      "plannedSec": 300,
+      "actualSec": 289,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-17T09:42:57.280Z"
+    },
+    {
+      "id": "2026-01-18T00:16:48.486Z",
+      "start": "2026-01-18T00:16:48.454Z",
+      "end": "2026-01-18T00:23:12.896Z",
+      "plannedSec": 1500,
+      "actualSec": 384,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-18T00:23:12.011Z"
+    },
+    {
+      "id": "2026-01-18T00:19:32.496Z",
+      "start": "2026-01-18T00:19:32.800Z",
+      "end": "2026-01-18T00:20:05.103Z",
+      "plannedSec": 300,
+      "actualSec": 33,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-18T00:20:05.845Z"
+    },
+    {
+      "id": "2026-01-21T10:03:08.487Z",
+      "start": "2026-01-21T10:03:08.698Z",
+      "end": "2026-01-21T10:16:50.606Z",
+      "plannedSec": 900,
+      "actualSec": 822,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2026-01-21T10:16:50.999Z"
+    },
+    {
+      "id": "2026-01-21T17:34:31.460Z",
+      "start": "2026-01-21T17:34:31.851Z",
+      "end": "2026-01-21T17:50:11.018Z",
+      "plannedSec": 900,
+      "actualSec": 940,
+      "status": "completed",
+      "note": "整理",
+      "createdAt": "2026-01-21T17:50:11.339Z"
+    },
+    {
+      "id": "2026-01-21T18:39:51.630Z",
+      "start": "2026-01-21T18:39:51.713Z",
+      "end": "2026-01-21T19:10:42.933Z",
+      "plannedSec": 1800,
+      "actualSec": 1851,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2026-01-21T19:10:42.826Z"
+    },
+    {
+      "id": "2026-01-21T19:59:49.321Z",
+      "start": "2026-01-21T19:59:49.691Z",
+      "end": "2026-01-21T20:15:59.570Z",
+      "plannedSec": 900,
+      "actualSec": 970,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-21T20:15:59.783Z"
+    },
+    {
+      "id": "2026-01-21T21:23:31.536Z",
+      "start": "2026-01-21T21:23:31.085Z",
+      "end": "2026-01-21T22:10:17.878Z",
+      "plannedSec": null,
+      "actualSec": 2806,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-21T22:10:17.653Z"
+    },
+    {
+      "id": "2026-01-23T02:52:12.433Z",
+      "start": "2026-01-23T02:52:12.708Z",
+      "end": "2026-01-23T02:54:31.896Z",
+      "plannedSec": 1800,
+      "actualSec": 139,
+      "status": "abandoned",
+      "note": "写作",
+      "createdAt": "2026-01-23T02:54:31.136Z"
+    },
+    {
+      "id": "2026-01-25T01:45:34.744Z",
+      "start": "2026-01-25T01:45:34.055Z",
+      "end": "2026-01-25T01:59:28.736Z",
+      "plannedSec": 1800,
+      "actualSec": 834,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-25T01:59:28.770Z"
+    },
+    {
+      "id": "2026-01-25T07:08:13.178Z",
+      "start": "2026-01-25T07:08:13.900Z",
+      "end": "2026-01-25T07:23:30.445Z",
+      "plannedSec": 900,
+      "actualSec": 917,
+      "status": "completed",
+      "note": "学习笔记",
+      "createdAt": "2026-01-25T07:23:30.303Z"
+    },
+    {
+      "id": "2026-01-25T20:24:13.070Z",
+      "start": "2026-01-25T20:24:13.448Z",
+      "end": "2026-01-25T20:29:38.183Z",
+      "plannedSec": 300,
+      "actualSec": 325,
+      "status": "completed",
+      "note": "写作",
+      "createdAt": "2026-01-25T20:29:38.221Z"
+    },
+    {
+      "id": "2026-01-27T18:13:27.565Z",
+      "start": "2026-01-27T18:13:27.464Z",
+      "end": "2026-01-27T18:59:53.747Z",
+      "plannedSec": null,
+      "actualSec": 2786,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-27T18:59:53.338Z"
+    },
+    {
+      "id": "2026-01-28T04:04:05.705Z",
+      "start": "2026-01-28T04:04:05.298Z",
+      "end": "2026-01-28T04:42:46.113Z",
+      "plannedSec": null,
+      "actualSec": 2321,
+      "status": "completed",
+      "note": "复习",
+      "createdAt": "2026-01-28T04:42:46.655Z"
+    },
+    {
+      "id": "2026-01-29T15:46:34.228Z",
+      "start": "2026-01-29T15:46:34.228Z",
+      "end": "2026-01-29T15:46:44.401Z",
+      "plannedSec": 1500,
+      "actualSec": 10,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-29T15:46:44.401Z"
+    },
+    {
+      "id": "2026-01-29T15:47:45.762Z",
+      "start": "2026-01-29T15:47:45.762Z",
+      "end": "2026-01-29T15:48:45.809Z",
+      "plannedSec": 60,
+      "actualSec": 60,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T15:48:45.809Z"
+    },
+    {
+      "id": "2026-01-29T15:49:11.619Z",
+      "start": "2026-01-29T15:49:11.619Z",
+      "end": "2026-01-29T15:50:21.155Z",
+      "plannedSec": 60,
+      "actualSec": 69,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T15:50:21.155Z"
+    },
+    {
+      "id": "2026-01-29T15:53:03.110Z",
+      "start": "2026-01-29T15:53:03.110Z",
+      "end": "2026-01-29T15:53:03.986Z",
+      "plannedSec": 300,
+      "actualSec": 0,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T15:53:03.986Z"
+    },
+    {
+      "id": "2026-01-29T15:53:16.813Z",
+      "start": "2026-01-29T15:53:16.813Z",
+      "end": "2026-01-29T15:53:18.498Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-29T15:53:18.498Z"
+    },
+    {
+      "id": "2026-01-29T15:53:24.747Z",
+      "start": "2026-01-29T15:53:24.747Z",
+      "end": "2026-01-29T15:53:26.812Z",
+      "plannedSec": 60,
+      "actualSec": 2,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-29T15:53:26.812Z"
+    },
+    {
+      "id": "2026-01-29T15:57:01.883Z",
+      "start": "2026-01-29T15:57:01.883Z",
+      "end": "2026-01-29T16:22:01.929Z",
+      "plannedSec": 1500,
+      "actualSec": 1500,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T16:22:01.929Z"
+    },
+    {
+      "id": "2026-01-29T16:22:46.788Z",
+      "start": "2026-01-29T16:22:46.788Z",
+      "end": "2026-01-29T16:37:14.519Z",
+      "plannedSec": 1500,
+      "actualSec": 867,
+      "status": "completed",
+      "note": "Github笔记完成",
+      "createdAt": "2026-01-29T16:37:14.519Z"
+    },
+    {
+      "id": "2026-01-29T16:50:04.952Z",
+      "start": "2026-01-29T16:50:04.952Z",
+      "end": "2026-01-29T16:50:05.794Z",
+      "plannedSec": 1500,
+      "actualSec": 0,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T16:50:05.794Z"
+    },
+    {
+      "id": "2026-01-29T16:59:54.239Z",
+      "start": "2026-01-29T16:59:54.239Z",
+      "end": "2026-01-29T16:59:55.970Z",
+      "plannedSec": null,
+      "actualSec": 1,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T16:59:55.970Z"
+    },
+    {
+      "id": "2026-01-29T17:01:05.815Z",
+      "start": "2026-01-29T17:01:05.815Z",
+      "end": "2026-01-29T17:09:05.954Z",
+      "plannedSec": null,
+      "actualSec": 480,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T17:09:05.954Z"
+    },
+    {
+      "id": "2026-01-29T18:42:18.094Z",
+      "start": "2026-01-29T18:42:18.094Z",
+      "end": "2026-01-29T19:12:59.742Z",
+      "plannedSec": null,
+      "actualSec": 1841,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T19:12:59.743Z"
+    },
+    {
+      "id": "2026-01-29T20:07:48.065Z",
+      "start": "2026-01-29T20:07:48.065Z",
+      "end": "2026-01-29T20:41:28.202Z",
+      "plannedSec": 1500,
+      "actualSec": 2020,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-29T20:41:28.203Z"
+    },
+    {
+      "id": "2026-01-29T20:50:16.662Z",
+      "start": "2026-01-29T20:50:16.662Z",
+      "end": "2026-01-29T20:50:17.851Z",
+      "plannedSec": null,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-29T20:50:17.851Z"
+    },
+    {
+      "id": "2026-01-30T02:07:57.217Z",
+      "start": "2026-01-30T02:07:57.217Z",
+      "end": "2026-01-30T02:08:19.827Z",
+      "plannedSec": null,
+      "actualSec": 22,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-30T02:08:19.827Z"
+    },
+    {
+      "id": "2026-01-30T02:08:25.940Z",
+      "start": "2026-01-30T02:08:25.940Z",
+      "end": "2026-01-30T02:25:01.550Z",
+      "plannedSec": 600,
+      "actualSec": 995,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:25:01.550Z"
+    },
+    {
+      "id": "2026-01-30T02:25:54.622Z",
+      "start": "2026-01-30T02:25:54.622Z",
+      "end": "2026-01-30T02:26:06.505Z",
+      "plannedSec": 1500,
+      "actualSec": 11,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:26:06.505Z"
+    },
+    {
+      "id": "2026-01-30T02:29:37.696Z",
+      "start": "2026-01-30T02:29:37.696Z",
+      "end": "2026-01-30T02:29:44.580Z",
+      "plannedSec": 1500,
+      "actualSec": 6,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:29:44.580Z"
+    },
+    {
+      "id": "2026-01-30T02:29:47.810Z",
+      "start": "2026-01-30T02:29:47.810Z",
+      "end": "2026-01-30T02:29:53.579Z",
+      "plannedSec": 1500,
+      "actualSec": 5,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:29:53.579Z"
+    },
+    {
+      "id": "2026-01-30T02:29:57.662Z",
+      "start": "2026-01-30T02:29:57.662Z",
+      "end": "2026-01-30T02:30:03.026Z",
+      "plannedSec": 1500,
+      "actualSec": 5,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:30:03.026Z"
+    },
+    {
+      "id": "2026-01-30T02:40:08.140Z",
+      "start": "2026-01-30T02:40:08.140Z",
+      "end": "2026-01-30T02:49:02.631Z",
+      "plannedSec": 1500,
+      "actualSec": 534,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-30T02:49:02.631Z"
+    },
+    {
+      "id": "2026-01-30T02:49:17.554Z",
+      "start": "2026-01-30T02:49:17.554Z",
+      "end": "2026-01-30T02:53:38.189Z",
+      "plannedSec": 60,
+      "actualSec": 260,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:53:38.189Z"
+    },
+    {
+      "id": "2026-01-30T02:53:49.964Z",
+      "start": "2026-01-30T02:53:49.964Z",
+      "end": "2026-01-30T02:54:49.972Z",
+      "plannedSec": 60,
+      "actualSec": 60,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T02:54:49.972Z"
+    },
+    {
+      "id": "2026-01-30T03:26:53.864Z",
+      "start": "2026-01-30T03:26:53.864Z",
+      "end": "2026-01-30T03:26:57.451Z",
+      "plannedSec": 6000,
+      "actualSec": 3,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-30T03:26:57.451Z"
+    },
+    {
+      "id": "2026-01-30T03:28:30.285Z",
+      "start": "2026-01-30T03:28:30.285Z",
+      "end": "2026-01-30T03:28:31.679Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-30T03:28:31.679Z"
+    },
+    {
+      "id": "2026-01-30T03:47:19.559Z",
+      "start": "2026-01-30T03:47:19.559Z",
+      "end": "2026-01-30T03:47:29.247Z",
+      "plannedSec": 1800,
+      "actualSec": 9,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-30T03:47:29.247Z"
+    },
+    {
+      "id": "2026-01-30T03:47:30.987Z",
+      "start": "2026-01-30T03:47:30.987Z",
+      "end": "2026-01-30T03:47:49.792Z",
+      "plannedSec": null,
+      "actualSec": 18,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T03:47:49.792Z"
+    },
+    {
+      "id": "2026-01-30T03:47:58.556Z",
+      "start": "2026-01-30T03:47:58.556Z",
+      "end": "2026-01-30T03:47:59.342Z",
+      "plannedSec": null,
+      "actualSec": 0,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T03:47:59.342Z"
+    },
+    {
+      "id": "2026-01-30T03:54:35.894Z",
+      "start": "2026-01-30T03:54:35.894Z",
+      "end": "2026-01-30T03:54:40.158Z",
+      "plannedSec": null,
+      "actualSec": 4,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T03:54:40.158Z"
+    },
+    {
+      "id": "2026-01-30T17:57:33.151Z",
+      "start": "2026-01-30T17:57:33.151Z",
+      "end": "2026-01-30T17:58:36.516Z",
+      "plannedSec": 1500,
+      "actualSec": 63,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-30T17:58:36.516Z"
+    },
+    {
+      "id": "2026-01-30T17:58:53.306Z",
+      "start": "2026-01-30T17:58:53.306Z",
+      "end": "2026-01-30T18:23:53.326Z",
+      "plannedSec": 1500,
+      "actualSec": 1500,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-30T18:23:53.326Z"
+    },
+    {
+      "id": "2026-01-31T02:33:41.538Z",
+      "start": "2026-01-31T02:33:41.538Z",
+      "end": "2026-01-31T02:34:31.575Z",
+      "plannedSec": 3000,
+      "actualSec": 50,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-31T02:34:31.575Z"
+    },
+    {
+      "id": "2026-01-31T02:42:36.410Z",
+      "start": "2026-01-31T02:42:36.410Z",
+      "end": "2026-01-31T02:42:48.929Z",
+      "plannedSec": 1500,
+      "actualSec": 12,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-31T02:42:48.929Z"
+    },
+    {
+      "id": "2026-01-31T02:44:34.683Z",
+      "start": "2026-01-31T02:44:34.683Z",
+      "end": "2026-01-31T02:45:40.857Z",
+      "plannedSec": 1500,
+      "actualSec": 66,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-31T02:45:40.857Z"
+    },
+    {
+      "id": "2026-01-31T02:48:28.817Z",
+      "start": "2026-01-31T02:48:28.817Z",
+      "end": "2026-01-31T02:48:32.297Z",
+      "plannedSec": 3600,
+      "actualSec": 3,
+      "status": "abandoned",
+      "note": "写代码",
+      "createdAt": "2026-01-31T02:48:32.297Z"
+    },
+    {
+      "id": "2026-01-31T02:48:33.852Z",
+      "start": "2026-01-31T02:48:33.852Z",
+      "end": "2026-01-31T02:48:38.353Z",
+      "plannedSec": 900,
+      "actualSec": 4,
+      "status": "abandoned",
+      "note": "阅读",
+      "createdAt": "2026-01-31T02:48:38.353Z"
+    },
+    {
+      "id": "2026-01-31T02:48:39.543Z",
+      "start": "2026-01-31T02:48:39.543Z",
+      "end": "2026-01-31T02:48:44.197Z",
+      "plannedSec": 2100,
+      "actualSec": 4,
+      "status": "abandoned",
+      "note": "运动",
+      "createdAt": "2026-01-31T02:48:44.197Z"
+    },
+    {
+      "id": "2026-01-31T02:50:59.702Z",
+      "start": "2026-01-31T02:50:59.702Z",
+      "end": "2026-01-31T02:51:01.412Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "打篮球",
+      "createdAt": "2026-01-31T02:51:01.412Z"
+    },
+    {
+      "id": "2026-01-31T02:51:11.698Z",
+      "start": "2026-01-31T02:51:11.698Z",
+      "end": "2026-01-31T02:51:12.887Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "打篮球",
+      "createdAt": "2026-01-31T02:51:12.887Z"
+    },
+    {
+      "id": "2026-01-31T02:51:59.678Z",
+      "start": "2026-01-31T02:51:59.678Z",
+      "end": "2026-01-31T02:52:01.631Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "打篮球",
+      "createdAt": "2026-01-31T02:52:01.631Z"
+    },
+    {
+      "id": "2026-01-31T02:52:08.576Z",
+      "start": "2026-01-31T02:52:08.576Z",
+      "end": "2026-01-31T02:52:11.623Z",
+      "plannedSec": 1500,
+      "actualSec": 3,
+      "status": "abandoned",
+      "note": "打篮球",
+      "createdAt": "2026-01-31T02:52:11.623Z"
+    },
+    {
+      "id": "2026-01-31T02:52:17.555Z",
+      "start": "2026-01-31T02:52:17.555Z",
+      "end": "2026-01-31T02:52:18.727Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "踢足球",
+      "createdAt": "2026-01-31T02:52:18.727Z"
+    },
+    {
+      "id": "2026-01-31T02:52:24.097Z",
+      "start": "2026-01-31T02:52:24.097Z",
+      "end": "2026-01-31T02:52:26.402Z",
+      "plannedSec": 1500,
+      "actualSec": 2,
+      "status": "abandoned",
+      "note": "踢足球",
+      "createdAt": "2026-01-31T02:52:26.402Z"
+    },
+    {
+      "id": "2026-01-31T03:25:54.404Z",
+      "start": "2026-01-31T03:25:54.404Z",
+      "end": "2026-01-31T03:25:56.181Z",
+      "plannedSec": 3600,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "唱",
+      "createdAt": "2026-01-31T03:25:56.181Z"
+    },
+    {
+      "id": "2026-01-31T03:25:57.084Z",
+      "start": "2026-01-31T03:25:57.084Z",
+      "end": "2026-01-31T03:25:58.464Z",
+      "plannedSec": 900,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "跳",
+      "createdAt": "2026-01-31T03:25:58.464Z"
+    },
+    {
+      "id": "2026-01-31T03:25:59.618Z",
+      "start": "2026-01-31T03:25:59.618Z",
+      "end": "2026-01-31T03:26:01.165Z",
+      "plannedSec": 2100,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "rap",
+      "createdAt": "2026-01-31T03:26:01.165Z"
+    },
+    {
+      "id": "2026-01-31T03:29:00.973Z",
+      "start": "2026-01-31T03:29:00.973Z",
+      "end": "2026-01-31T03:29:02.720Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "打篮球",
+      "createdAt": "2026-01-31T03:29:02.720Z"
+    },
+    {
+      "id": "2026-01-31T03:29:07.978Z",
+      "start": "2026-01-31T03:29:07.978Z",
+      "end": "2026-01-31T03:29:09.413Z",
+      "plannedSec": 1500,
+      "actualSec": 1,
+      "status": "abandoned",
+      "note": "打篮球",
+      "createdAt": "2026-01-31T03:29:09.413Z"
+    },
+    {
+      "id": "2026-01-31T07:15:33.298Z",
+      "start": "2026-01-31T07:15:33.298Z",
+      "end": "2026-01-31T07:15:34.103Z",
+      "plannedSec": 1500,
+      "actualSec": 0,
+      "status": "abandoned",
+      "note": "",
+      "createdAt": "2026-01-31T07:15:34.103Z"
+    },
+    {
+      "id": "2026-01-31T07:15:49.096Z",
+      "start": "2026-01-31T07:15:49.096Z",
+      "end": "2026-01-31T07:15:49.956Z",
+      "plannedSec": 1500,
+      "actualSec": 0,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-31T07:15:49.956Z"
+    },
+    {
+      "id": "2026-01-31T07:16:00.016Z",
+      "start": "2026-01-31T07:16:00.016Z",
+      "end": "2026-01-31T07:16:00.957Z",
+      "plannedSec": 1500,
+      "actualSec": 0,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-01-31T07:16:00.957Z"
+    },
+    {
+      "id": "2026-02-02T00:49:36.819Z",
+      "start": "2026-02-02T00:49:36.819Z",
+      "end": "2026-02-02T01:14:36.916Z",
+      "plannedSec": 1500,
+      "actualSec": 1500,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-02T01:14:36.916Z"
+    },
+    {
+      "id": "2026-02-02T01:15:58.810Z",
+      "start": "2026-02-02T01:15:58.810Z",
+      "end": "2026-02-02T01:16:07.424Z",
+      "plannedSec": 60,
+      "actualSec": 8,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-02T01:16:07.424Z"
+    },
+    {
+      "id": "2026-02-02T01:16:32.019Z",
+      "start": "2026-02-02T01:16:32.019Z",
+      "end": "2026-02-02T01:17:32.056Z",
+      "plannedSec": 60,
+      "actualSec": 60,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-02T01:17:32.056Z"
+    },
+    {
+      "id": "2026-02-02T01:49:23.752Z",
+      "start": "2026-02-02T01:49:23.752Z",
+      "end": "2026-02-02T03:42:57.279Z",
+      "plannedSec": null,
+      "actualSec": 6813,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-02T03:42:57.280Z"
+    },
+    {
+      "id": "2026-02-03T06:06:52.112Z",
+      "start": "2026-02-03T06:06:52.112Z",
+      "end": "2026-02-03T16:06:52.256Z",
+      "plannedSec": 36000,
+      "actualSec": 36000,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-03T16:06:52.257Z"
+    },
+    {
+      "id": "2026-02-03T06:06:52.112Z",
+      "start": "2026-02-03T06:06:52.112Z",
+      "end": "2026-02-03T16:06:52.259Z",
+      "plannedSec": 36000,
+      "actualSec": 36000,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-03T16:06:52.259Z"
+    },
+    {
+      "id": "2026-02-03T17:33:23.665Z",
+      "start": "2026-02-03T17:33:23.665Z",
+      "end": "2026-02-03T17:58:23.730Z",
+      "plannedSec": 1500,
+      "actualSec": 1500,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-03T17:58:23.731Z"
+    },
+    {
+      "id": "2026-02-04T01:01:38.604Z",
+      "start": "2026-02-04T01:01:38.604Z",
+      "end": "2026-02-04T01:01:44.070Z",
+      "plannedSec": 1500,
+      "actualSec": 5,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-04T01:01:44.070Z"
+    },
+    {
+      "id": "2026-02-04T01:02:00.355Z",
+      "start": "2026-02-04T01:02:00.355Z",
+      "end": "2026-02-04T01:27:15.313Z",
+      "plannedSec": 1500,
+      "actualSec": 1514,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-04T01:27:15.315Z"
+    },
+    {
+      "id": "2026-02-04T02:27:26.811Z",
+      "start": "2026-02-04T02:27:26.811Z",
+      "end": "2026-02-04T02:52:33.000Z",
+      "plannedSec": 1500,
+      "actualSec": 1506,
+      "status": "completed",
+      "note": "",
+      "createdAt": "2026-02-04T02:52:33.001Z"
+    }
+  ],
+  "settings": {
+    "autoContinue": false,
+    "defaultMode": "countdown",
+    "adjustStepMinutes": 5,
+    "defaultChartRange": "14天",
+    "defaultDurationMinutes": 25,
+    "quickTimer1": {
+      "name": "唱",
+      "minutes": 60
+    },
+    "quickTimer2": {
+      "name": "跳",
+      "minutes": 15
+    },
+    "quickTimer3": {
+      "name": "rap",
+      "minutes": 35
+    },
+    "autoRest": true,
+    "defaultRestMinutes": 5,
+    "keyboardShortcuts": true,
+    "statusBarShowFocus": true,
+    "allowCompleteCountdownEarly": true,
+    "suggestTasks": [
+      "打篮球"
+    ],
+    "codeBlockChartShowTime": true,
+    "codeBlockChartShowCount": true
+  }
+}

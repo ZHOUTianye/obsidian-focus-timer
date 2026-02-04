@@ -8,27 +8,24 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Obsidian 社区插件目录要求：main.js、manifest.json 必须作为独立附件上传
-      - name: Create plugin zip
-        run: |
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+      - run: npm run build
+
+      - run: |
           zip -r "${{ github.event.repository.name }}.zip" \
-            manifest.json \
-            main.js \
-            styles.css
+            manifest.json main.js styles.css
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           files: |
             manifest.json
             main.js
             styles.css
             ${{ github.event.repository.name }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
