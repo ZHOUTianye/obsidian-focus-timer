@@ -44,21 +44,21 @@ const dataFileLock = new FileLock();
 
 /**
  * 定时器管理器：统一管理 setInterval/setTimeout，按 id 注册与清除，避免泄漏与重复。
- * 使用方式：plugin.timerManager.setInterval(id, ms, fn) / setTimeout(id, ms, fn)；clear(id)；onunload 时 clearAll()。
+ * 使用方式：plugin.timerManager.scheduleInterval(id, ms, fn) / scheduleTimeout(id, ms, fn)；clear(id)；onunload 时 clearAll()。
  */
 class TimerManager {
   constructor() {
     this._timers = new Map(); // id -> { type: 'interval'|'timeout', handle: number }
   }
 
-  setInterval(id, ms, fn) {
+  scheduleInterval(id, ms, fn) {
     this.clear(id);
     const handle = setInterval(fn, ms);
     this._timers.set(id, { type: "interval", handle });
     return id;
   }
 
-  setTimeout(id, ms, fn) {
+  scheduleTimeout(id, ms, fn) {
     this.clear(id);
     const handle = setTimeout(() => {
       this._timers.delete(id);

@@ -47,7 +47,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     await ensureDataFileExists(this.app);
 
     // 初始化语言检测（延迟执行以确保 DOM 已加载，使用统一定时器管理器）
-    this.timerManager.setTimeout("init-language", 100, () => {
+    this.timerManager.scheduleTimeout("init-language", 100, () => {
       resetLanguageCache();
       getLanguage();
     });
@@ -403,7 +403,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (this._tickActive) return;
     this._tickActive = true;
     this.timerManager.clear(this._tickTimerId);
-    this.timerManager.setInterval(this._tickTimerId, 1000, () => this.tick());
+    this.timerManager.scheduleInterval(this._tickTimerId, 1000, () => this.tick());
     if (!this._tickRunning) {
       this.tick();
     }
@@ -902,7 +902,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     tomorrow.setHours(0, 0, 0, 0);
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
 
-    this.timerManager.setTimeout(id, msUntilMidnight, async () => {
+    this.timerManager.scheduleTimeout(id, msUntilMidnight, async () => {
       const todayKey = getDateKey(new Date());
       const storedHeight = el._focusBlockHeight || height;
       await this.renderFocusBlock(el, ctx, todayKey, true, showRecord, showItems, storedHeight, chartRange, chartMetric);

@@ -158,7 +158,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
           // 防抖更新视图，最多500ms刷新一次（使用统一定时器管理器）
           this.plugin.timerManager.clear("setting-view-debounce");
-          this.plugin.timerManager.setTimeout("setting-view-debounce", 500, () => {
+          this.plugin.timerManager.scheduleTimeout("setting-view-debounce", 500, () => {
             this.plugin.updateView();
           });
         });

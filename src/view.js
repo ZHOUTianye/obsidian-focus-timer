@@ -49,7 +49,7 @@ class FocusTimerView extends ItemView {
         // 防抖处理（使用统一定时器管理器）
         const mgr = this.plugin.timerManager;
         mgr.clear(this._resizeTimerId);
-        mgr.setTimeout(this._resizeTimerId, 100, () => {
+        mgr.scheduleTimeout(this._resizeTimerId, 100, () => {
           const currentHeight = container.clientHeight || this.containerEl.clientHeight;
           const currentWidth = container.clientWidth || container.offsetWidth || this.containerEl.clientWidth;
           // 当高度跨越400px阈值或宽度跨越400px阈值时重新渲染
