@@ -1,6 +1,12 @@
 const obsidian = require("obsidian");
 const { PluginSettingTab, Setting, Notice } = obsidian;
-const { MAX_SUGGEST_TASKS } = require("./constants.js");
+const {
+  MAX_SUGGEST_TASKS,
+  FOCUS_NOTE_MAX_ASCII,
+  FOCUS_NOTE_MAX_OTHER,
+  QUICK_TIMER_MAX_ASCII,
+  QUICK_TIMER_MAX_OTHER
+} = require("./constants.js");
 const { t, getLanguage } = require("./i18n.js");
 const { readSettings, writeSettings, writeSessions, readSessions } = require("./data.js");
 const { ConfirmModal } = require("./modal.js");
@@ -287,7 +293,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
         // 实时限制输入长度
         text.inputEl.addEventListener("input", (e) => {
           const value = e.target.value;
-          const limited = limitInputLength(value);
+          const limited = limitInputLength(value, QUICK_TIMER_MAX_ASCII, QUICK_TIMER_MAX_OTHER);
           if (value !== limited) {
             e.target.value = limited;
           }
@@ -297,7 +303,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
             this.plugin.settings.quickTimer1 = { name: "", minutes: 25 };
           }
           // 限制名称长度：英文字符最多40个
-          const limitedValue = limitInputLength(value || "");
+          const limitedValue = limitInputLength(value || "", QUICK_TIMER_MAX_ASCII, QUICK_TIMER_MAX_OTHER);
           this.plugin.settings.quickTimer1.name = limitedValue;
           if (value !== limitedValue) {
             text.setValue(limitedValue);
@@ -348,7 +354,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
         // 实时限制输入长度
         text.inputEl.addEventListener("input", (e) => {
           const value = e.target.value;
-          const limited = limitInputLength(value);
+          const limited = limitInputLength(value, QUICK_TIMER_MAX_ASCII, QUICK_TIMER_MAX_OTHER);
           if (value !== limited) {
             e.target.value = limited;
           }
@@ -358,7 +364,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
             this.plugin.settings.quickTimer2 = { name: "", minutes: 25 };
           }
           // 限制名称长度：英文字符最多40个
-          const limitedValue = limitInputLength(value || "");
+          const limitedValue = limitInputLength(value || "", QUICK_TIMER_MAX_ASCII, QUICK_TIMER_MAX_OTHER);
           this.plugin.settings.quickTimer2.name = limitedValue;
           if (value !== limitedValue) {
             text.setValue(limitedValue);
@@ -409,7 +415,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
         // 实时限制输入长度
         text.inputEl.addEventListener("input", (e) => {
           const value = e.target.value;
-          const limited = limitInputLength(value);
+          const limited = limitInputLength(value, QUICK_TIMER_MAX_ASCII, QUICK_TIMER_MAX_OTHER);
           if (value !== limited) {
             e.target.value = limited;
           }
@@ -419,7 +425,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
             this.plugin.settings.quickTimer3 = { name: "", minutes: 25 };
           }
           // 限制名称长度：英文字符最多40个
-          const limitedValue = limitInputLength(value || "");
+          const limitedValue = limitInputLength(value || "", QUICK_TIMER_MAX_ASCII, QUICK_TIMER_MAX_OTHER);
           this.plugin.settings.quickTimer3.name = limitedValue;
           if (value !== limitedValue) {
             text.setValue(limitedValue);
@@ -532,7 +538,9 @@ class FocusTimerSettingTab extends PluginSettingTab {
             v = lines.join("\n");
             ta.value = v;
           }
-          const limited = lines.map((line) => limitInputLength(line));
+          const limited = lines.map((line) =>
+            limitInputLength(line, FOCUS_NOTE_MAX_ASCII, FOCUS_NOTE_MAX_OTHER)
+          );
           const newV = limited.join("\n");
           if (newV !== v) {
             ta.value = newV;
@@ -541,7 +549,7 @@ class FocusTimerSettingTab extends PluginSettingTab {
         text.onChange(async (value) => {
           const arr = (value || "")
             .split(/\r?\n/)
-            .map((s) => limitInputLength(s.trim()))
+            .map((s) => limitInputLength(s.trim(), FOCUS_NOTE_MAX_ASCII, FOCUS_NOTE_MAX_OTHER))
             .filter(Boolean)
             .slice(0, MAX_SUGGEST_TASKS);
           this.plugin.settings.suggestTasks = arr;

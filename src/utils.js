@@ -22,7 +22,7 @@ function truncateForButton(text, maxLength = 10) {
   return text.substring(0, maxLength) + "...";
 }
 
-function limitInputLength(text) {
+function limitInputLength(text, maxAscii = 40, maxOther = 10) {
   if (!text) return "";
 
   let asciiCount = 0;
@@ -32,11 +32,11 @@ function limitInputLength(text) {
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
     if (isAsciiChar(char)) {
-      if (asciiCount >= 40) break;
+      if (asciiCount >= maxAscii) break;
       asciiCount++;
       result += char;
     } else {
-      if (otherCount >= 10) break;
+      if (otherCount >= maxOther) break;
       otherCount++;
       result += char;
     }

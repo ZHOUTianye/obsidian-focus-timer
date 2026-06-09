@@ -1,5 +1,7 @@
 # Focus Timer Plugin - User Guide
 
+> **A note to our users**: Thank you for your support and enthusiasm for Focus Timer! The plugin is still under active development, and some features may be unstable or subject to change. We appreciate your understanding and patience. Feedback and suggestions are welcome via the link below.
+
 A local focus timer plugin designed for Obsidian, with support for statistical analysis, card view, and embedding data display in notes.
 
 ## Quick Start
@@ -7,7 +9,7 @@ A local focus timer plugin designed for Obsidian, with support for statistical a
 **Open the timer**: Click the left sidebar icon / bottom status bar / command palette `Open Focus Timer View`
 
 **Start focusing**:
-1. Enter a task name (optional, up to 40 characters)
+1. Enter a task name (optional, up to 100 ASCII characters or 50 non-ASCII characters such as Chinese)
 2. Choose mode: **Countdown** (default 25 minutes) or **Stopwatch**
 3. Use +/- buttons to adjust or click the time to set focus duration
 4. Click "Start" or press Enter (if keyboard shortcuts are enabled)
@@ -17,12 +19,26 @@ A local focus timer plugin designed for Obsidian, with support for statistical a
 - **Abandon**: Mark as abandoned and save the record
 - When countdown ends, you can start a break period
 
+The panel adapts automatically when the window is narrow or compact:
+
+![Narrow window layout](assets/窄窗口适配.png)
+
+![Compact window layout](assets/小窗口适配.png)
+
 ## Timer Modes
 
 | Mode | Description | Features |
 |------|-------------|----------|
 | **Countdown** | Count down from a set duration | Can auto-switch to stopwatch / start break period |
 | **Stopwatch** | Count up from zero | No preset duration, can pause/resume |
+
+**Countdown**
+
+![Countdown mode](assets/倒计时.png)
+
+**Stopwatch**
+
+![Stopwatch mode](assets/正计时.png)
 
 ## Commands
 
@@ -36,9 +52,13 @@ Access via command palette (`Cmd/Ctrl + P`):
 
 ## Statistics and Views
 
-**Focus history**: Card-style layout to view all sessions, filterable by date
-**Statistics**: Today's focus duration / completed task count / 7-day average / monthly average / yearly total
+**Focus history**: Card-style layout to view all sessions, filterable by date  
+**Statistics**: Today's focus duration / completed task count / 7-day average / monthly average / yearly total  
 **Charts**: Visualize focus data (7/14/30 days, this month, this year), supports both duration and task count metrics
+
+![Statistics cards and history](assets/图表1.png)
+
+![Focus trend charts](assets/图表2.png)
 
 ## Embed in Notes
 
@@ -53,12 +73,21 @@ Use code blocks to embed focus timer data and charts in notes.
 
 Displays today's focus statistics and the default statistics chart.
 
+![Default embed](assets/文档嵌入-默认.png)
+
 ````markdown
 ```focus
 date: today
 ```
 ````
+
 Displays today's focus statistics and today's focus items list.
+
+![Today's embed](assets/文档嵌入-今天.png)
+
+Example with chart parameters and custom height:
+
+![Default embed with parameters](assets/文档嵌入-默认-参数.png)
 
 ### Configuration Parameters
 
@@ -79,6 +108,7 @@ chart: 7 task
 height: 500
 ```
 ````
+
 Displays today's focus statistics and 7-day completed task count chart, with display box height limited to 500px.
 
 ````markdown
@@ -88,7 +118,10 @@ items: none
 height: 400
 ```
 ````
+
 Displays that day's statistics and limits the display box height to 400px.
+
+![Date-specific embed with parameters](assets/文档嵌入-日期-参数.png)
 
 ## Tips
 

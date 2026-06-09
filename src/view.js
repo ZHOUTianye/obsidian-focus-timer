@@ -1,6 +1,11 @@
 const obsidian = require("obsidian");
 const { ItemView, Notice } = obsidian;
-const { VIEW_TYPE, MAX_SUGGEST_TASKS } = require("./constants.js");
+const {
+  VIEW_TYPE,
+  MAX_SUGGEST_TASKS,
+  FOCUS_NOTE_MAX_ASCII,
+  FOCUS_NOTE_MAX_OTHER
+} = require("./constants.js");
 const { t, getLanguage } = require("./i18n.js");
 const { readState, readSessions } = require("./data.js");
 const { formatTime, formatTimeChinese, formatTimeShort, getDateKey } = require("./format.js");
@@ -21,6 +26,8 @@ class FocusTimerView extends ItemView {
     this.currentView = "stats"; // 当前视图："stats" 或 "history"
     this.restStartTime = null; // 休息开始时间
     this.restSec = null; // 休息时长（秒）
+    this._renderGeneration = 0; // 并发 render 代数，避免旧渲染覆盖新 UI
+    this._renderChain = Promise.resolve(); // render 串行队列
   }
 
   getViewType() {
@@ -150,6 +157,7 @@ class FocusTimerView extends ItemView {
   }
 
   async onClose() {
+    this._renderGeneration++;
     this.stopTimer();
     this.plugin.timerManager.clear(this._resizeTimerId);
     if (this.resizeObserver) {
@@ -165,7 +173,7 @@ class FocusTimerView extends ItemView {
   handleKeyboardEnter() {
     if (!this._idle) return;
     let note = (this.noteInput && this.noteInput.value) ? this.noteInput.value.trim() : "";
-    note = limitInputLength(note);
+    note = limitInputLength(note, FOCUS_NOTE_MAX_ASCII, FOCUS_NOTE_MAX_OTHER);
     if (this._isStopwatch) {
       this.plugin.startFocus(null, "stopwatch", note);
     } else {
@@ -197,24 +205,44 @@ class FocusTimerView extends ItemView {
   }
 
   async render() {
-    const container = this.containerEl.children[1];
-    // 保存输入框的值（如果存在）
-    const savedNoteValue = this.noteInput ? this.noteInput.value : "";
-    container.empty();
-    this.timerElements = null; // 重置引用
-    this.noteInput = null; // 重置输入框引用
+    const generation = ++this._renderGeneration;
+    const isStale = () => generation !== this._renderGeneration;
 
-    // 检测容器高度和宽度
-    // 等待一帧确保容器已渲染
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    const containerHeight = container.clientHeight || container.offsetHeight || this.containerEl.clientHeight || 400;
-    const containerWidth = container.clientWidth || container.offsetWidth || this.containerEl.clientWidth || 400;
-    const isCompact = containerHeight < 400;
-    const isNarrow = containerWidth < 400; // 宽度较窄时使用单列布局
+    let releaseRender;
+    const renderTurn = new Promise((resolve) => {
+      releaseRender = resolve;
+    });
+    const previousRender = this._renderChain;
+    this._renderChain = renderTurn;
 
-    const state = await readState(this.plugin.app);
-    this._idle = !state.active && !state.resting;
-    const sessions = await readSessions(this.plugin.app);
+    await previousRender;
+    try {
+      if (isStale()) return;
+
+      // 保存输入框的值（如果存在）
+      const savedNoteValue = this.noteInput ? this.noteInput.value : "";
+
+      // 等待一帧确保容器已渲染，再读取数据；确认仍是最新 render 后才清空 DOM
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      if (isStale()) return;
+
+      const container = this.containerEl.children[1];
+      const containerHeight = container.clientHeight || container.offsetHeight || this.containerEl.clientHeight || 400;
+      const containerWidth = container.clientWidth || container.offsetWidth || this.containerEl.clientWidth || 400;
+      const isCompact = containerHeight < 400;
+      const isNarrow = containerWidth < 400; // 宽度较窄时使用单列布局
+
+      const state = await readState(this.plugin.app);
+      if (isStale()) return;
+
+      const sessions = await readSessions(this.plugin.app);
+      if (isStale()) return;
+
+      container.empty();
+      this.timerElements = null; // 重置引用
+      this.noteInput = null; // 重置输入框引用
+
+      this._idle = !state.active && !state.resting;
     
     // 统计只使用已持久化的会话，专注进行中时不把当前时长计入统计；完成时由 stopFocus 写入后再反映到统计中
     const sessionsForStats = sessions;
@@ -687,9 +715,8 @@ class FocusTimerView extends ItemView {
       
       // 输入事件监听
       noteInput.addEventListener("input", (e) => {
-        // 限制专注事项：英文字符最多40个，其他字符最多10个
         const value = e.target.value;
-        const limited = limitInputLength(value);
+        const limited = limitInputLength(value, FOCUS_NOTE_MAX_ASCII, FOCUS_NOTE_MAX_OTHER);
         if (value !== limited) {
           e.target.value = limited;
         }
@@ -752,9 +779,8 @@ class FocusTimerView extends ItemView {
       
       const startBtn = btnContainer.createEl("button", { text: t("start"), cls: "focus-timer-plugin-btn-start" });
       startBtn.onclick = () => {
-        // 限制专注事项：英文字符最多40个，其他字符最多10个
         let note = noteInput.value.trim() || "";
-        const limitedNote = limitInputLength(note);
+        const limitedNote = limitInputLength(note, FOCUS_NOTE_MAX_ASCII, FOCUS_NOTE_MAX_OTHER);
         if (note !== limitedNote) {
           note = limitedNote;
           noteInput.value = note;
@@ -892,6 +918,9 @@ class FocusTimerView extends ItemView {
       } else {
         historyToggleBtn.classList.add("focus-timer-plugin-view-toggle-active");
       }
+    }
+    } finally {
+      releaseRender();
     }
   }
 

@@ -6,16 +6,15 @@
   overflow: hidden; /* 父容器不滚动 */
 }
 
-.workspace-leaf-content[data-type="focus-timer-view"] .view-content {
+body .workspace-leaf-content[data-type="focus-timer-view"] .view-content {
   padding: 20px;
   background: var(--background-primary);
   height: 100%;
-  overflow-y: auto !important;
+  overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  /* 强制启用滚动：使用 !important 确保样式生效 */
 }
 
 /* 顶部计时器区域 */
@@ -224,20 +223,20 @@
   gap: 6px;
 }
 
-.focus-timer-plugin-time-edit-boxes {
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-time-edit-boxes {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 24px !important;
+  font-size: 24px;
   font-weight: 600;
   color: var(--text-normal);
 }
 
-.focus-timer-plugin-time-box {
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-time-box {
   display: inline-block;
-  min-width: 72px !important;
-  padding: 8px 12px !important;
-  font-size: 26px !important;
+  min-width: 72px;
+  padding: 8px 12px;
+  font-size: 26px;
   border: 1px solid var(--background-modifier-border);
   border-radius: 10px;
   background: var(--background-secondary);
@@ -248,11 +247,11 @@
   color: var(--text-muted);
 }
 
-.focus-timer-plugin-time-box-input {
-  width: 72px !important;
-  min-width: 72px !important;
-  padding: 8px 12px !important;
-  font-size: 26px !important;
+body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plugin-time-box-input {
+  width: 72px;
+  min-width: 72px;
+  padding: 8px 12px;
+  font-size: 26px;
   font-weight: 600;
   text-align: center;
   border: 1px solid var(--background-modifier-border);
@@ -329,19 +328,19 @@
   box-shadow: none;
 }
 
-.focus-timer-plugin-btn-start {
+.focus-timer-plugin-btn-container button.focus-timer-plugin-btn-start {
   flex: 1;
   max-width: 200px;
-  background: var(--text-accent) !important;
-  color: var(--text-on-accent, #fff) !important;
-  border-color: var(--text-accent) !important;
+  background: var(--text-accent);
+  color: var(--text-on-accent, #ffffff);
+  border-color: var(--text-accent);
 }
 
-.focus-timer-plugin-btn-control {
+.focus-timer-plugin-btn-container button.focus-timer-plugin-btn-control {
   min-width: 36px;
   width: 36px;
   height: 36px;
-  padding: 0 !important;
+  padding: 0;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
   color: var(--text-normal);
@@ -360,18 +359,18 @@
   background: var(--background-secondary-alt);
 }
 
-.focus-timer-plugin-btn-primary {
+.focus-timer-plugin-btn-container button.focus-timer-plugin-btn-primary {
   flex: 1;
   max-width: 150px;
-  background: var(--text-accent) !important;
-  color: var(--text-on-accent, #fff) !important;
-  border-color: var(--text-accent) !important;
+  background: var(--text-accent);
+  color: var(--text-on-accent, #ffffff);
+  border-color: var(--text-accent);
 }
 
-.focus-timer-plugin-btn-secondary {
+.focus-timer-plugin-btn-container button.focus-timer-plugin-btn-secondary {
   flex: 1;
   max-width: 150px;
-  background: var(--background-secondary) !important;
+  background: var(--background-secondary);
 }
 
 .focus-timer-plugin-btn-container button:active {
@@ -409,41 +408,41 @@
   align-items: center;
 }
 
-.focus-timer-plugin-view-toggle-btn {
-  padding: 8px 16px !important;
-  border: none !important;
-  background: transparent !important;
-  color: var(--text-normal) !important;
-  border-radius: 0 !important;
-  font-size: 14px !important;
-  font-weight: 400 !important;
-  cursor: pointer !important;
-  box-shadow: none !important;
-  transition: none !important;
-  margin: 0 !important;
-  outline: none !important;
-  position: relative !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  line-height: normal !important;
-  text-decoration: none !important;
-  text-align: left !important;
-  display: inline-block !important;
-  vertical-align: baseline !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-view-toggle-container button.focus-timer-plugin-view-toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-normal);
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: none;
+  transition: none;
+  margin: 0;
+  outline: none;
+  position: relative;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: normal;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  vertical-align: baseline;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.focus-timer-plugin-view-toggle-btn:hover {
-  background: transparent !important;
-  color: var(--text-normal) !important;
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-view-toggle-container button.focus-timer-plugin-view-toggle-btn:hover {
+  background: transparent;
+  color: var(--text-normal);
 }
 
-.focus-timer-plugin-view-toggle-btn.focus-timer-plugin-view-toggle-active {
-  color: var(--text-accent) !important;
-  border-bottom: 2px solid var(--text-accent) !important;
-  background: transparent !important;
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-view-toggle-container button.focus-timer-plugin-view-toggle-btn.focus-timer-plugin-view-toggle-active {
+  color: var(--text-accent);
+  border-bottom: 2px solid var(--text-accent);
+  background: transparent;
 }
 
 .focus-timer-plugin-view-container {
@@ -474,37 +473,32 @@
   color: var(--text-normal);
 }
 
-/* 图表按钮和关闭按钮 - 使用加/减按钮的样式，使用important套用 */
-.focus-timer-plugin-chart-btn,
-.focus-timer-plugin-chart-close-btn {
-  min-width: 50px !important;
-  padding: 8px 16px !important;
-  border: none !important;
-  background: transparent !important;
-  color: var(--text-normal) !important;
-  border-radius: 0 !important;
-  font-size: 14px !important;
-  font-weight: 400 !important;
-  cursor: pointer !important;
-  box-shadow: none !important;
-  transition: none !important;
-  margin-left: auto !important; /* 自动靠右 */
+/* 图表按钮和关闭按钮 */
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-view-toggle-container button.focus-timer-plugin-chart-btn,
+body .focus-timer-plugin-chart-content button.focus-timer-plugin-chart-close-btn {
+  min-width: 50px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-normal);
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: none;
+  transition: none;
+  margin-left: auto;
 }
 
-.focus-timer-plugin-chart-btn:hover,
-.focus-timer-plugin-chart-close-btn:hover {
-  background: transparent !important;
-  color: var(--text-normal) !important;
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-view-toggle-container button.focus-timer-plugin-chart-btn:hover,
+body .focus-timer-plugin-chart-content button.focus-timer-plugin-chart-close-btn:hover {
+  background: transparent;
+  color: var(--text-normal);
 }
 
-/* 图表按钮在切换容器中的样式 */
-.focus-timer-plugin-view-toggle-container .focus-timer-plugin-chart-btn {
-  margin-left: auto !important;
-}
-
-.focus-timer-plugin-chart-close-btn {
-  float: right !important;
-  margin-bottom: 10px !important;
+body .focus-timer-plugin-chart-content button.focus-timer-plugin-chart-close-btn {
+  float: right;
+  margin-bottom: 10px;
 }
 
 /* 统计卡片网格 - 2×2布局 */
@@ -745,12 +739,11 @@
   background: var(--background-modifier-hover);
 }
 
-.focus-timer-plugin-line-chart {
-  /* 确保图表使用主题色 */
-  color: var(--text-accent) !important;
-  width: 100%;
+.focus-timer-plugin-chart-container canvas.focus-timer-plugin-line-chart {
+  color: var(--text-accent);
+  width: var(--focus-canvas-width, 600px);
   max-width: 100%;
-  height: auto;
+  height: var(--focus-canvas-height, 200px);
   display: block;
 }
 
@@ -773,17 +766,17 @@
 }
 
 /* 紧凑模式：高度小于300px时隐藏统计和记录 */
-.focus-timer-plugin-compact-mode .focus-timer-plugin-stats-section,
-.focus-timer-plugin-compact-mode .focus-timer-plugin-history-section,
-.focus-timer-plugin-compact-mode .focus-timer-plugin-view-toggle-container {
-  display: none !important;
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-compact-mode .focus-timer-plugin-stats-section,
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-compact-mode .focus-timer-plugin-history-section,
+body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-compact-mode .focus-timer-plugin-view-toggle-container {
+  display: none;
 }
 
 /* 响应式设计 */
 @media (max-width: 400px) {
-  .focus-timer-plugin-stats-grid,
-  .focus-timer-plugin-code-stats-grid {
-    grid-template-columns: 1fr !important; /* 宽度<300px时单列布局（1×4） */
+  body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-stats-grid,
+  .markdown-rendered .focus-timer-plugin-code-block .focus-timer-plugin-code-stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -874,10 +867,11 @@
 }
 
 /* 确保代码块中的统计卡片样式生效 */
+.markdown-rendered .focus-timer-plugin-code-block .focus-timer-plugin-stat-card,
 .focus-timer-plugin-code-block .focus-timer-plugin-stat-card {
   padding: 16px;
   border-radius: 12px;
-  background: var(--background-secondary) !important;
+  background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -983,15 +977,15 @@
   border-radius: 12px;
 }
 
-/* 图表悬浮提示样式 */
-.focus-timer-plugin-chart-tooltip {
+/* 图表悬浮提示样式（位置由 JS 设置 CSS 变量） */
+.focus-timer-plugin-chart-container .focus-timer-plugin-chart-tooltip {
   position: absolute;
-  background: var(--background-primary) !important;
-  border: 1px solid var(--background-modifier-border) !important;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 12px;
-  color: var(--text-normal) !important;
+  color: var(--text-normal);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   pointer-events: none;
   z-index: 1000;
@@ -999,26 +993,25 @@
   max-width: 250px;
   word-wrap: break-word;
   white-space: normal;
-  transform: translateX(-50%);
   box-sizing: border-box;
-  /* 确保tooltip不会影响容器宽度 */
-  left: 0;
-  top: 0;
+  left: var(--focus-tooltip-left, 0);
+  top: var(--focus-tooltip-top, 0);
   width: auto;
 }
 
-/* 最右侧5个数据点的tooltip样式 - 右对齐，避免挤压 */
-.focus-timer-plugin-chart-tooltip-right {
-  transform: none !important;
-  /* 确保tooltip右边界不超出容器 */
-  max-width: calc(100% - 10px) !important;
-  /* 右对齐 */
-  right: auto !important;
-  left: auto !important;
-  /* 确保tooltip不会超出容器 */
-  word-wrap: break-word !important;
-  overflow-wrap: break-word !important;
-  box-sizing: border-box !important;
+.focus-timer-plugin-chart-container .focus-timer-plugin-chart-tooltip.focus-timer-plugin-chart-tooltip-centered {
+  transform: translateX(-50%);
+}
+
+/* 最右侧数据点的 tooltip：右对齐，避免挤压 */
+.focus-timer-plugin-chart-container .focus-timer-plugin-chart-tooltip.focus-timer-plugin-chart-tooltip-right {
+  transform: none;
+  max-width: calc(100% - 10px);
+  right: auto;
+  left: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
 }
 
 .focus-timer-plugin-chart-tooltip div {
@@ -1143,11 +1136,12 @@
   white-space: nowrap;
 }
 
-/* 代码块样式 */
+/* 代码块样式（高度由 JS 设置 --focus-block-height） */
 .focus-timer-plugin-code-block-with-height {
   display: flex;
   flex-direction: column;
   overflow-y: hidden;
+  height: var(--focus-block-height);
 }
 
 .focus-timer-plugin-code-stats-section-no-shrink {
@@ -1181,34 +1175,11 @@
   min-height: 0;
 }
 
-/* ========= 动态样式：使用 CSS 变量 ========= */
-
-/* Canvas 尺寸 */
-.focus-timer-plugin-line-chart {
-  width: var(--focus-canvas-width, 600px);
-  height: var(--focus-canvas-height, 200px);
-}
-
-/* Tooltip 位置 */
-.focus-timer-plugin-chart-tooltip {
-  left: var(--focus-tooltip-left, 0);
-  top: var(--focus-tooltip-top, 0);
-}
-
-.focus-timer-plugin-chart-tooltip-centered {
-  transform: translateX(-50%);
-}
-
 .focus-timer-plugin-chart-tooltip-measuring {
   visibility: hidden;
   left: 0;
   top: 0;
   position: absolute;
-}
-
-/* 代码块高度 */
-.focus-timer-plugin-code-block-with-height {
-  height: var(--focus-block-height);
 }
 
 /* 测试元素（用于获取计算后的颜色值） */

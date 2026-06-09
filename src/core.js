@@ -1,4 +1,8 @@
-const DATA_PATH = ".obsidian/plugins/obsidian-focus-timer/data.json";
+const PLUGIN_ID = "focus-timer";
+const DATA_DIR = `.obsidian/plugins/${PLUGIN_ID}`;
+const DATA_PATH = `${DATA_DIR}/data.json`;
+/** 旧版插件 id 下的数据路径，仅用于一次性迁移 */
+const LEGACY_DATA_PATH = ".obsidian/plugins/obsidian-focus-timer/data.json";
 
 /**
  * 异步文件锁，保证对 data.json 的写入串行化，避免竞态条件。
@@ -112,4 +116,13 @@ function getDefaultDataTemplate() {
   };
 }
 
-module.exports = { DATA_PATH, FileLock, dataFileLock, TimerManager, getDefaultDataTemplate };
+module.exports = {
+  PLUGIN_ID,
+  DATA_DIR,
+  DATA_PATH,
+  LEGACY_DATA_PATH,
+  FileLock,
+  dataFileLock,
+  TimerManager,
+  getDefaultDataTemplate
+};

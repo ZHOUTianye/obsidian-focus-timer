@@ -1,7 +1,16 @@
 const obsidian = require("obsidian");
 const { Plugin, Notice, MarkdownPostProcessor } = obsidian;
 const { TimerManager } = require("./core.js");
-const { VIEW_TYPE, MAX_SUGGEST_TASKS, nowISO, clamp0 } = require("./constants.js");
+const {
+  VIEW_TYPE,
+  MAX_SUGGEST_TASKS,
+  FOCUS_NOTE_MAX_ASCII,
+  FOCUS_NOTE_MAX_OTHER,
+  QUICK_TIMER_MAX_ASCII,
+  QUICK_TIMER_MAX_OTHER,
+  nowISO,
+  clamp0
+} = require("./constants.js");
 const { getLanguage, resetLanguageCache, t } = require("./i18n.js");
 const { ensureDataFileExists, readState, readSessions, writeState, appendSession, readSettings, writeSettings } = require("./data.js");
 const { msBetween, formatTime, getDateKey, formatTimeChinese, formatTimeShort } = require("./format.js");
@@ -51,38 +60,6 @@ module.exports = class FocusTimerPlugin extends Plugin {
       resetLanguageCache();
       getLanguage();
     });
-    
-    // 加载CSS样式文件
-    try {
-      // 方法1: 尝试使用vault adapter读取（适用于iCloud同步的vault）
-      const cssPath = ".obsidian/plugins/obsidian-focus-timer/styles.css";
-      try {
-        const cssContent = await this.app.vault.adapter.read(cssPath);
-        const styleEl = document.createElement("style");
-        styleEl.textContent = cssContent;
-        document.head.appendChild(styleEl);
-        this.styleEl = styleEl;
-      } catch (vaultError) {
-        // 方法2: 如果vault adapter失败，使用Node.js fs模块
-        const fs = require("fs");
-        const path = require("path");
-        // 尝试从vault根目录读取
-        const vaultPath = this.app.vault.adapter.basePath;
-        const fullPath = path.join(vaultPath, ".obsidian", "plugins", "obsidian-focus-timer", "styles.css");
-        
-        if (fs.existsSync(fullPath)) {
-          const cssContent = fs.readFileSync(fullPath, "utf8");
-          const styleEl = document.createElement("style");
-          styleEl.textContent = cssContent;
-          document.head.appendChild(styleEl);
-          this.styleEl = styleEl;
-        }
-      }
-    } catch (error) {
-      // 忽略CSS加载错误
-    }
-
-    await ensureDataFileExists(this.app);
 
     // 加载设置
     await this.loadSettings();
@@ -481,9 +458,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
       return;
     }
     
-    // 限制专注事项：英文字符最多40个
     const trimmedNote = (note || "").trim();
-    const finalNote = limitInputLength(trimmedNote);
+    const finalNote = limitInputLength(trimmedNote, FOCUS_NOTE_MAX_ASCII, FOCUS_NOTE_MAX_OTHER);
     
     if (finalNote) {
       let list = this.settings.suggestTasks || [];
@@ -627,8 +603,11 @@ module.exports = class FocusTimerPlugin extends Plugin {
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
     leaves.forEach(leaf => {
       if (leaf.view instanceof FocusTimerView) {
-        leaf.view.render(); // 只在状态改变时重新渲染
-        leaf.view.startTimer(); // 重启计时器
+        leaf.view.render().then(() => {
+          if (leaf.view instanceof FocusTimerView) {
+            leaf.view.startTimer();
+          }
+        });
       }
     });
   }
@@ -676,15 +655,26 @@ module.exports = class FocusTimerPlugin extends Plugin {
       if (!this.settings.quickTimer1) this.settings.quickTimer1 = { name: "", minutes: 25 };
       if (!this.settings.quickTimer2) this.settings.quickTimer2 = { name: "", minutes: 25 };
       if (!this.settings.quickTimer3) this.settings.quickTimer3 = { name: "", minutes: 25 };
-      // 确保名称长度符合限制：英文字符最多40个
       if (this.settings.quickTimer1.name) {
-        this.settings.quickTimer1.name = limitInputLength(this.settings.quickTimer1.name);
+        this.settings.quickTimer1.name = limitInputLength(
+          this.settings.quickTimer1.name,
+          QUICK_TIMER_MAX_ASCII,
+          QUICK_TIMER_MAX_OTHER
+        );
       }
       if (this.settings.quickTimer2.name) {
-        this.settings.quickTimer2.name = limitInputLength(this.settings.quickTimer2.name);
+        this.settings.quickTimer2.name = limitInputLength(
+          this.settings.quickTimer2.name,
+          QUICK_TIMER_MAX_ASCII,
+          QUICK_TIMER_MAX_OTHER
+        );
       }
       if (this.settings.quickTimer3.name) {
-        this.settings.quickTimer3.name = limitInputLength(this.settings.quickTimer3.name);
+        this.settings.quickTimer3.name = limitInputLength(
+          this.settings.quickTimer3.name,
+          QUICK_TIMER_MAX_ASCII,
+          QUICK_TIMER_MAX_OTHER
+        );
       }
       // 确保休息设置存在
       if (this.settings.autoRest === undefined) this.settings.autoRest = false;
@@ -1243,8 +1233,5 @@ module.exports = class FocusTimerPlugin extends Plugin {
       this._keydownHandler = null;
     }
     this.timerManager.clearAll();
-    if (this.styleEl && this.styleEl.parentNode) {
-      this.styleEl.parentNode.removeChild(this.styleEl);
-    }
   }
 };
