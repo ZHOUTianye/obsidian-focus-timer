@@ -5,6 +5,13 @@ on:
     tags:
       - "*"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -18,9 +25,13 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Verify release artifacts
+        run: test -f main.js && test -f manifest.json && test -f styles.css
+
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             manifest.json
             main.js
             styles.css
+          fail_on_unmatched_files: true
