@@ -86,14 +86,10 @@ class FocusTimerSettingTab extends PluginSettingTab {
                 this.plugin.statusBarEl.addClass("focus-timer-plugin-timer-statusbar");
                 this.plugin.statusBarEl.onClickEvent(() => this.plugin.openView());
               }
-              this.plugin.updateStatusBarDisplay();
-              this.plugin.startStatusBarTimer();
-            } else {
-              this.plugin.stopStatusBarTimer();
-              if (this.plugin.statusBarEl) {
-                this.plugin.statusBarEl.remove();
-                this.plugin.statusBarEl = null;
-              }
+              await this.plugin.updateStatusBarDisplay();
+            } else if (this.plugin.statusBarEl) {
+              this.plugin.statusBarEl.remove();
+              this.plugin.statusBarEl = null;
             }
           });
       });

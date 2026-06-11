@@ -487,11 +487,15 @@ module.exports = class FocusTimerPlugin extends Plugin {
 
     await writeState(this.app, {
       active: true,
+      resting: false,
       start: s,
       end,
       plannedSec: actualPlannedSec,
       mode: timerMode,
-      note: finalNote
+      note: finalNote,
+      restStart: null,
+      restEnd: null,
+      restSec: null
     });
 
     if (isStopwatch) {

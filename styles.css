@@ -739,7 +739,8 @@ body .focus-timer-plugin-chart-content button.focus-timer-plugin-chart-close-btn
   background: var(--background-modifier-hover);
 }
 
-.focus-timer-plugin-chart-container canvas.focus-timer-plugin-line-chart {
+/* 模态框与代码块共用：尺寸由 chart.js 写入 --focus-canvas-* 变量 */
+canvas.focus-timer-plugin-line-chart {
   color: var(--text-accent);
   width: var(--focus-canvas-width, 600px);
   max-width: 100%;
