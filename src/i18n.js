@@ -130,7 +130,9 @@ const translations = {
     restEnded: "休息结束",
     focusStartFailed: "正在专注中，启动失败",
     focusStopFailed: "当前未在执行任务，放弃/完成任务失败",
-    completeCountdownEarlyDisabled: "已关闭「倒计时允许提前完成」，无法提前完成"
+    completeCountdownEarlyDisabled: "已关闭「倒计时允许提前完成」，无法提前完成",
+    settingsLoadFailed: "加载设置失败，已使用默认值",
+    settingsSaveFailed: "保存设置失败，请稍后重试"
   },
   en: {
     cancel: "Cancel",
@@ -261,7 +263,9 @@ const translations = {
     restEnded: "Rest ended",
     focusStartFailed: "You are focusing now, start failed",
     focusStopFailed: "You are not focusing now, nothing to abandon/complete",
-    completeCountdownEarlyDisabled: "Early complete is disabled; cannot complete countdown early"
+    completeCountdownEarlyDisabled: "Early complete is disabled; cannot complete countdown early",
+    settingsLoadFailed: "Failed to load settings, using defaults",
+    settingsSaveFailed: "Failed to save settings, please try again"
   }
 };
 

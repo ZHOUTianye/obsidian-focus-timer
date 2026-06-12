@@ -1,5 +1,17 @@
 const obsidian = require("obsidian");
-const { Plugin, Notice, MarkdownPostProcessor } = obsidian;
+const { Plugin, Notice, Component } = obsidian;
+
+/** 代码块 date:today 午夜刷新定时器的生命周期：随代码块卸载时清除 */
+class FocusBlockDailyRefresh extends Component {
+  constructor(plugin, timerId) {
+    super();
+    this.plugin = plugin;
+    this.timerId = timerId;
+  }
+  onunload() {
+    this.plugin.timerManager.clear(this.timerId);
+  }
+}
 const { TimerManager } = require("./core.js");
 const {
   VIEW_TYPE,
@@ -414,8 +426,11 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (this.statusBarMode === "rest") {
       if (this.statusBarPlannedSec != null && elapsed >= this.statusBarPlannedSec) {
         this._autoStopInFlight = true;
-        await this.stopRest();
-        this._autoStopInFlight = false;
+        try {
+          await this.stopRest();
+        } finally {
+          this._autoStopInFlight = false;
+        }
       }
       return;
     }
@@ -425,9 +440,12 @@ module.exports = class FocusTimerPlugin extends Plugin {
       if (this.statusBarPlannedSec === null) {
         if (elapsed >= 600 * 60) {
           this._autoStopInFlight = true;
-          new Notice(t("stopwatchOver10Hours"), 5000);
-          await this.stopFocus("completed");
-          this._autoStopInFlight = false;
+          try {
+            new Notice(t("stopwatchOver10Hours"), 5000);
+            await this.stopFocus("completed");
+          } finally {
+            this._autoStopInFlight = false;
+          }
         }
         return;
       }
@@ -435,8 +453,11 @@ module.exports = class FocusTimerPlugin extends Plugin {
       // 倒计时：未开启自动继续时到点完成
       if (elapsed >= this.statusBarPlannedSec && !this.settings.autoContinue) {
         this._autoStopInFlight = true;
-        await this.stopFocus("completed");
-        this._autoStopInFlight = false;
+        try {
+          await this.stopFocus("completed");
+        } finally {
+          this._autoStopInFlight = false;
+        }
       }
     }
   }
@@ -686,7 +707,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
         this.settings.defaultRestMinutes = 5;
       }
     } catch (error) {
-      // 忽略设置加载错误
+      console.error("[Focus Timer] Failed to load settings:", error);
+      new Notice(t("settingsLoadFailed"), 5000);
     }
   }
 
@@ -696,7 +718,8 @@ module.exports = class FocusTimerPlugin extends Plugin {
       // 更新快捷 timer 命令名称
       this.registerQuickTimerCommands();
     } catch (error) {
-      // 忽略设置保存错误
+      console.error("[Focus Timer] Failed to save settings:", error);
+      new Notice(t("settingsSaveFailed"), 5000);
     }
   }
 
@@ -882,13 +905,18 @@ module.exports = class FocusTimerPlugin extends Plugin {
   }
 
   // 设置每天0:00自动刷新（使用统一定时器管理器）
-  setupDailyRefresh(el, ctx, showRecord = true, showItems = true, height = null, chartRange = null, chartMetric = null) {
+  setupDailyRefresh(el, ctx, showRecord = true, showItems = true, height = null, chartRange = null, chartMetric = null, registerLifecycle = true) {
     if (!el._focusDailyRefreshId) {
       this._dailyRefreshCounter = (this._dailyRefreshCounter ?? 0) + 1;
       el._focusDailyRefreshId = "daily-refresh-" + this._dailyRefreshCounter;
     }
     const id = el._focusDailyRefreshId;
     this.timerManager.clear(id);
+
+    // 代码块被重渲染或移除时，通过 Obsidian 组件生命周期清除定时器
+    if (registerLifecycle && ctx) {
+      ctx.addChild(new FocusBlockDailyRefresh(this, id));
+    }
 
     const now = new Date();
     const tomorrow = new Date(now);
@@ -897,10 +925,14 @@ module.exports = class FocusTimerPlugin extends Plugin {
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
 
     this.timerManager.scheduleTimeout(id, msUntilMidnight, async () => {
+      if (!el.isConnected) {
+        this.timerManager.clear(id);
+        return;
+      }
       const todayKey = getDateKey(new Date());
       const storedHeight = el._focusBlockHeight || height;
       await this.renderFocusBlock(el, ctx, todayKey, true, showRecord, showItems, storedHeight, chartRange, chartMetric);
-      this.setupDailyRefresh(el, ctx, showRecord, showItems, storedHeight, chartRange, chartMetric);
+      this.setupDailyRefresh(el, ctx, showRecord, showItems, storedHeight, chartRange, chartMetric, false);
     });
   }
 
