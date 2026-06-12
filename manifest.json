@@ -1,7 +1,7 @@
 {
   "id": "focus-timer",
   "name": "Focus Timer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "minAppVersion": "1.4.5",
   "description": "Local dedicated timer, supporting statistical analysis and card view, can embed data display in notes.",
   "author": "Tianye Zhou",

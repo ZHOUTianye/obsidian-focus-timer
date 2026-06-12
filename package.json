@@ -1,6 +1,6 @@
 {
   "name": "focus-timer",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "private": true,
   "scripts": {
     "build": "esbuild src/index.js --bundle --format=cjs --platform=node --target=node14 --outfile=main.js --minify=false --external:obsidian"
