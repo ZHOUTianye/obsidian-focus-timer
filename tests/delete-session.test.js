@@ -30,7 +30,7 @@ const row = (id, status = 'completed') => ({ id, start: new Date().toISOString()
   actualSec: 120, status, note: 'task', customOldField: 'preserved' });
 function fixture() {
   const original = { ...getDefaultDataTemplate(), sessions: [row('a'), row('b', 'abandoned')],
-    state: { active: true, start: '2026-01-01', note: 'running' } };
+    state: { active: true, resting: false, start: '2026-01-01', note: 'running' } };
   let raw = JSON.stringify(original);
   const events = [];
   const app = { vault: { adapter: { exists: async () => true, read: async () => raw,
@@ -81,10 +81,10 @@ test('record trash icon opens confirmation; cancel leaves file untouched; confir
 });
 test('all history clear publishes event and completed totals/chart drop to zero', async () => {
   const f = fixture();
-  assert.ok(calculateChartData(f.data().sessions, '7天').some(point => point.time > 0 || point.focusTime > 0));
+  assert.ok(calculateChartData(f.data().sessions, '7天').some(point => point.value > 0));
   await writeSessions(f.app, []);
   assert.equal(f.events.length, 1);
   assert.equal((await readSessions(f.app)).length, 0);
   assert.ok(calculateStats([]));
-  assert.ok(calculateChartData([], '7天').every(point => !point.time && !point.focusTime));
+  assert.ok(calculateChartData([], '7天').every(point => point.value === 0));
 });
