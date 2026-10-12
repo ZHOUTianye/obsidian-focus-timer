@@ -12,6 +12,18 @@ class FocusBlockDailyRefresh extends Component {
     this.plugin.timerManager.clear(this.timerId);
   }
 }
+class FocusBlockSessionRefresh extends Component {
+  constructor(app, refresh) {
+    super();
+    this.app = app;
+    this.refresh = refresh;
+  }
+  onload() {
+    this.registerEvent(this.app.workspace.on("focus-timer:sessions-changed", () => {
+      this.refresh().catch(error => console.error("Focus block refresh failed", error));
+    }));
+  }
+}
 const { TimerManager } = require("./core.js");
 const {
   VIEW_TYPE,
@@ -229,6 +241,10 @@ module.exports = class FocusTimerPlugin extends Plugin {
         return;
       }
       
+      ctx.addChild(new FocusBlockSessionRefresh(this.app, () => this.renderFocusBlock(
+        el, ctx, isToday ? getDateKey(new Date()) : targetDate, isToday,
+        showRecord, showItems, height, el._chartRange ?? chartRange, el._chartMetric ?? chartMetric
+      )));
       // 如果是today，设置定时器在每天0:00刷新
       if (isToday) {
         this.setupDailyRefresh(el, ctx, showRecord, showItems, height, chartRange, chartMetric);

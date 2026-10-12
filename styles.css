@@ -1170,3 +1170,21 @@ body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-c
   position: absolute;
   visibility: hidden;
 }
+
+.focus-timer-plugin-history-item { display: flex; align-items: center; gap: 8px; }
+.focus-timer-plugin-history-entry { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.focus-timer-plugin-history-item button.focus-timer-plugin-delete-session {
+  flex: 0 0 auto;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  box-shadow: none;
+}
+.focus-timer-plugin-history-item button.focus-timer-plugin-delete-session:hover {
+  color: var(--text-error);
+  background: var(--background-modifier-hover);
+}
+.focus-timer-plugin-delete-session svg { width: 16px; height: 16px; }

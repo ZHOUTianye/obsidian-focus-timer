@@ -4,6 +4,9 @@ const translations = {
   zh: {
     cancel: "取消",
     delete: "删除",
+    deleteSession: "删除专注记录",
+    deleteSessionConfirm: "删除「{task}」这条专注记录？无法撤销，统计与图表将同步更新。",
+    deleteSessionSuccess: "专注记录已删除",
     confirm: "确认",
     close: "关闭",
     start: "开始",
@@ -137,6 +140,9 @@ const translations = {
   en: {
     cancel: "Cancel",
     delete: "Delete",
+    deleteSession: "Delete focus record",
+    deleteSessionConfirm: "Delete this focus record: {task}? This cannot be undone. Statistics and charts will update.",
+    deleteSessionSuccess: "Focus record deleted",
     confirm: "Confirm",
     close: "Close",
     start: "Start",
