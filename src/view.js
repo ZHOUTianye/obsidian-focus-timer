@@ -492,14 +492,14 @@ class FocusTimerView extends ItemView {
       const allowEarly = this.plugin.settings.allowCompleteCountdownEarly !== false;
       const isCountdown = this.timerMode === "countdown";
       const showComplete = allowEarly || !isCountdown || isOvertime;
-      if (showComplete) {
-        const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-timer-plugin-btn-primary" });
-        completeBtn.onclick = () => this.plugin.stopFocus("completed");
-      }
       const pauseBtn = btnContainer.createEl("button", {
         text: t(state.paused ? "resume" : "pause"), cls: "focus-timer-plugin-btn-secondary"
       });
       pauseBtn.onclick = () => this.plugin.setFocusPaused(!state.paused);
+      if (showComplete) {
+        const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-timer-plugin-btn-primary" });
+        completeBtn.onclick = () => this.plugin.stopFocus("completed");
+      }
       const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-timer-plugin-btn-danger" });
       abandonBtn.onclick = () => this.plugin.stopFocus("abandoned");
     } else {

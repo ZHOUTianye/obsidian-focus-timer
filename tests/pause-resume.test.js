@@ -122,3 +122,45 @@ test('native View and status bar display use paused effective time', async () =>
   await f.plugin.updateStatusBarDisplay();
   assert.ok(text.includes('Paused 00:09'));
 });
+
+test('running restart includes downtime, paused countdown View stays frozen', async () => {
+  const f = fixture({ ...active('countdown'), start: new Date(Date.now() - 5000).toISOString() });
+  await f.plugin.syncLocalTimerState();
+  assert.ok(focusElapsedMs(f.plugin.focusState) >= 5000);
+  await f.plugin.setFocusPaused(true);
+  const view = Object.create(FocusTimerView.prototype);
+  Object.assign(view, { plugin: f.plugin, startTime: Date.parse(f.data().state.start),
+    focusState: f.data().state, plannedSec: 60, timerMode: 'countdown', restStartTime: null,
+    timerElements: { timeEl: {} } });
+  view.updateTimerDisplay();
+  assert.equal(view.timerElements.timeEl.textContent, '00:55');
+});
+
+test('expired running countdown completes; autoContinue keeps it running', async () => {
+  for (const autoContinue of [false, true]) {
+    const f = fixture(active('countdown'));
+    f.plugin.settings.autoContinue = autoContinue;
+    await f.plugin.syncLocalTimerState();
+    await f.plugin.handleAutoStop();
+    assert.equal(f.data().state.active, autoContinue);
+    assert.equal(f.data().sessions.length, autoContinue ? 0 : 1);
+  }
+});
+
+test('pause queued before automatic completion wins the race', async () => {
+  const f = fixture(active('countdown'));
+  await Promise.all([f.plugin.setFocusPaused(true), f.plugin.stopFocus('completed', true)]);
+  assert.equal(f.data().state.paused, true);
+  assert.equal(f.data().sessions.length, 0);
+});
+
+test('a new timer clears accumulated pause fields; rest cannot be paused', async () => {
+  const f = fixture({ ...active(), active: false, paused: true, pausedMs: 5000 });
+  await f.plugin.startFocus(null, 'stopwatch');
+  assert.equal(f.data().state.pausedMs, 0);
+  assert.equal(f.data().state.paused, false);
+  await f.plugin.stopFocus('abandoned');
+  await f.plugin.startRest();
+  assert.equal(await f.plugin.setFocusPaused(true), false);
+  assert.equal(f.data().state.resting, true);
+});

@@ -129,7 +129,7 @@ body .workspace-leaf-content[data-type="focus-timer-view"] .view-content {
 
 .focus-timer-plugin-quick-timer-btn:hover {
   background: var(--background-modifier-hover);
-  border-color: var(--text-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-quick-timer-btn:active {
@@ -263,7 +263,7 @@ body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plu
 
 .focus-timer-plugin-time-box-input:focus {
   outline: none;
-  border-color: var(--text-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-overtime-label {
@@ -298,7 +298,7 @@ body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plu
 
 .focus-timer-plugin-note-input:focus {
   outline: none;
-  border-color: var(--text-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-note-input::placeholder {
@@ -331,9 +331,9 @@ body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plu
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-start {
   flex: 1;
   max-width: 200px;
-  background: var(--text-accent);
+  background: var(--interactive-accent);
   color: var(--text-on-accent);
-  border-color: var(--text-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-control {
@@ -362,9 +362,9 @@ body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plu
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-primary {
   flex: 1;
   max-width: 150px;
-  background: var(--text-accent);
+  background: var(--interactive-accent);
   color: var(--text-on-accent);
-  border-color: var(--text-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-secondary {
