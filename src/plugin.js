@@ -20,12 +20,11 @@ const {
   FOCUS_NOTE_MAX_OTHER,
   QUICK_TIMER_MAX_ASCII,
   QUICK_TIMER_MAX_OTHER,
-  nowISO,
-  clamp0
+  nowISO
 } = require("./constants.js");
 const { getLanguage, resetLanguageCache, t } = require("./i18n.js");
-const { ensureDataFileExists, readState, readSessions, writeState, appendSession, finishFocusSession, readSettings, writeSettings } = require("./data.js");
-const { msBetween, formatTime, getDateKey, formatTimeChinese, formatTimeShort } = require("./format.js");
+const { ensureDataFileExists, readState, readSessions, writeState, finishFocusSession, readSettings, writeSettings } = require("./data.js");
+const { formatTime, getDateKey, formatTimeChinese, formatTimeShort } = require("./format.js");
 const { defaultChartRangeToShortKey, chartRangeToLabelAndCalculation, calculateChartData, createLineChart, CHART_RANGE_CONFIG } = require("./chart.js");
 const { calculateStats } = require("./stats.js");
 const { focusElapsedMs, pauseFocusState, resumeFocusState } = require("./timer-state.js");
