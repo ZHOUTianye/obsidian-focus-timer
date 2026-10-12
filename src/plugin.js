@@ -12,7 +12,7 @@ class FocusBlockDailyRefresh extends Component {
     this.plugin.timerManager.clear(this.timerId);
   }
 }
-const { TimerManager } = require("./core.js");
+const { TimerManager, FileLock } = require("./core.js");
 const {
   VIEW_TYPE,
   MAX_SUGGEST_TASKS,
@@ -24,15 +24,18 @@ const {
   clamp0
 } = require("./constants.js");
 const { getLanguage, resetLanguageCache, t } = require("./i18n.js");
-const { ensureDataFileExists, readState, readSessions, writeState, appendSession, readSettings, writeSettings } = require("./data.js");
+const { ensureDataFileExists, readState, readSessions, writeState, appendSession, finishFocusSession, readSettings, writeSettings } = require("./data.js");
 const { msBetween, formatTime, getDateKey, formatTimeChinese, formatTimeShort } = require("./format.js");
 const { defaultChartRangeToShortKey, chartRangeToLabelAndCalculation, calculateChartData, createLineChart, CHART_RANGE_CONFIG } = require("./chart.js");
 const { calculateStats } = require("./stats.js");
+const { focusElapsedMs, pauseFocusState, resumeFocusState } = require("./timer-state.js");
 const { FocusTimerView } = require("./view.js");
 const { FocusTimerSettingTab } = require("./settings-tab.js");
 const { limitInputLength } = require("./utils.js");
 
 module.exports = class FocusTimerPlugin extends Plugin {
+  focusActionLock = new FileLock();
+  focusState = {};
   statusBarEl = null;
   timerManager = new TimerManager();
   statusBarStartTime = null; // 本地记录的开始时间
@@ -271,6 +274,20 @@ module.exports = class FocusTimerPlugin extends Plugin {
       callback: () => this.openView(),
     });
 
+    for (const [id, label, paused] of [
+      ["focus-pause", "pause", false], ["focus-resume", "resume", true]
+    ]) {
+      this.addCommand({
+        id, name: t(label),
+        checkCallback: checking => {
+          const state = this.focusState;
+          const available = state.active && !state.resting && !!state.paused === paused;
+          if (available && !checking) this.setFocusPaused(!paused);
+          return !!available;
+        }
+      });
+    }
+
     // 左侧功能区（Ribbon）按钮：打开专注计时器（与状态栏同逻辑）
     this.addRibbonIcon("timer", getLanguage() === 'zh' ? "打开专注计时器" : "Open Focus Timer", () => this.openView());
 
@@ -303,6 +320,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
   // 从文件读取状态并更新本地计时器数据（只在状态改变时调用）
   async syncLocalTimerState() {
     const state = await readState(this.app);
+    this.focusState = state;
 
     if (state.active && !state.resting) {
       // 保存开始时间和计划时长，用于本地计时
@@ -365,21 +383,21 @@ module.exports = class FocusTimerPlugin extends Plugin {
     // 正计时模式（plannedSec为null）：实时显示已用时间
     if (this.statusBarStartTime && this.statusBarPlannedSec === null) {
       const now = Date.now();
-      const elapsed = Math.floor((now - this.statusBarStartTime) / 1000);
+      const elapsed = Math.floor(focusElapsedMs(this.focusState, now) / 1000);
       // 正计时时实时显示
-      this.statusBarEl.setText(`⏱️ ${formatTime(elapsed)}`);
+      this.statusBarEl.setText(`⏱️ ${this.focusState.paused ? t("paused") + " " : ""}${formatTime(elapsed)}`);
       return;
     }
     
     if (this.statusBarStartTime && this.statusBarPlannedSec !== null) {
       const now = Date.now();
-      const elapsed = Math.floor((now - this.statusBarStartTime) / 1000);
-      this.statusBarEl.setText(`⏱️ ${formatTime(elapsed)} / ${formatTime(this.statusBarPlannedSec)}`);
+      const elapsed = Math.floor(focusElapsedMs(this.focusState, now) / 1000);
+      this.statusBarEl.setText(`⏱️ ${this.focusState.paused ? t("paused") + " " : ""}${formatTime(elapsed)} / ${formatTime(this.statusBarPlannedSec)}`);
     }
   }
 
   updateTickingState() {
-    const shouldRun = this._timerActive || this._timerResting;
+    const shouldRun = (this._timerActive && !this.focusState.paused) || this._timerResting;
     if (shouldRun) {
       this.startUnifiedTimer();
     } else {
@@ -421,7 +439,10 @@ module.exports = class FocusTimerPlugin extends Plugin {
     if (!this.statusBarStartTime || !this.statusBarMode) return;
 
     const now = Date.now();
-    const elapsed = Math.floor((now - this.statusBarStartTime) / 1000);
+    if (this.statusBarMode === "focus" && this.focusState.paused) return;
+    const elapsed = this.statusBarMode === "focus"
+      ? Math.floor(focusElapsedMs(this.focusState, now) / 1000)
+      : Math.floor((now - this.statusBarStartTime) / 1000);
 
     if (this.statusBarMode === "rest") {
       if (this.statusBarPlannedSec != null && elapsed >= this.statusBarPlannedSec) {
@@ -442,7 +463,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
           this._autoStopInFlight = true;
           try {
             new Notice(t("stopwatchOver10Hours"), 5000);
-            await this.stopFocus("completed");
+            await this.stopFocus("completed", true);
           } finally {
             this._autoStopInFlight = false;
           }
@@ -454,7 +475,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       if (elapsed >= this.statusBarPlannedSec && !this.settings.autoContinue) {
         this._autoStopInFlight = true;
         try {
-          await this.stopFocus("completed");
+          await this.stopFocus("completed", true);
         } finally {
           this._autoStopInFlight = false;
         }
@@ -471,7 +492,35 @@ module.exports = class FocusTimerPlugin extends Plugin {
     });
   }
 
+  async runFocusAction(action) {
+    return this.focusActionLock.runWithLock(async () => {
+      try { return await action(); }
+      catch (error) {
+        console.error("Focus Timer action failed", error);
+        new Notice(t("focusActionFailed"));
+        return false;
+      }
+    });
+  }
+
+  async setFocusPaused(paused) {
+    return this.runFocusAction(async () => {
+      const state = await readState(this.app);
+      const next = paused ? pauseFocusState(state) : resumeFocusState(state);
+      if (!next) return false;
+      await writeState(this.app, next);
+      await this.updateStatusBarDisplay();
+      this.updateView();
+      this.app.workspace.trigger("focus-timer:state-changed");
+      return true;
+    });
+  }
+
   async startFocus(plannedSec, mode = null, note = "") {
+    return this.runFocusAction(() => this._startFocus(plannedSec, mode, note));
+  }
+
+  async _startFocus(plannedSec, mode = null, note = "") {
     // 检查是否已经有正在执行的番茄
     const state = await readState(this.app);
     if (state.active && !state.resting) {
@@ -510,6 +559,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
       active: true,
       resting: false,
       start: s,
+      paused: false, pausedAt: null, pausedMs: 0,
       end,
       plannedSec: actualPlannedSec,
       mode: timerMode,
@@ -529,16 +579,25 @@ module.exports = class FocusTimerPlugin extends Plugin {
     this.updateView(); // 更新视图（只在状态改变时）
   }
 
-  async stopFocus(status) {
+  async stopFocus(status, automatic = false) {
+    return this.runFocusAction(() => this._stopFocus(status, automatic));
+  }
+
+  async _stopFocus(status, automatic) {
     const state = await readState(this.app);
     if (!state.active || state.resting) {
       new Notice(t("focusStopFailed"));
       return; // 已结束或正在休息（如倒计时自动完成时可能被重复调用）
     }
+    // Recheck after acquiring the action lock: pause may have won the race.
+    const elapsedSecNow = Math.floor(focusElapsedMs(state) / 1000);
+    if (automatic && (state.paused || (state.plannedSec == null
+      ? elapsedSecNow < 600 * 60
+      : this.settings.autoContinue || elapsedSecNow < state.plannedSec))) return;
     // 若以「完成」结束且当前是倒计时且不允许提前完成，则拒绝（超时后允许完成）
     if (status === "completed" && this.settings.allowCompleteCountdownEarly !== true) {
       const isCountdown = state.mode === "countdown" || state.plannedSec != null;
-      const elapsedSec = Math.floor(clamp0(msBetween(state.start, nowISO())) / 1000);
+      const elapsedSec = Math.floor(focusElapsedMs(state) / 1000);
       const isOvertime = state.plannedSec != null && elapsedSec >= state.plannedSec;
       if (isCountdown && !isOvertime) {
         new Notice(t("completeCountdownEarlyDisabled"));
@@ -547,7 +606,7 @@ module.exports = class FocusTimerPlugin extends Plugin {
     }
 
     const end = nowISO();
-    const actualSec = Math.floor(clamp0(msBetween(state.start, end)) / 1000);
+    const actualSec = Math.floor(focusElapsedMs(state, Date.parse(end)) / 1000);
 
     const session = {
       id: state.start,
@@ -560,7 +619,13 @@ module.exports = class FocusTimerPlugin extends Plugin {
       createdAt: nowISO()
     };
 
-    await appendSession(this.app, session);
+    const autoRest = status === "completed" && this.settings.autoRest === true;
+    const restSec = (this.settings.defaultRestMinutes || 5) * 60;
+    await finishFocusSession(this.app, session, {
+      active: false, resting: autoRest, paused: false, pausedAt: null,
+      ...(autoRest ? { restStart: end, restEnd: new Date(Date.parse(end) + restSec * 1000).toISOString(), restSec } : {})
+    });
+    this.app.workspace.trigger("focus-timer:sessions-changed");
     
     // 停止提醒（Obsidian 内）
     const mins = Math.round(actualSec / 60);
@@ -568,13 +633,9 @@ module.exports = class FocusTimerPlugin extends Plugin {
     new Notice(t("focusEnded").replace("{status}", statusText).replace("{minutes}", mins));
 
     // 如果设置为自动休息且状态为完成，则自动进入休息
-    if (status === "completed" && this.settings.autoRest === true) {
-      await this.startRest();
-    } else {
-      await writeState(this.app, { active: false, resting: false });
-      await this.updateStatusBarDisplay(); // 更新本地计时器数据
-      this.updateView(); // 更新视图（只在状态改变时）
-    }
+    if (autoRest) new Notice(t("restStarted").replace("{minutes}", Math.round(restSec / 60)));
+    await this.updateStatusBarDisplay();
+    this.updateView();
 
     // 可选：把记录写入当天 Daily Note 的某个标题（需要你有固定 daily note 路径/命名）
     // 这里先不强绑，避免你说的“强行联系在一起”
