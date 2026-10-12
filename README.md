@@ -53,6 +53,8 @@ Access via command palette (`Cmd/Ctrl + P`):
 ## Statistics and Views
 
 **Focus history**: Card-style layout to view all sessions, filterable by date  
+Use the trash icon beside a record to delete it after confirmation. Cancel keeps the record. A successful deletion immediately updates open history/statistics Views, charts, and embedded `focus` blocks; other records and settings are preserved.
+
 **Statistics**: Today's focus duration / completed task count / 7-day average / monthly average / yearly total  
 **Charts**: Visualize focus data (7/14/30 days, this month, this year), supports both duration and task count metrics
 
