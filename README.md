@@ -1,6 +1,8 @@
 # Focus Timer Plugin - User Guide
 
 > **A note to our users**: Thank you for your support and enthusiasm for Focus Timer! The plugin is still under active development, and some features may be unstable or subject to change. We appreciate your understanding and patience. Feedback and suggestions are welcome via the link below.
+> **Help**: https://tianyezhou.com/focus-timer
+> **Author**: Tianye Zhou (https://tianyezhou.com), S-Qin(https://github.com/s-qin)
 
 A local focus timer plugin designed for Obsidian, with support for statistical analysis, card view, and embedding data display in notes.
 
@@ -23,9 +25,9 @@ A local focus timer plugin designed for Obsidian, with support for statistical a
 
 The panel adapts automatically when the window is narrow or compact:
 
-![Narrow window layout](assets/窄窗口适配.png)
+<img src="assets/窄窗口适配.png" alt="Narrow window layout" width="280">
 
-![Compact window layout](assets/小窗口适配.png)
+<img src="assets/小窗口适配.png" alt="Compact window layout" width="410">
 
 ## Timer Modes
 
@@ -36,11 +38,11 @@ The panel adapts automatically when the window is narrow or compact:
 
 **Countdown**
 
-![Countdown mode](assets/倒计时.png)
+<img src="assets/倒计时.png" alt="Countdown mode" width="340">
 
 **Stopwatch**
 
-![Stopwatch mode](assets/正计时.png)
+<img src="assets/正计时.png" alt="Stopwatch mode" width="340">
 
 ## Commands
 
@@ -61,9 +63,9 @@ Use the trash icon beside a record to delete it after confirmation. Cancel keeps
 **Statistics**: Today's focus duration / completed task count / 7-day average / monthly average / yearly total  
 **Charts**: Visualize focus data (7/14/30 days, this month, this year), supports both duration and task count metrics
 
-![Statistics cards and history](assets/图表1.png)
+<img src="assets/图表1.png" alt="Statistics cards and history" width="540">
 
-![Focus trend charts](assets/图表2.png)
+<img src="assets/图表2.png" alt="Focus trend charts" width="640">
 
 ## Embed in Notes
 
@@ -78,7 +80,7 @@ Use code blocks to embed focus timer data and charts in notes.
 
 Displays today's focus statistics and the default statistics chart.
 
-![Default embed](assets/文档嵌入-默认.png)
+<img src="assets/文档嵌入-默认.png" alt="Default embed" width="570">
 
 ````markdown
 ```focus
@@ -88,11 +90,11 @@ date: today
 
 Displays today's focus statistics and today's focus items list.
 
-![Today's embed](assets/文档嵌入-今天.png)
+<img src="assets/文档嵌入-今天.png" alt="Today's embed" width="720">
 
 Example with chart parameters and custom height:
 
-![Default embed with parameters](assets/文档嵌入-默认-参数.png)
+<img src="assets/文档嵌入-默认-参数.png" alt="Default embed with parameters" width="580">
 
 ### Configuration Parameters
 
@@ -126,7 +128,7 @@ height: 400
 
 Displays that day's statistics and limits the display box height to 400px.
 
-![Date-specific embed with parameters](assets/文档嵌入-日期-参数.png)
+<img src="assets/文档嵌入-日期-参数.png" alt="Date-specific embed with parameters" width="860">
 
 ## Tips
 
@@ -136,10 +138,6 @@ Displays that day's statistics and limits the display box height to 400px.
 - **Pomodoro**: Enable auto-break feature
 - **Embed anywhere**: Add focus code blocks in journals, project pages, or review documents
 
-## Support
-
-- **Help**: https://tianyezhou.com/focus-timer
-- **Author**: Tianye Zhou (https://tianyezhou.com)
 
 ---
 

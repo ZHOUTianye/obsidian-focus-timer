@@ -266,7 +266,11 @@ class FocusTimerView extends ItemView {
     if (state.resting) {
       breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-rest");
     } else if (state.active) {
-      breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-active");
+      if (state.paused) {
+        breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-paused");
+      } else {
+        breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-active");
+      }
     } else {
       breathingLight.classList.add("focus-timer-plugin-timer-section-top-status-breathing-idle");
       // 空闲时不呼吸，只显示静态颜色
@@ -284,7 +288,6 @@ class FocusTimerView extends ItemView {
       breathingLight.classList.remove("focus-timer-plugin-breathing-active", "focus-timer-plugin-breathing-idle");
       breathingLight.classList.add("focus-timer-plugin-breathing-rest");
     } else if (state.active) {
-      if (state.paused) breathingLight.classList.add("focus-timer-plugin-breathing-paused");
       const mode = state.mode || "countdown";
       const modeText = mode === "stopwatch" ? t("stopwatch") : t("countdown");
       // 如果有专注事项，显示"任务名称-倒计时/正计时"

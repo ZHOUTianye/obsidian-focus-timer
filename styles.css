@@ -54,6 +54,11 @@ body .workspace-leaf-content[data-type="focus-timer-view"] .view-content {
   animation: breathe-orange 2s ease-in-out infinite;
 }
 
+.focus-timer-plugin-timer-section-top-status-breathing-light.focus-timer-plugin-timer-section-top-status-breathing-paused {
+  background-color: var(--text-muted);
+  opacity: 0.6;
+}
+
 /* 呼吸动画 - 绿色（空闲） */
 @keyframes breathe-green {
   0%, 100% {
@@ -1194,8 +1199,4 @@ body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-c
   color: var(--text-on-accent);
   background: var(--background-modifier-error);
   border-color: var(--background-modifier-error);
-}
-.focus-timer-plugin-breathing-paused {
-  animation: none !important;
-  background: var(--text-muted) !important;
 }
