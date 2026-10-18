@@ -14,6 +14,8 @@ A local focus timer plugin designed for Obsidian, with support for statistical a
 3. Use +/- buttons to adjust or click the time to set focus duration
 4. Click "Start" or press Enter (if keyboard shortcuts are enabled)
 
+**Pause and resume**: Click "Pause" / "Resume" in either timer mode. Paused time is excluded from focus duration; countdown remaining time stays fixed. Paused sessions stay paused after reloading or restarting Obsidian. Complete and Abandon remain available while paused, subject to the existing early-completion setting.
+
 **End a session**:
 - **Complete**: Mark as completed and save the record
 - **Abandon**: Mark as abandoned and save the record
@@ -46,6 +48,7 @@ Access via command palette (`Cmd/Ctrl + P`):
 
 - `Start Focus (25m/50m)` - Quick start the timer
 - `Stop Focus (Complete)` - Complete current session
+- `Pause` / `Resume` - Pause or resume the active focus session; bind shortcuts in Settings → Hotkeys
 - `Abandon Focus` - Abandon current session
 - `Open Focus Timer View` - Open timer panel
 - `Start Quick Timer 1/2/3` - Start preset quick timer 1/2/3

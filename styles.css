@@ -331,9 +331,9 @@ body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plu
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-start {
   flex: 1;
   max-width: 200px;
-  background: var(--text-accent);
-  color: var(--text-on-accent, #ffffff);
-  border-color: var(--text-accent);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-control {
@@ -362,9 +362,9 @@ body .workspace-leaf-content[data-type="focus-timer-view"] input.focus-timer-plu
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-primary {
   flex: 1;
   max-width: 150px;
-  background: var(--text-accent);
-  color: var(--text-on-accent, #ffffff);
-  border-color: var(--text-accent);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
 }
 
 .focus-timer-plugin-btn-container button.focus-timer-plugin-btn-secondary {
@@ -1188,3 +1188,14 @@ body .workspace-leaf-content[data-type="focus-timer-view"] .focus-timer-plugin-c
   background: var(--background-modifier-hover);
 }
 .focus-timer-plugin-delete-session svg { width: 16px; height: 16px; }
+.focus-timer-plugin-btn-container button.focus-timer-plugin-btn-danger {
+  flex: 1;
+  max-width: 150px;
+  color: var(--text-on-accent);
+  background: var(--background-modifier-error);
+  border-color: var(--background-modifier-error);
+}
+.focus-timer-plugin-breathing-paused {
+  animation: none !important;
+  background: var(--text-muted) !important;
+}

@@ -9,6 +9,7 @@ const {
 const { t, getLanguage } = require("./i18n.js");
 const { ConfirmModal } = require("./modal.js");
 const { readState, readSessions, deleteSession } = require("./data.js");
+const { focusElapsedMs } = require("./timer-state.js");
 const { formatTime, formatTimeChinese, formatTimeShort, getDateKey } = require("./format.js");
 const { calculateStats } = require("./stats.js");
 const { createLineChart, calculateChartData, chartRangeToLabelAndCalculation, defaultChartRangeToShortKey, CHART_RANGE_CONFIG } = require("./chart.js");
@@ -119,7 +120,7 @@ class FocusTimerView extends ItemView {
         }
     } else if (this.startTime !== null) {
       const now = Date.now();
-      const elapsed = Math.floor((now - this.startTime) / 1000);
+      const elapsed = Math.floor(focusElapsedMs(this.focusState, now) / 1000);
       
       if (this.timerMode === "stopwatch") {
         timeEl.textContent = formatTime(elapsed);
@@ -283,6 +284,7 @@ class FocusTimerView extends ItemView {
       breathingLight.classList.remove("focus-timer-plugin-breathing-active", "focus-timer-plugin-breathing-idle");
       breathingLight.classList.add("focus-timer-plugin-breathing-rest");
     } else if (state.active) {
+      if (state.paused) breathingLight.classList.add("focus-timer-plugin-breathing-paused");
       const mode = state.mode || "countdown";
       const modeText = mode === "stopwatch" ? t("stopwatch") : t("countdown");
       // 如果有专注事项，显示"任务名称-倒计时/正计时"
@@ -321,6 +323,7 @@ class FocusTimerView extends ItemView {
       });
     }
     
+    if (state.active && state.paused) statusText.textContent = `${t("paused")} · ${statusText.textContent}`;
     const circleContainer = timerSection.createDiv("focus-timer-plugin-circle-container");
     
     // 初始化休息相关变量
@@ -382,13 +385,14 @@ class FocusTimerView extends ItemView {
       endRestBtn.onclick = () => this.plugin.stopRest();
     } else if (state.active) {
       // 保存开始时间和计划时长，用于本地计时
+      this.focusState = state;
       this.startTime = new Date(state.start).getTime();
       this.plannedSec = state.plannedSec;
       this.timerMode = state.mode || "countdown";
       const isStopwatch = this.timerMode === "stopwatch";
       
       const now = Date.now();
-      const elapsed = Math.floor((now - this.startTime) / 1000);
+      const elapsed = Math.floor(focusElapsedMs(this.focusState, now) / 1000);
       
       // 判断是否超时
       let isOvertime = false;
@@ -492,11 +496,15 @@ class FocusTimerView extends ItemView {
       const allowEarly = this.plugin.settings.allowCompleteCountdownEarly !== false;
       const isCountdown = this.timerMode === "countdown";
       const showComplete = allowEarly || !isCountdown || isOvertime;
+      const pauseBtn = btnContainer.createEl("button", {
+        text: t(state.paused ? "resume" : "pause"), cls: "focus-timer-plugin-btn-secondary"
+      });
+      pauseBtn.onclick = () => this.plugin.setFocusPaused(!state.paused);
       if (showComplete) {
         const completeBtn = btnContainer.createEl("button", { text: t("complete"), cls: "focus-timer-plugin-btn-primary" });
         completeBtn.onclick = () => this.plugin.stopFocus("completed");
       }
-      const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-timer-plugin-btn-secondary" });
+      const abandonBtn = btnContainer.createEl("button", { text: t("abandon"), cls: "focus-timer-plugin-btn-danger" });
       abandonBtn.onclick = () => this.plugin.stopFocus("abandoned");
     } else {
       // 非专注状态
