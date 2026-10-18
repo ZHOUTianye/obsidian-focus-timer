@@ -1,5 +1,5 @@
 const obsidian = require("obsidian");
-const { ItemView, Notice } = obsidian;
+const { ItemView, Notice, setIcon, Component } = obsidian;
 const {
   VIEW_TYPE,
   MAX_SUGGEST_TASKS,
@@ -7,8 +7,9 @@ const {
   FOCUS_NOTE_MAX_OTHER
 } = require("./constants.js");
 const { t, getLanguage } = require("./i18n.js");
+const { ConfirmModal } = require("./modal.js");
+const { readState, readSessions, deleteSession } = require("./data.js");
 const { focusElapsedMs } = require("./timer-state.js");
-const { readState, readSessions } = require("./data.js");
 const { formatTime, formatTimeChinese, formatTimeShort, getDateKey } = require("./format.js");
 const { calculateStats } = require("./stats.js");
 const { createLineChart, calculateChartData, chartRangeToLabelAndCalculation, defaultChartRangeToShortKey, CHART_RANGE_CONFIG } = require("./chart.js");
@@ -44,6 +45,9 @@ class FocusTimerView extends ItemView {
   }
 
   async onOpen() {
+    this.registerEvent(this.plugin.app.workspace.on("focus-timer:sessions-changed", () => {
+      this.render().catch(error => console.error("Focus view refresh failed", error));
+    }));
     await this.render();
     this.startTimer(); // 启动计时器更新
     
@@ -1067,6 +1071,23 @@ class FocusTimerView extends ItemView {
           text: entryText,
           cls: `focus-timer-plugin-history-entry ${session.status === "completed" ? "focus-timer-plugin-status-completed" : "focus-timer-plugin-status-abandoned"}`
         });
+        const deleteBtn = item.createEl("button", { cls: "focus-timer-plugin-delete-session" });
+        deleteBtn.setAttribute("aria-label", t("deleteSession"));
+        deleteBtn.setAttribute("title", t("deleteSession"));
+        setIcon(deleteBtn, "trash-2");
+        deleteBtn.onclick = () => new ConfirmModal(
+          this.plugin.app, t("deleteSession"),
+          t("deleteSessionConfirm").replace("{task}", noteText),
+          async () => {
+            try {
+              await deleteSession(this.plugin.app, session.id);
+              new Notice(t("deleteSessionSuccess"));
+            } catch (error) {
+              console.error("Focus session delete failed", error);
+              new Notice(t("deleteFailed"));
+            }
+          }
+        ).open();
       });
     });
   }
@@ -1080,10 +1101,13 @@ class FocusTimerView extends ItemView {
       const chartContent = document.createElement("div");
       chartContent.className = "focus-timer-plugin-chart-content";
       
+      const chartLifecycle = this.addChild(new Component());
+      chartLifecycle.register(() => chartModal.remove());
+      const closeChart = () => this.removeChild(chartLifecycle);
       const closeBtn = document.createElement("button");
       closeBtn.textContent = t("close");
       closeBtn.className = "focus-timer-plugin-chart-close-btn";
-      closeBtn.onclick = () => chartModal.remove();
+      closeBtn.onclick = closeChart;
       
       const title = document.createElement("h3");
       title.textContent = t("focusTrendChart");
@@ -1114,7 +1138,7 @@ class FocusTimerView extends ItemView {
       // 点击模态框背景（非内容区域）可以关闭
       chartModal.onclick = (e) => {
         if (e.target === chartModal) {
-          chartModal.remove();
+          closeChart();
         }
       };
       
@@ -1138,6 +1162,14 @@ class FocusTimerView extends ItemView {
           this.createLineChart(container, data, opts);
         });
       };
+      chartLifecycle.registerEvent(this.plugin.app.workspace.on("focus-timer:sessions-changed", async () => {
+        try {
+          const latest = await readSessions(this.plugin.app);
+          if (!chartModal.isConnected) return;
+          charts.forEach(chart => { chart.data = calculateChartData(latest, chart.rangeKey); });
+          redrawAll();
+        } catch (error) { console.error("Focus chart refresh failed", error); }
+      }));
       showTimeCb.addEventListener("change", redrawAll);
       showCountCb.addEventListener("change", redrawAll);
       
@@ -1187,7 +1219,7 @@ class FocusTimerView extends ItemView {
           // 绘制图表
           if (chartData && Array.isArray(chartData) && chartData.length > 0) {
             try {
-              charts.push({ container: chartContainer, data: chartData });
+              charts.push({ container: chartContainer, data: chartData, rangeKey });
               this.createLineChart(chartContainer, chartData, { showTime: showTimeCb.checked, showCount: showCountCb.checked });
             } catch (drawError) {
               const errorMsg = document.createElement("div");

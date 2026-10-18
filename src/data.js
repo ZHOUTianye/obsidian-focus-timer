@@ -359,6 +359,7 @@ async function writeSessions(app, sessions) {
     data.sessions = sessions;
     await writeJson(app, DATA_PATH, data);
   });
+  app.workspace.trigger("focus-timer:sessions-changed");
 }
 
 async function readSettings(app) {
@@ -387,6 +388,21 @@ async function appendSession(app, session) {
     data.sessions = sessions;
     await writeJson(app, DATA_PATH, data);
   });
+  app.workspace.trigger("focus-timer:sessions-changed");
+}
+
+/** Delete by stable id inside the shared read/modify/write lock. */
+async function deleteSession(app, id) {
+  const deleted = await dataFileLock.runWithLock(async () => {
+    const data = await readDataFileForWrite(app);
+    const remaining = data.sessions.filter(session => session.id !== id);
+    if (remaining.length === data.sessions.length) return false;
+    data.sessions = remaining;
+    await writeJson(app, DATA_PATH, data);
+    return true;
+  });
+  if (deleted) app.workspace.trigger("focus-timer:sessions-changed");
+  return deleted;
 }
 
 // Commit the record and final state together; a failed write leaves the timer active.
@@ -412,6 +428,7 @@ module.exports = {
   readSettings,
   writeSettings,
   appendSession,
+  deleteSession,
   finishFocusSession,
   // exported for testing
   isValidSession,
