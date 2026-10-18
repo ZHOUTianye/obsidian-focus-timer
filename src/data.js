@@ -389,6 +389,17 @@ async function appendSession(app, session) {
   });
 }
 
+// Commit the record and final state together; a failed write leaves the timer active.
+async function finishFocusSession(app, session, nextState) {
+  await dataFileLock.runWithLock(async () => {
+    const data = await readDataFileForWrite(app);
+    if (!data.state.active || data.state.resting || data.state.start !== session.start) return;
+    if (!data.sessions.some(item => item.id === session.id)) data.sessions.push(session);
+    data.state = { ...data.state, ...nextState };
+    await writeJson(app, DATA_PATH, data);
+  });
+}
+
 module.exports = {
   DataFileCorruptError,
   ensureDataFileExists,
@@ -401,6 +412,7 @@ module.exports = {
   readSettings,
   writeSettings,
   appendSession,
+  finishFocusSession,
   // exported for testing
   isValidSession,
   normalizeDataFile,
